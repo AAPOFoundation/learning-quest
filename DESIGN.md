@@ -1,0 +1,33 @@
+# Pocket Reserve design language (extracted from live CSS, 16 Oct 2026)
+Source: https://aapofoundation.github.io/pocket-reserve/ (index.html, landing CSS). Nothing was changed there; assets were not copied (only tokens/patterns re-implemented).
+
+**Mood:** dark night-blue "field" panels with brass/gold trim, warm parchment text, quiet and unhurried. Calm, craft-like, "field guide" feel.
+
+**Palette:** ink #f6efe0, ink-dim #e8dcc4, ghost-ink #f4ead8; gold #d7b56a, gold-hi #f3e2b0, gold-lo #8a6528; brass #c8a86a, brass-mid #8a6528, brass-lo #6b4a0e, brass-ink #2a1d0a; panel #0e141c, panel-deep #0a0f15, panel-lift #121a24; field gradient 180deg #1c2733 → #0e141c 46% → #0a0f15.
+**Fonts:** Nunito (variable, body, weights 700-800) and Cormorant Garamond (display: kickers, headings, uppercase with .14em tracking). Fallbacks Palatino/Georgia, system-ui.
+**Shape/space:** radius 12px, fluid gutter clamp(16px,4vw,56px), content max ~1100px, tap targets ≥ 44-56px.
+**Components:** 
+- Panel (`h2-panel`): field gradient, 1px brass border (light top, dark bottom), double inset hairline, tiny gold corner ticks (8px), film-grain overlay at .42, layered drop shadow.
+- Primary button: gold gradient #ecd28a→#c9a24f→#b08a38, dark text #1a1208, brass-lo border, inset highlight, 1px press on :active. Ghost button: panel fill, brass-mid border, ghost-ink text.
+- Topbar: 44-48px, panel-deep, round brass-ringed mark badge + brand name.
+- Kicker: small uppercase Cormorant, gold-hi, letter-spacing .14em. Gold rule: gradient line fading at both ends.
+- Stars: gold-gradient 5-point star with brown outline; empty star dark with brass outline (used as progress/rating).
+- Motion: subtle, .1-.14s transitions on colour/transform only.
+**Copy tone:** short, warm, plain sentences; invitational ("Plant the first seed", "Continue your island"); reassures about saving ("saves in this browser, never sent anywhere"); a quiet footnote line at the end.
+**Adaptation here:** chapters→levels, stars→level stars, island→skills map, "Continue" CTA, same save note. Nothing in the originals' art was reused.
+
+## v2: exploration edition (16 Oct 2026)
+Presentation follows Pocket Reserve's Civilization-7-style strategy-map look, drawn procedurally on canvas (no external assets): painterly pointy-top hex terrain with soft shading and brush-stroke texture, foam shorelines, brass-trimmed gold UI, leader-portrait NPC cards, fog of war that lifts as regions unlock. Shining Force 2 is used only as the game mechanic: a hero walks the map, enters towns, talks to NPCs, fights gatekeepers (the quizzes), opens chests, and a party HUD shows progress.
+
+**Files:** shared/art.js (terrain, sprites, portraits), shared/world.js (map, hero, dialogue, quests, HUD), shared/engine.js (v1 lessons/quizzes/boss/scoring, now rendering into an overlay), shared/world.css, <app>/world.js (regions, NPCs, names), <app>/content.js (unchanged v1 content).
+**Progress:** same localStorage key as v1 (`learning-apps.<app>`); v1 progress loads automatically and the world adds a `w` field (position, chests, caches, taught, simulators).
+**Layout:** overworld 36x26 hexes with 8 nodes (7 regions + citadel) joined by a road; each node opens a 15x12-hex town (teacher, guide, Trial Hall + gatekeeper, chest, optional simulator building, south gate).
+
+## v3: AI safety path (16 Oct 2026)
+Worlds: `ai-foundations/`, `ai-evals/`, `ai-safety/` (same exploration engine as before; `shared/worldkit.js` builds region/NPC config from compact specs). Home page lists them in order; `portfolio-guide/` is separate.
+**Python challenges:** `shared/code.js` + `shared/pyworker.js` run Pyodide 0.26.4 (jsDelivr CDN) in a Web Worker (8 s timeout, worker restarted if code loops). A `t:'code'` question has starter code, visible and hidden tests, progressive hints and a model solution; it is appended as the last question of a level in `<world>/challenges.js`. Offline: the question offers Retry or Skip (counts as unsolved). Solved ids are stored in the existing progress save under `code`.
+**Narration:** new worlds use text captions only (`narration/lines2.js`); no audio or video files exist for them.
+**Content rules:** cautious wording, contested points marked, no invented citations, toy models and toy numbers only for anything hazardous. Reading list in `ai-safety/content.js` (links checked 16 Oct 2026).
+
+## v4: depth pass (17 Oct 2026)
+`shared/extrakit.js` + `<world>/extra.js` add one deeper lesson section and two questions per level, plus six more Python challenges (ev-l4b, ev-l7b, af-l2b, af-l5b, as-l4b, as-l5b). `shared/review.js` adds a spaced-review deck (1/3/7/14/30-day boxes, stored in localStorage `learning-apps.<app>.review`), a 10-question boss round, and (evals and safety worlds) a "Real-model practice" tab of Inspect exercises done outside the game. Pause menu lists both. Content is unreviewed by experts.
