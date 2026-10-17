@@ -34,4 +34,6 @@ A.tagline=words+(n>=10?' short levels, from your first lines of Python to buildi
 A.badges.forEach(function(b){if(b.id==='all'){b.desc='Clear all '+n+' levels'}});
 if(W.castle&&W.castle.herald&&W.castle.herald.hint)W.castle.herald.hint=W.castle.herald.hint.replace(/the seven regions/,'the '+words.toLowerCase()+' regions');
 if(W.intro&&W.intro[0])W.intro[0]=W.intro[0].replace(/seven regions/,n+' regions');
+/* simulators */
+if(window.AISims){var ix=A.levels.map(function(l){return l.id}).indexOf('l4');if(ix>=0)W.regions[ix].sim={name:'The Threshold Workshop',kind:'custom',building:'guild',blurb:'Slide a threshold and watch precision, recall and the confusion matrix move.',render:function(h){AISims.confusion(h,{bad:'bad answers',who:'an automatic grader',missName:'missed bad answer',alarmName:'false alarm'})}}}
 })();
