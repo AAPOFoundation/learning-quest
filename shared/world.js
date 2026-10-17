@@ -20,8 +20,9 @@ function chime(){blip(660,.25,.04,'triangle',880);setTimeout(function(){blip(990
 /* ---------- scenes ---------- */
 var BIG=[[4,26],[13,27],[22,25],[31,27],[40,25],[42,17],[33,13],[24,15],[15,12],[7,8],[17,4]];
 var BASE8=[[4,21],[12,22],[20,19],[28,21],[31,12],[21,9],[11,10],[5,4]];
-var NODES=NR>7?BIG.slice(0,NR).concat([BIG[10]]):NR<7?BASE8.slice(0,NR).concat([BASE8[7]]):BASE8;
-var MAPC=NR>7?46:36,MAPR=NR>7?31:26;
+var BIG12=[[4,28],[13,29],[22,27],[31,29],[40,27],[47,20],[38,16],[29,18],[20,15],[11,11],[17,5],[28,6]];
+var NODES=NR>10?BIG12.slice(0,NR+1):NR>7?BIG.slice(0,NR).concat([BIG[10]]):NR<7?BASE8.slice(0,NR).concat([BASE8[7]]):BASE8;
+var MAPC=NR>10?52:NR>7?46:36,MAPR=NR>10?34:NR>7?31:26;
 function bio(i){return i<NR?C.regions[i].biome:C.castle.biome}
 function groundOf(b,h){return b==='desert'?'sand':b==='tundra'?(h<.22?'pine':'snow'):b==='marsh'?'marsh':b==='crown'?'crown':b==='forest'?(h<.55?'forest':'grass'):b==='hills'?(h<.5?'hills':'grass'):b==='highland'?(h<.3?'hills':h<.5?'pine':'grass'):b==='meadow'?(h<.1?'forest':'grass'):'grass'}
 function inb(sc,c,r){return c>=0&&r>=0&&c<sc.cols&&r<sc.rows}
