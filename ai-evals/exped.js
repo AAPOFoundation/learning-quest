@@ -1,0 +1,32 @@
+/* Expedition for AI Evals: real-model practice with Inspect, unlocking as regions are cleared. */
+(function(){var A=window.APP;
+A.expedition={title:'From the game to a real eval',
+intro:'The game teaches the ideas with toy data. The Expedition is where you do the same things with a real model on your own computer, using the free Inspect framework. Each stage matches a region you have cleared, so you apply an idea while it is fresh.',
+stages:[
+{id:'e1',t:'Your first real eval',needs:['l2'],goal:'Learn the shape of an Inspect task: a dataset of questions and answers, a solver that asks the model, and a scorer. First a free dry run, then a real model.',
+ files:['first_eval.py'],
+ steps:['Download <code>first_eval.py</code> into your expedition folder and open it in a text editor (Notepad works; VS Code is nicer).','Add 7 more questions with short, distinctive answers (you wrote cases in <b>Test cases and rubrics</b>; use the same care).','Dry run with the fake model: <code>inspect eval first_eval.py --model mockllm/model</code>. The score will be about zero. That is expected: it proves the pipeline works.','Run with a real model, then open <code>inspect view</code> and read every sample.'],
+ run:'inspect eval first_eval.py --model mockllm/model\ninspect eval first_eval.py --model <provider/model-name>\ninspect view',
+ done:'you can open the log, find one failed sample, and say whether the model, the grader or the question caused the failure.',ask:'Which sample failed and why (model, grader or question)?'},
+{id:'e2',t:'A model-graded rubric, and a check on the grader',needs:['lJ'],goal:'Grade open-ended answers with a model judge, then measure the judge against your own labels, as in the Tribunal Terraces.',
+ code:'from inspect_ai import Task, task\nfrom inspect_ai.dataset import Sample\nfrom inspect_ai.scorer import model_graded_qa\nfrom inspect_ai.solver import generate\n\n@task\ndef rubric_eval():\n    return Task(\n        dataset=[Sample(input="Explain in two sentences why a hexagonal tile pattern wastes no space.",\n                        target="Mentions that regular hexagons tile the plane with no gaps, and that they approximate circles with less perimeter than squares or triangles.")],\n        solver=generate(),\n        scorer=model_graded_qa(),\n    )',
+ run:'inspect eval rubric_eval.py --model <provider/model-name> --model-role grader=<provider/judge-model>\ninspect view',
+ steps:['Write 20 questions whose answers need a sentence or two, each with a target that describes what a good answer must contain.','Run the task. Then read the 20 outputs and write your own pass or fail for each, before looking at the judge.','Compare with the judge using your agreement code from the game (raw agreement and kappa), and list the cases where they disagree.'],
+ game:'your <code>parse_verdict</code>, kappa and <code>disagreement_by_tag</code> functions.',
+ done:'you can state the judge\'s agreement with you and describe one case where the judge was wrong.',ask:'Agreement (and kappa if you computed it) and one disagreement?'},
+{id:'e3',t:'Measure the noise',needs:['lS'],goal:'See how much a score moves by chance, and whether a difference between two models or prompts is bigger than that noise.',
+ run:'inspect eval first_eval.py --model <provider/model-name> --epochs 5 --temperature 0.7\ninspect eval first_eval.py --model <other-model-or-prompt> --epochs 5 --temperature 0.7',
+ steps:['Run the same eval several times with the <code>--epochs</code> option (it repeats each question) at a temperature above zero.','Compute the pass rate and a 95% interval using the interval code you wrote in the Variance Fens.','Compare two models, or two prompts. Say whether the difference is larger than the intervals, using the paired comparison idea from the same region.'],
+ game:'your interval, paired-difference and bootstrap functions.',
+ done:'you can say "A beats B" or "I cannot tell" and show the numbers behind it.',ask:'Your two scores with intervals, and your conclusion?'},
+{id:'e4',t:'An agent trial',needs:['lA'],goal:'Run a tiny agent that must use a tool, then grade the trajectory as well as the answer, as in the Agent Proving Grounds. It runs in-process with fake data: no Docker, no shell, safe on Windows.',
+ files:['agent_eval.py'],
+ run:'inspect eval agent_eval.py --model mockllm/model\ninspect eval agent_eval.py --model <provider/model-name> --epochs 3\ninspect view',
+ steps:['Download <code>agent_eval.py</code>, run the dry run, then run it with a real model and 3 epochs.','In <code>inspect view</code> open three transcripts. Did the agent call the tool? With the right argument? How many steps did it take?','Add one more sample with a trap (for example an item that is not in the price list) and see whether the agent says unknown or invents a price.'],
+ game:'<code>steps_matched</code>, <code>grade_run</code> and <code>reliability</code> from the Python challenges.',
+ done:'you can describe what the agent did step by step in one run, and say how reliable it was across its 3 runs.',ask:'What did the agent do, and how reliable was it over 3 runs?'},
+{id:'e5',t:'Capstone: a small public eval',needs:['l7'],goal:'Make evidence that you can do the work: a narrow, harmless eval that a stranger can rerun.',
+ steps:['Pick a narrow question you know well and that is harmless (for example reading Australian planning or building-code text accurately).','Write 50 or more original items, a rubric, a grader check against your own labels and an uncertainty estimate.','Publish the code and a one-page write-up with limitations on a public repository, with no keys in it.'],
+ done:'a stranger can rerun it and finds a limitations section that says what the eval cannot show.',ask:'Where is it (a short description), and what are its main limitations?'}],
+safety:'Keep every prompt harmless. Do not build evals that need dangerous content, and do not send secrets or personal data to a model. Check the provider\'s data and pricing terms before you start.'};
+})();
