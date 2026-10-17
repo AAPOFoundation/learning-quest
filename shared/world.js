@@ -76,6 +76,7 @@ function buildTown(i){
   add({type:'npc',role:'boss',c:7,r:3,block:true,name:R.boss.name,sp:R.boss});
   add({type:'npc',role:'guide',c:mir(10,i),r:5,block:true,name:R.herald.name,sp:R.herald});
   add({type:'chest',kind:'chest',role:'chest',c:2,r:4,block:true,i:i});
+  if(window.Party)Party.cameo(add,i,true,mir);
  }else{
   add({type:'building',kind:R.hallKind,role:'hall',c:7,r:2,block:true,name:R.hall});
   add({type:'npc',role:'gate',c:7,r:3,block:true,name:R.gate.name,sp:R.gate});
@@ -83,6 +84,7 @@ function buildTown(i){
   add({type:'npc',role:'guide',c:mir(10,i),r:5,block:true,name:R.guide.name,sp:R.guide});
   add({type:'chest',kind:'chest',role:'chest',c:mir(2,i),r:4,block:true,i:i});
   if(R.sim)add({type:'building',kind:R.sim.building,role:'sim',c:mir(12,i),r:3,block:true,name:R.sim.name});
+  if(window.Party)Party.cameo(add,i,false,mir);
  }
  for(c=0;c<cols;c++)for(r=0;r<rows;r++){if(!sc.pass[c][r]||res[c+','+r])continue;var rr=Math.sqrt(Math.pow((c+0.5*(r&1)-7)/7.4,2)+Math.pow((r-5.5)/5.9,2));
   if(rr<.7||plz[c+','+r])continue;var near=false;O.forEach(function(o){if(Art.hdist(c,r,o.c,o.r)<=1)near=true});if(near)continue;
@@ -174,6 +176,7 @@ function interact(o){
  else if(o.role==='boss')bossTalk();
  else if(o.role==='sim')simTalk(region());
  else if(o.role==='chest')chestOpen(o);
+ else if(o.role==='party'||o.role==='workshop')Party.talk(o,{say:say,ask:ask,openOv:openOv,closeOv:closeOv,wrap:wrap,chime:chime,allDone:allDone,region:region,hud:hud});
  else if(o.role==='guide'){var sp=o.sp,hint=region()>=NR?C.castle.herald.hint:C.regions[region()].guide.hint;say(sp,['Hello there, traveller.',hint])}}
 function actionKey(){if(st.mode==='dlg')return adv();if(st.mode!=='play')return;var h=st.hero,best=null;for(var d=0;d<6;d++){var n=neigh(h.c,h.r,d),o=objAt(n[0],n[1]);if(interactive(o)){var pref=(d===0||d===2||d===4)===(h.face>0);if(!best||pref)best=o}}
  if(best)interact(best)}
@@ -192,13 +195,14 @@ function objective(){var w=PW(),k=-1,i;for(i=0;i<NR;i++)if(incomplete(i)){k=i;br
  o=find('sim');return {text:'Visit '+R.sim.name+'.',target:{sid:sc.id,c:o.c,r:o.r}}}
 /* ---------- HUD ---------- */
 function buildHud(){var h=$('#hud');
- h.innerHTML='<div id="lt"><div id="party" class="panel"><img class="hp" alt="" src="'+Art.portrait(C.hero,60)+'"><div class="pi"><div class="nm">'+esc(C.heroName)+'</div><div class="rk" id="rk"></div><div class="bar"><i id="xb" style="width:0"></i></div><div class="st" id="stt"></div><div id="pm"></div></div></div>'
+ h.innerHTML='<div id="lt"><div id="party" class="panel"><img class="hp" alt="" src="'+Art.portrait(C.hero,60)+'"><div class="pi"><div class="nm">'+esc(C.heroName)+'</div><div class="rk" id="rk"></div><div class="bar"><i id="xb" style="width:0"></i></div><div class="st" id="stt"></div><div id="pm"></div><div id="pc"></div></div></div>'
  +'<div id="quest" class="panel" role="button" tabindex="0" title="Open quest log"><p class="kicker">Next objective</p><div id="qt"></div></div></div>'
  +'<div id="tr"><canvas id="mm" width="300" height="220" title="Mini-map (tap for full map)"></canvas><div class="row"><button class="ib" id="bmap" title="Map (M)">🗺</button><button class="ib" id="bq" title="Quest log (J)">📜</button><button class="ib" id="bsnd" title="Sound">🔊</button><button class="ib" id="bmenu" title="Menu (Esc)">☰</button></div></div>'
  +'<div id="area"><p class="kicker"></p><b></b></div>'
  +'<div id="pad">'+[['↖',3],['↗',2],['←',1],['→',0],['↙',5],['↘',4]].map(function(a){return '<button class="ib" data-d="'+a[1]+'" aria-label="Move '+['east','west','north-east','north-west','south-east','south-west'][a[1]]+'">'+a[0]+'</button>'}).join('')+'</div>'
  +'<div id="acts"><button class="ib" id="bact" aria-label="Talk or interact">A</button></div>';
  $('#pm').innerHTML=C.regions.map(function(R,i){return '<img alt="'+esc(R.gate.name)+'" title="'+esc(R.gate.name)+'" src="'+Art.portrait(R.gate.look,24)+'">'}).join('');
+ if(window.Party&&$('#pc'))Party.hud($('#pc'));
  $('#bmap').onclick=mapScreen;$('#mm').onclick=mapScreen;$('#bq').onclick=questLog;$('#quest').onclick=questLog;$('#bmenu').onclick=menu;$('#bsnd').onclick=toggleSound;$('#bact').onclick=function(){gest=true;actionKey()};
  [].forEach.call(document.querySelectorAll('#pad button'),function(b){var d=+b.dataset.d;b.addEventListener('pointerdown',function(e){e.preventDefault();gest=true;if(st.mode==='play')st.pad=d});['pointerup','pointerleave','pointercancel'].forEach(function(ev){b.addEventListener(ev,function(){if(st.pad===d)st.pad=-1})})});
  updSound()}
@@ -213,7 +217,7 @@ function showBanner(t,s){var a=$('#area');a.querySelector('.kicker').textContent
 /* ---------- menus ---------- */
 function nextTab(){var t=(A.tabs||[]).filter(function(x){return x.id==='next'})[0];return t||null}
 function tabScreen(id){var t=(A.tabs||[]).filter(function(x){return x.id===id})[0];if(!t)return;openOv(function(){wrap('<div id="rd"></div><button class="btn btn-ghost" id="bk2">Back</button>');t.render($('#rd'),{award:E.award,save:E.save,toast:E.toast,P:P()});$('#bk2').onclick=closeOv})}
-function extraTabBtns(){return (A.tabs||[]).filter(function(x){return x.id==='review'||x.id==='practice'||x.id==='scratch'}).map(function(t){return '<button class="btn btn-ghost" data-m="tab:'+t.id+'">'+esc(t.label)+'</button>'}).join('')}
+function extraTabBtns(){return (A.tabs||[]).filter(function(x){return x.id==='review'||x.id==='practice'||x.id==='scratch'||x.id==='party'||x.id==='satchel'}).map(function(t){return '<button class="btn btn-ghost" data-m="tab:'+t.id+'">'+esc(t.label)+'</button>'}).join('')}
 function readScreen(){var t=nextTab();if(!t)return;openOv(function(){wrap('<div id="rd"></div><button class="btn btn-ghost" id="bk2">Back</button>');t.render($('#rd'),{award:E.award,save:E.save,toast:E.toast,P:P()});$('#bk2').onclick=closeOv})}
 function menu(){if(st.mode!=='play')return;openOv(function(){wrap('<section class="panel"><p class="kicker">Paused</p><h2>'+esc(A.title)+'</h2><div class="row" style="flex-direction:column"><button class="btn btn-primary" data-m="x">Resume</button><button class="btn btn-ghost" data-m="q">Quest log</button><button class="btn btn-ghost" data-m="m">World map</button><button class="btn btn-ghost" data-m="b">Badges</button><button class="btn btn-ghost" data-m="s">Skills map</button><button class="btn btn-ghost" data-m="h">How to play</button>'+(nextTab()?'<button class="btn btn-ghost" data-m="r">'+esc(nextTab().label)+'</button>':'')+extraTabBtns()+'<button class="btn btn-ghost" data-m="v">Save now</button><button class="btn btn-ghost" data-m="t">Title screen</button><a class="btn btn-ghost" href="../index.html">All games</a></div></section><p class="disc">'+esc(A.disclaimer)+'</p>');
   $('#ovbody').onclick=function(e){var b=e.target.closest('[data-m]');if(!b)return;var m=b.dataset.m;if(m==='x')closeOv();else if(m==='v'){E.save();E.toast('Saved in this browser')}else if(m==='t'){closeOv();title()}else if(m.indexOf('tab:')===0){closeOv();tabScreen(m.slice(4))}else{closeOv();({q:questLog,m:mapScreen,b:badgeScreen,s:skillScreen,h:help,r:readScreen})[m]()}}})}

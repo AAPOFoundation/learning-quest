@@ -13,6 +13,7 @@ body.world{height:100vh;height:100dvh;overflow:hidden;position:fixed;inset:0;wid
 #party .bar{height:8px;margin:4px 0}
 #party .st{font-size:12px;color:var(--ink-dim);display:flex;gap:10px;flex-wrap:wrap}
 #pm{display:flex;gap:3px;margin-top:5px}
+#pc{display:flex;gap:4px;margin-top:4px}#pc img{width:26px;height:26px;border-radius:6px;border:1px solid var(--gold);background:#0e141c}
 #pm img{width:24px;height:24px;border-radius:50%;border:1px solid var(--brass-mid);filter:grayscale(1) brightness(.55);opacity:.7}
 #pm img.on{filter:none;opacity:1;border-color:var(--gold)}
 #quest{width:min(300px,100%);cursor:pointer}

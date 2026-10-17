@@ -10,20 +10,24 @@ var HARNESS=[
 '        if tb.tb_frame.f_code.co_filename=="<your code>": ln=tb.tb_lineno',
 '        tb=tb.tb_next',
 '    return "%s: %s%s"%(type(e).__name__,e,(" (line %d)"%ln if ln else ""))',
-'def _exec(code):',
+'def _exec(code,prelude=""):',
 '    ns={"__name__":"__main__"}',
 '    buf=io.StringIO()',
 '    err=None',
 '    with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):',
-'        try: exec(compile(code,"<your code>","exec"),ns)',
-'        except BaseException as e: err=_fmt(e)',
+'        try:',
+'            if prelude: exec(compile(prelude,"<satchel>","exec"),ns)',
+'        except BaseException as e: err="Problem in your satchel code: "+type(e).__name__+": "+str(e)',
+'        if err is None:',
+'            try: exec(compile(code,"<your code>","exec"),ns)',
+'            except BaseException as e: err=_fmt(e)',
 '    return ns,buf.getvalue(),err',
-'def run_code(code):',
-'    ns,out,err=_exec(code)',
+'def run_code(code,prelude=""):',
+'    ns,out,err=_exec(code,prelude)',
 '    return json.dumps({"out":out[:4000],"err":err})',
-'def run_tests(code,tests_json):',
+'def run_tests(code,tests_json,prelude=""):',
 '    tests=json.loads(tests_json)',
-'    ns,out,err=_exec(code)',
+'    ns,out,err=_exec(code,prelude)',
 '    if err: return json.dumps({"out":out[:4000],"err":err,"res":[]})',
 '    res=[]',
 '    for t in tests:',
@@ -45,5 +49,5 @@ if(self.loadPyodide){
  loadPyodide({indexURL:PYV}).then(function(p){py=p;py.runPython(HARNESS);postMessage({type:'ready'})}).catch(function(e){postMessage({type:'fatal',msg:String(e&&e.message||e)})});
 }
 onmessage=function(ev){var m=ev.data;if(!py){postMessage({type:'result',id:m.id,error:'Python engine not ready'});return}
- try{var f=py.globals.get(m.kind==='tests'?'run_tests':'run_code');var r=m.kind==='tests'?f(m.code,m.tests):f(m.code);f.destroy&&f.destroy();postMessage({type:'result',id:m.id,data:JSON.parse(r)})}
+ try{var f=py.globals.get(m.kind==='tests'?'run_tests':'run_code');var r=m.kind==='tests'?f(m.code,m.tests,m.prelude||''):f(m.code,m.prelude||'');f.destroy&&f.destroy();postMessage({type:'result',id:m.id,data:JSON.parse(r)})}
  catch(e){postMessage({type:'result',id:m.id,error:String(e&&e.message||e)})}};
