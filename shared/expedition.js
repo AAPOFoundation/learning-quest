@@ -26,6 +26,7 @@ function render(el,ctx){var P=typeof ctx.P==='function'?ctx.P():ctx.P;P.exp=P.ex
  h+=card('camp','Base camp: set up (about 20 minutes, once)',true,body,'What did you see when you ran the doctor script?',false,'');
  X.stages.forEach(function(st,i){var op=open(st),b='<p>'+st.goal+'</p><ol>'+st.steps.map(function(s){return '<li>'+s+'</li>'}).join('')+'</ol>';
   if(st.files&&st.files.length)b+='<p>'+st.files.map(function(f){return '<button class="btn btn-ghost btn-sm" data-dl="'+f+'">Download '+esc(f)+'</button> <button class="btn btn-ghost btn-sm" data-show="'+f+'">Show code</button>'}).join(' ')+'</p><div data-view="'+(st.files[0])+'"></div>';
+  if(st.play)b+='<p><button class="btn btn-primary btn-sm" data-play="'+st.play+'">Run it here, in your browser</button> <span class="small dim">(no setup; the first run downloads the Python engine, about 10 MB)</span></p><div class="cq-exout" data-pout="'+st.play+'" aria-live="polite"></div>';
   if(st.run)b+=codeBlock(st.run,'Commands (run them in the folder that holds the file)');
   if(st.code)b+=codeBlock(st.code,'Starting code');
   if(st.game)b+='<p class="small dim">Reuse from the game: '+st.game+'</p>';
@@ -35,6 +36,7 @@ function render(el,ctx){var P=typeof ctx.P==='function'?ctx.P():ctx.P;P.exp=P.ex
  el.innerHTML=h;
  el.onclick=function(e){var t=e.target;
   if(t.dataset.copy){copyText(decodeURIComponent(t.dataset.copy),t);return}
+  if(t.dataset.play){var po=el.querySelector('[data-pout="'+t.dataset.play+'"]');if(!window.PyPlay){po.textContent='The Python component did not load.';return}getFile(t.dataset.play).then(function(x){window.PyPlay.run(x,po)},function(){po.textContent='Could not load the file.'});return}
   if(t.dataset.dl){download(t.dataset.dl,t);return}
   if(t.dataset.show){var v=el.querySelector('[data-view="'+t.dataset.show+'"]');if(v.innerHTML){v.innerHTML='';t.textContent='Show code';return}getFile(t.dataset.show).then(function(x){v.innerHTML='<pre class="ex" style="white-space:pre-wrap;max-height:320px;overflow:auto">'+esc(x)+'</pre>';t.textContent='Hide code'},function(){v.innerHTML='<p class="small dim">Could not load the file (offline?).</p>'});return}
   if(t.dataset.done){var id=t.dataset.done,ta=el.querySelector('[data-note="'+id+'"]'),note=(ta.value||'').trim(),msg=el.querySelector('[data-msg="'+id+'"]');
