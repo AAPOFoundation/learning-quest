@@ -13,8 +13,12 @@ lS:{name:'Variance Fens',biome:'marsh',accent:'#2f6a62',
 lJ:{name:'Tribunal Terraces',biome:'hills',accent:'#6a4a8f',
  teacher:{name:'Magistrate Soren',title:'Builder of Judges',look:lk('#d2a078','#d8d4cc','#5a3f7a','crown',true)},
  gate:{name:'Warden Briar',title:'Gatekeeper of the Terraces',look:lk('#bf8c62','#3a2a1a','#33425a','helm')},
- guide:{name:'Nell the Clerk',look:lk('#e8bd94','#2a1c14','#8a6a4a','hood'),hint:'Tip: a judge is a measuring instrument. Test it against your own labels, and swap the order of answers to see whether it just likes the first one.'},hall:'Judges\' Workshop',hallKind:'smithy',sim:null}};
-var ORDER=['lP','l1','l2','lS','l3','lJ','l4','l5','l6','l7'];
+ guide:{name:'Nell the Clerk',look:lk('#e8bd94','#2a1c14','#8a6a4a','hood'),hint:'Tip: a judge is a measuring instrument. Test it against your own labels, and swap the order of answers to see whether it just likes the first one.'},hall:'Judges\' Workshop',hallKind:'smithy',sim:null},
+lA:{name:'Agent Proving Grounds',biome:'desert',accent:'#8a5a2a',
+ teacher:{name:'Marshal Ketter',title:'Trainer of Trial Runs',look:lk('#d9a97c','#4a4a52','#3a5878','crown',true)},
+ gate:{name:'Warden Relay',title:'Gatekeeper of the Grounds',look:lk('#c99568','#14100e','#6a2f2a','helm')},
+ guide:{name:'Quill the Scout',look:lk('#e8bd94','#7a3b22','#4f6a58','cap'),hint:'Tip: grade where the agent ended up and what else it touched, and run each task more than once. One lucky run proves little.'},hall:'Obstacle Course',hallKind:'tower',sim:null}};
+var ORDER=['lP','l1','l2','lS','l3','lJ','l4','l5','l6','lA','l7'];
 var oldIds=A.levels.map(function(l){return l.id}),oldRegs=W.regions.slice();
 var byId={};A.levels.forEach(function(l,i){byId[l.id]={lv:l,rg:oldRegs[i],ix:i}});
 var lv=[],rg=[],map=[];
@@ -26,11 +30,11 @@ if(window.NARR&&window.NARR['ai-evals']){var o=window.NARR['ai-evals'],nn={},NN=
 /* skills map */
 var sk=A.skills,extra=[];
 if(N.lP)extra.push({level:'lP',name:'Python basics',note:'Variables, lists, loops, functions, simple probability'});
-var pos=[];sk.forEach(function(s){pos.push(s);if(s.level==='l2'&&N.lS)pos.push({level:'lS',name:'Statistics for evals',note:'Confidence intervals, paired comparison, bootstrap, clustering, power'});if(s.level==='l3'&&N.lJ)pos.push({level:'lJ',name:'Judge engineering',note:'Write a judge, swap test, kappa against your labels, iterate the rubric'})});
+var pos=[];sk.forEach(function(s){pos.push(s);if(s.level==='l2'&&N.lS)pos.push({level:'lS',name:'Statistics for evals',note:'Confidence intervals, paired comparison, bootstrap, clustering, power'});if(s.level==='l6'&&N.lA)pos.push({level:'lA',name:'Agent and multi-turn evals',note:'Trajectory and outcome grading, side effects, pass@k vs pass^k, sandboxes'});if(s.level==='l3'&&N.lJ)pos.push({level:'lJ',name:'Judge engineering',note:'Write a judge, swap test, kappa against your labels, iterate the rubric'})});
 A.skills=(N.lP?[extra[0]]:[]).concat(pos);
 /* wording that said seven */
-var n=A.levels.length,words={8:'Eight',9:'Nine',10:'Ten'}[n]||'Several';
-A.tagline=words+(n>=10?' short levels, from your first lines of Python to building a judge, and a final challenge where you design an eval yourself.':' short levels on how to measure whether an AI system is any good, and a final challenge where you design an eval yourself.');
+var n=A.levels.length,words={8:'Eight',9:'Nine',10:'Ten',11:'Eleven'}[n]||'Several';
+A.tagline=words+(n>=10?' short levels, from your first lines of Python to building a judge and grading AI agents, and a final challenge where you design an eval yourself.':' short levels on how to measure whether an AI system is any good, and a final challenge where you design an eval yourself.');
 A.badges.forEach(function(b){if(b.id==='all'){b.desc='Clear all '+n+' levels'}});
 if(W.castle&&W.castle.herald&&W.castle.herald.hint)W.castle.herald.hint=W.castle.herald.hint.replace(/the seven regions/,'the '+words.toLowerCase()+' regions');
 if(W.intro&&W.intro[0])W.intro[0]=W.intro[0].replace(/seven regions/,n+' regions');
