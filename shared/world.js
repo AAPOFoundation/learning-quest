@@ -18,13 +18,15 @@ var AC=null,muted=false,gest=false;try{muted=localStorage.getItem('learning-apps
 function blip(f,d,v,type,f2){if(muted||!gest)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();var o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.linearRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v||.025,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
 function chime(){blip(660,.25,.04,'triangle',880);setTimeout(function(){blip(990,.4,.035,'triangle')},120)}
 /* ---------- scenes ---------- */
-var NODES=[[4,21],[12,22],[20,19],[28,21],[31,12],[21,9],[11,10],[5,4]];
+var BIG=[[4,26],[13,27],[22,25],[31,27],[40,25],[42,17],[33,13],[24,15],[15,12],[7,8],[17,4]];
+var NODES=NR>7?BIG.slice(0,NR).concat([BIG[10]]):[[4,21],[12,22],[20,19],[28,21],[31,12],[21,9],[11,10],[5,4]];
+var MAPC=NR>7?46:36,MAPR=NR>7?31:26;
 function bio(i){return i<NR?C.regions[i].biome:C.castle.biome}
 function groundOf(b,h){return b==='desert'?'sand':b==='tundra'?(h<.22?'pine':'snow'):b==='marsh'?'marsh':b==='crown'?'crown':b==='forest'?(h<.55?'forest':'grass'):b==='hills'?(h<.5?'hills':'grass'):b==='highland'?(h<.3?'hills':h<.5?'pine':'grass'):b==='meadow'?(h<.1?'forest':'grass'):'grass'}
 function inb(sc,c,r){return c>=0&&r>=0&&c<sc.cols&&r<sc.rows}
 function mk2(cols,rows,v){var a=[];for(var c=0;c<cols;c++){a.push([]);for(var r=0;r<rows;r++)a[c].push(typeof v==='function'?v(c,r):v)}return a}
 function buildWorld(){
- var cols=36,rows=26,seed=11,sc={id:'w',cols:cols,rows:rows,seed:seed,title:A.title,sub:'World map',objs:[],roads:[],nodes:NODES,omap:{}};
+ var cols=MAPC,rows=MAPR,seed=11,sc={id:'w',cols:cols,rows:rows,seed:seed,title:A.title,sub:'World map',objs:[],roads:[],nodes:NODES,omap:{}};
  var road={},k,c,r,i,n=NODES.length;
  for(k=0;k<n-1;k++){var ln=Art.hline(NODES[k][0],NODES[k][1],NODES[k+1][0],NODES[k+1][1]);sc.roads.push(ln);ln.forEach(function(p){if(road[p[0]+','+p[1]]===undefined)road[p[0]+','+p[1]]=k})}
  sc.zone=mk2(cols,rows,0);sc.t=mk2(cols,rows,'grass');sc.pass=mk2(cols,rows,true);
@@ -143,10 +145,11 @@ function gateTalk(i){var R=C.regions[i],G=R.gate,done=levelDone(i);
  if(!done)say(G,['Halt, traveller. I am '+G.name+', '+G.title.toLowerCase()+'.','Answer the questions in the '+R.hall+' and score at least 60% to pass. There is no penalty for trying again.'],function(){ask(G,'Will you take the trial?',[{t:'Take the trial',fn:function(){trial(i)}},{t:'Not yet'}])});
  else say(G,['You have passed, traveller. The way onward is open, and a chest awaits you in this town.'],function(){ask(G,'Replay the trial for a better score?',[{t:'Replay the trial',fn:function(){trial(i)}},{t:'No, thanks'}])})}
 function trial(i){var G=C.regions[i].gate,was=levelDone(i);openOv(function(){E.level(i,'quiz')},function(){var now=levelDone(i);if(now&&!was){chime();var nx=i<NR-1?'The fog lifts from '+C.regions[i+1].name+'.':'The gates of the '+C.castle.name+' now stand open.';say(G,['Well fought. You may pass. '+nx,'Open the chest in this town, then take the south gate back to the map.'])}else if(!now)say(G,['Not this time. Re-read the lesson with the teacher and try again; there is no penalty.'])})}
-function simTalk(i){var R=C.regions[i],s=R.sim,sp={name:s.name,icon:({vault:'🏦',guild:'📏',smithy:'🔨',tower:'🗼'})[s.building]||'📜'};
- say(sp,[s.blurb+' (Example data, not advice. Nothing is ordered or connected.)'],function(){ask(sp,s.kind==='lesson'?'Climb the tower?':'Step inside?',[{t:'Enter',fn:function(){openSim(i)}},{t:'Not now'}])})}
+function simTalk(i){var R=C.regions[i],s=R.sim,sp={name:s.name,icon:({vault:'🏦',guild:'📏',smithy:'🔨',tower:'🗼',lab:'🧪',observatory:'🔭'})[s.building]||'📜'};
+ say(sp,[s.blurb+(s.render?' (A toy example with made-up numbers, not real model data.)':' (Example data, not advice. Nothing is ordered or connected.)')],function(){ask(sp,s.kind==='lesson'?'Climb the tower?':'Step inside?',[{t:'Enter',fn:function(){openSim(i)}},{t:'Not now'}])})}
 function openSim(i){var s=C.regions[i].sim,w=PW();w.sim[i]=1;
  if(s.kind==='lesson'){openOv(function(){E.level(i,'lesson')});return}
+ if(s.render){openOv(function(){wrap('<section class="panel"><p class="kicker">'+esc(C.regions[i].name)+'</p><h2>'+esc(s.name)+'</h2><p class="dim small">'+esc(s.blurb)+'</p></section><div id="simhost"></div>');var host=$('#simhost');s.render(host);host.insertAdjacentHTML('beforeend','<button class="btn btn-primary" id="simx" style="margin-top:12px">Leave</button>');$('#simx').onclick=function(){closeOv()}});return}
  var map={cash:'#s1',hedge:'#s2',trim:'#s3'};
  openOv(function(){wrap('<section class="panel"><p class="kicker">'+esc(C.regions[i].name)+'</p><h2>'+esc(s.name)+'</h2><p class="dim small">'+esc(s.blurb)+'</p></section><div id="simhost"></div>');
   var host=$('#simhost'),tab=A.tabs[0];tab.render(host,{award:E.award,save:E.save,toast:E.toast,P:P()});

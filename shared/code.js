@@ -21,12 +21,33 @@ function mount(q,el,ctx){
  var code=q.starter,hints=0,tries=0,solved=false,gaveUp=false;
  var vis=(q.tests||[]).filter(function(t){return !t.hidden}).length,hid=(q.tests||[]).length-vis;
  var h='<section class="panel codeq"><p class="small dim">'+esc(ctx.title)+' · question '+(ctx.idx+1)+' of '+ctx.total+'</p><div class="bar" style="margin-bottom:12px"><i style="width:'+Math.round(100*ctx.idx/ctx.total)+'%"></i></div><p class="kicker">Python challenge</p><h3 style="color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.4">'+esc(q.title)+'</h3><div class="cq-prompt">'+q.q+'</div>'
- +'<label class="small dim" for="cq-ed">Your code (Tab inserts spaces)</label><textarea id="cq-ed" class="cq-ed" spellcheck="false" autocapitalize="off" autocomplete="off" rows="14"></textarea>'
+ +'<label class="small dim" for="cq-ed">Your code (Tab indents, Shift+Tab un-indents, Enter keeps your indent)</label><div class="cq-edwrap"><div class="cq-gut" aria-hidden="true"><div class="cq-gin"></div></div><textarea id="cq-ed" class="cq-ed" spellcheck="false" autocapitalize="off" autocomplete="off" rows="14" wrap="off"></textarea></div>'
  +'<div class="row cq-btns"><button class="btn btn-ghost" id="cq-run">Run</button><button class="btn btn-primary" id="cq-chk">Check ('+vis+' shown, '+hid+' hidden tests)</button></div>'
  +'<div id="cq-out" class="cq-out" aria-live="polite"></div><div class="row cq-btns2"><button class="btn btn-ghost btn-sm" id="cq-hint">Hint</button><button class="btn btn-ghost btn-sm" id="cq-reset">Reset code</button><button class="btn btn-ghost btn-sm" id="cq-giveup">Show solution (counts as unsolved)</button></div><div id="cq-hints"></div><div id="cq-end"></div></section>';
  el.innerHTML=h;
  var ed=el.querySelector('#cq-ed'),out=el.querySelector('#cq-out');ed.value=code;
- var kd=function(e){if(e.key==='Tab'&&!e.shiftKey){e.preventDefault();var s=ed.selectionStart,t=ed.selectionEnd;ed.value=ed.value.slice(0,s)+'    '+ed.value.slice(t);ed.selectionStart=ed.selectionEnd=s+4}else if(e.key==='Escape'){ed.blur()}e.stopPropagation()};
+ var gin=el.querySelector('.cq-gin');
+ function gutter(){var n=ed.value.split('\n').length,h='';for(var i=1;i<=n;i++)h+=i+'\n';gin.textContent=h;gin.style.transform='translateY('+(-ed.scrollTop)+'px)'}
+ gutter();ed.addEventListener('input',gutter);ed.addEventListener('scroll',function(){gin.style.transform='translateY('+(-ed.scrollTop)+'px)'});
+ function lineStart(v,i){return v.lastIndexOf('\n',i-1)+1}
+ var kd=function(e){var v=ed.value,s0=ed.selectionStart,t0=ed.selectionEnd;
+  if(e.key==='Tab'){e.preventDefault();
+   var ls=lineStart(v,s0),multi=v.slice(s0,t0).indexOf('\n')>=0;
+   if(e.shiftKey||multi){var blockEnd=t0,lines=v.slice(ls,blockEnd).split('\n'),removed0=0,total=0;
+    var out=lines.map(function(l,k){if(e.shiftKey){var m=l.match(/^( {1,4}|\t)/),r=m?m[0].length:0;if(k===0)removed0=r;total+=r;return l.slice(r)}total+=4;if(k===0)removed0=-4;return '    '+l});
+    ed.value=v.slice(0,ls)+out.join('\n')+v.slice(blockEnd);
+    var d0=e.shiftKey?-Math.min(removed0,s0-ls):4;ed.selectionStart=Math.max(ls,s0+d0);ed.selectionEnd=e.shiftKey?t0-total:t0+total}
+   else{ed.value=v.slice(0,s0)+'    '+v.slice(t0);ed.selectionStart=ed.selectionEnd=s0+4}
+   gutter()}
+  else if(e.key==='Enter'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();
+   var ls2=lineStart(v,s0),cur=v.slice(ls2,s0),ind=cur.match(/^[ \t]*/)[0];
+   if(/:\s*$/.test(cur.replace(/#.*$/,'')))ind+='    ';
+   ed.value=v.slice(0,s0)+'\n'+ind+v.slice(t0);ed.selectionStart=ed.selectionEnd=s0+1+ind.length;gutter();
+   var lh=21,top=ed.selectionStart&&ed.value.slice(0,ed.selectionStart).split('\n').length*lh;if(top-ed.scrollTop>ed.clientHeight-lh)ed.scrollTop=top-ed.clientHeight+lh*2}
+  else if(e.key==='Backspace'&&s0===t0&&s0>0){var ls3=lineStart(v,s0),before=v.slice(ls3,s0);
+   if(before.length>=4&&/^ +$/.test(before)&&before.length%4===0){e.preventDefault();ed.value=v.slice(0,s0-4)+v.slice(s0);ed.selectionStart=ed.selectionEnd=s0-4;gutter()}}
+  else if(e.key==='Escape'){ed.blur()}
+  e.stopPropagation()};
  ed.addEventListener('keydown',kd);ed.addEventListener('keyup',function(e){e.stopPropagation()});
  function busy(m){out.className='cq-out';out.innerHTML='<span class="dim">'+esc(m)+'</span>'}
  function loadMsg(){return state==='ready'?'Running…':'Loading the Python engine (about 10 MB, first time only)…'}
@@ -35,15 +56,17 @@ function mount(q,el,ctx){
   out.querySelector('#cq-skip').onclick=function(){lock();ctx.done(false)}}
  function lock(){solved=true;ed.readOnly=true;['#cq-run','#cq-chk','#cq-hint','#cq-reset','#cq-giveup'].forEach(function(s){var b=el.querySelector(s);if(b)b.disabled=true})}
  el.querySelector('#cq-run').onclick=function(){if(solved)return;busy(loadMsg());call('code',ed.value).then(function(r){if(r.unavailable)return unavailable(r);if(r.error){out.className='cq-out bad';out.textContent=r.error;return}var d=r.data;out.className='cq-out'+(d.err?' bad':'');out.innerHTML=(d.out?'<pre>'+esc(d.out)+'</pre>':'')+(d.err?'<b>Error:</b> '+esc(d.err):(d.out?'':'<span class="dim">Ran with no printed output. Use print(...) to see values, or press Check.</span>'))})};
- el.querySelector('#cq-chk').onclick=function(){if(solved)return;tries++;busy(loadMsg());call('tests',ed.value,JSON.stringify(q.tests.map(function(t){return {code:t.code}}))).then(function(r){
+ el.querySelector('#cq-chk').onclick=function(){if(solved)return;tries++;hintBtn();busy(loadMsg());call('tests',ed.value,JSON.stringify(q.tests.map(function(t){return {code:t.code}}))).then(function(r){
   if(r.unavailable)return unavailable(r);if(r.error){out.className='cq-out bad';out.textContent=r.error;return}
   var d=r.data;if(d.err){out.className='cq-out bad';out.innerHTML='<b>Your code has an error:</b> '+esc(d.err);return}
   var pass=0,rows='',hn=0,hfail=0;d.res.forEach(function(x,i){var t=q.tests[i];if(x.ok)pass++;if(t.hidden){hn++;if(!x.ok)hfail++}else rows+='<div class="cq-t '+(x.ok?'ok':'no')+'">'+(x.ok?'✔ ':'✘ ')+esc(t.n)+(x.ok?'':'<div class="small">'+esc(x.msg||'failed')+'</div>')+'</div>'});
-  rows+='<div class="cq-t '+(hfail?'no':'ok')+'">'+(hfail?'✘ ':'✔ ')+'Hidden tests: '+(hn-hfail)+' of '+hn+' passed'+(hfail?'<div class="small">Some cases you were not shown still fail. Think about edge cases (empty input, ties, unusual values).</div>':'')+'</div>';
+  var hmsgs=[];d.res.forEach(function(x,i){if(q.tests[i].hidden&&!x.ok)hmsgs.push(x.msg||'failed')});
+  rows+='<div class="cq-t '+(hfail?'no':'ok')+'">'+(hfail?'✘ ':'✔ ')+'Hidden tests: '+(hn-hfail)+' of '+hn+' passed'+(hmsgs.length?hmsgs.map(function(m){return '<div class="small">Failed: '+esc(m)+'</div>'}).join(''):'')+'</div>';
   if(pass===d.res.length){out.className='cq-out ok';out.innerHTML='<b>All '+pass+' tests pass.</b>'+rows;finish(true)}
   else{out.className='cq-out bad';out.innerHTML='<b>'+pass+' of '+d.res.length+' tests pass.</b>'+rows}})};
  function finish(ok){lock();var E=window.Engine;if(ok&&E&&E.codeSolved)E.codeSolved(q.id);var end=el.querySelector('#cq-end');end.innerHTML='<div class="fb ok"><b>Solved. </b>'+(q.why||'')+'</div><button class="btn btn-primary" id="cq-next">Next</button>';end.querySelector('#cq-next').onclick=function(){ctx.done(true)}}
- el.querySelector('#cq-hint').onclick=function(){var hs=q.hints||[];if(hints<hs.length){hints++;el.querySelector('#cq-hints').innerHTML=hs.slice(0,hints).map(function(x,i){return '<div class="cq-hintbox"><b>Hint '+(i+1)+':</b> '+x+'</div>'}).join('')}if(hints>=hs.length)el.querySelector('#cq-hint').disabled=true};
+ function hintBtn(){var b=el.querySelector('#cq-hint'),hs=q.hints||[];if(hints>=hs.length){b.disabled=true;b.textContent='No more hints';return}b.disabled=false;b.textContent=(hints>=1&&tries<hints)?'Next hint (press Check first)':(hints?'Next hint':'Hint')}
+ el.querySelector('#cq-hint').onclick=function(){var hs=q.hints||[];if(hints>=hs.length)return;if(hints>=1&&tries<hints){out.className='cq-out';out.innerHTML='<span class="dim">Try the hint you have, then press Check at least '+hints+' time'+(hints>1?'s':'')+' before the next hint opens. Working it out yourself is the point.</span>';return}hints++;el.querySelector('#cq-hints').innerHTML=hs.slice(0,hints).map(function(x,i){return '<div class="cq-hintbox"><b>Hint '+(i+1)+':</b> '+x+'</div>'}).join('');hintBtn()};
  el.querySelector('#cq-reset').onclick=function(){if(!solved&&confirm('Reset to the starter code?'))ed.value=q.starter};
  el.querySelector('#cq-giveup').onclick=function(){if(solved)return;lock();gaveUp=true;var end=el.querySelector('#cq-end');end.innerHTML='<div class="fb no"><b>Model solution (one of several valid ones):</b><pre class="cq-sol">'+esc(q.solution)+'</pre>'+(q.why||'')+'</div><button class="btn btn-primary" id="cq-next">Next</button>';end.querySelector('#cq-next').onclick=function(){ctx.done(false)}};
  /* warm the engine in the background so Run feels quick */
