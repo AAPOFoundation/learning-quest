@@ -163,7 +163,7 @@ function chestOpen(o){var i=o.i,w=PW(),sp={name:'Treasure chest',icon:'🎁'};
  if(w.chests[i])return say(sp,['Empty now. You already took the Seal of '+R.name+'.']);
  w.chests[i]=1;P().xp+=25;E.award('seal_'+A.levels[i].id);chime();E.save();hud();say(sp,['You found the Seal of '+R.name+'! +25 XP and a badge.'])}
 function bossTalk(){var B=C.castle.boss;
- if(!allDone())return say(B,['You are not ready. Clear all seven regions first.']);
+ if(!allDone())return say(B,['You are not ready. Clear all '+NR+' regions first.']);
  say(B,bossDone()?['You have faced us already, and did well. Care to try for a higher score?']:['So you have crossed the whole realm. I am '+B.name+'.',B.title+'. Make your five choices wisely.'],function(){ask(B,bossDone()?'Face the challenge again?':'Begin the final challenge?',[{t:'Begin',fn:function(){openOv(function(){E.boss()},function(){if(bossDone()){chime();say(B,['A fine piece of work. Open the chest by the wall, and take your crown.'])}})}},{t:'Not yet'}])})}
 function interact(o){
  if(o.role==='teacher')teacherTalk(region());
@@ -318,6 +318,6 @@ function init(){cv=$('#cv');ctx=cv.getContext('2d');resize();window.addEventList
  document.body.addEventListener('pointerdown',function(){gest=true},{passive:true});
  var w=P().w;if(w&&w.sid){var sc=w.sid==='w'?st.world:null;if(sc){st.hero.c=w.c;st.hero.r=w.r}}
  title();requestAnimationFrame(frame);
- window.__w={st:st,walkTo:function(c,r){return new Promise(function(res){if(!walkTo(c,r))return res(false);var t0=Date.now();(function p(){if(!st.path&&!st.hero.mv||Date.now()-t0>60000)res(true);else setTimeout(p,30)})()})},warp:function(sid,c,r){enter(sid,c,r)},objective:objective,speed:function(n){st.speed=n},NODES:NODES,hud:hud,scene:function(){return st.scene},bfs:bfs,getScene:getScene,zoneOpen:zoneOpen,adv:adv,pick:pick,neigh:neigh,canWalk:canWalk,start:start}}
+ window.__w={interact:interact,st:st,walkTo:function(c,r){return new Promise(function(res){if(!walkTo(c,r))return res(false);var t0=Date.now();(function p(){if(!st.path&&!st.hero.mv||Date.now()-t0>60000)res(true);else setTimeout(p,30)})()})},warp:function(sid,c,r){enter(sid,c,r)},objective:objective,speed:function(n){st.speed=n},NODES:NODES,hud:hud,scene:function(){return st.scene},bfs:bfs,getScene:getScene,zoneOpen:zoneOpen,adv:adv,pick:pick,neigh:neigh,canWalk:canWalk,start:start}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
