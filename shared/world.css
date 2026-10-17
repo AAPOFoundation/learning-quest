@@ -80,3 +80,24 @@ pre.code{margin:10px 0;padding:10px 12px;background:#070b10;border:1px solid #2b
 .sim-row{margin:10px 0}.sim-row label{display:block;color:var(--ink-dim)}.sim-row input[type=range]{display:block;width:100%;margin-top:6px;accent-color:#d7b56a}.sim-row select{margin-left:6px;background:#0b1118;color:var(--ink);border:1px solid var(--brass-mid);border-radius:8px;padding:6px 8px;font:inherit}
 .sim-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.sim-grid .cell{padding:10px 12px;border-radius:10px;border:1px solid #2b3643;background:#0b1118}.sim-grid .cell b{display:block;font-size:24px;color:var(--ink)}.sim-grid .cell span{font-size:13px;color:var(--ink-dim)}.sim-grid .good{border-color:#3f6a45}.sim-grid .warn{border-color:#8a6a2a}.sim-grid .bad{border-color:#8a3b3b}
 .sm-bar{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:14px}.sm-t{width:56px;color:var(--ink)}.sm-b{flex:1;height:14px;background:#0b1118;border:1px solid #2b3643;border-radius:7px;overflow:hidden}.sm-b i{display:block;height:100%;background:linear-gradient(90deg,#8a6a2a,#d7b56a)}.sm-p{width:54px;text-align:right;color:var(--ink-dim)}
+
+/* beginner scaffolding for Python challenges */
+.cq-learn{margin:0 0 14px;border:1px solid var(--brass-mid);border-radius:var(--radius);background:#0b1118;padding:0 12px 10px}
+.cq-learn>summary{cursor:pointer;padding:10px 0;color:var(--gold-hi);font-weight:800;font-size:14px}
+.cq-exh{margin:8px 0 4px;color:var(--ink);font-weight:800;font-size:14px}.cq-say{color:var(--ink-dim);font-size:14px;margin:0 0 6px}
+.cq-say code,.cq-walkbox code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;background:#070b10;border:1px solid #2b3643;border-radius:5px;padding:1px 5px;color:var(--gold-hi)}
+.cq-exed{display:block;width:100%;box-sizing:border-box;margin:4px 0;padding:10px 12px;font:600 13px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#f6efe0;background:#070b10;border:1px solid #2b3643;border-radius:8px;white-space:pre;overflow:auto;resize:vertical}
+.cq-exed:focus{outline:none;border-color:var(--gold-hi)}.cq-exrow{margin:2px 0 4px}.cq-exrow .btn{width:auto;min-height:36px}
+.cq-exout{font-size:13px}.cq-exout:empty{display:none}.cq-exout{padding:6px 10px;border-left:3px solid var(--good);background:#0a0f15;border-radius:6px;margin-bottom:4px}.cq-exout.bad{border-left-color:var(--bad)}.cq-exout pre{margin:0;white-space:pre-wrap;font:600 13px/1.45 ui-monospace,Menlo,Consolas,monospace;color:var(--ink)}
+.cq-walkbox{margin-top:10px;padding:10px 14px;border-left:3px solid var(--good);background:#101a20;border-radius:8px;color:var(--ink-dim);font-size:14px}.cq-walkbox ol{margin:6px 0 0 18px;padding:0}.cq-walkbox li{margin:4px 0}
+
+/* runnable lesson examples, scratchpad, "Python ideas used here" */
+.pyx{margin:12px 0;padding:10px 12px;border:1px solid var(--brass-mid);border-radius:var(--radius);background:#0b1118}
+.pyx .cq-exed{min-height:48px}
+.pyx .cq-exrow .btn{margin-right:6px}
+.cq-ideas{margin:6px 0 12px}.pyidea-link{background:none;border:1px solid var(--brass-mid);border-radius:999px;color:var(--gold-hi);font:700 12px/1 var(--font);padding:5px 10px;margin:2px 2px;cursor:pointer;min-height:28px}.pyidea-link:hover{border-color:var(--gold-hi)}
+.pyidea{position:fixed;inset:0;z-index:9500;background:rgba(5,8,12,.82);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:4vh 12px}
+.pyidea-in{width:min(760px,100%);background:var(--panel,#0e141c);border:1px solid var(--brass-mid);border-radius:var(--radius);padding:14px 18px 18px;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+.pyidea-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;color:var(--gold-hi)}.pyidea-bar .btn{width:auto}
+.scratch select{max-width:100%}
+.lesson .pyx p{margin:0 0 6px}
