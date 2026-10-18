@@ -44,6 +44,7 @@ var FOR={ /* challenge id -> ideas used */
  'jd1':['strings','conditions'],'jd2':['dicts','tuples','comprehensions'],'jd3':['dicts','comprehensions','listtools'],'jd4':['dicts','getcount','forloops'],
  'ag1':['forloops','conditions','listtools'],'ag2':['dicts','conditions','listtools'],'ag3':['comprehensions','listtools','tuples'],'ag4':['forloops','conditions'],
  'sy1':['conditions','listtools','comprehensions'],'sy2':['tuples','comprehensions'],'ea1':['conditions','comprehensions','listtools'],'ea2':['strings','forloops','listtools'],'af1':['conditions','comprehensions','listtools'],'af2':['conditions','records','comprehensions'],'cp1':['funcvalues','listtools','comprehensions'],'cp2':['conditions','forloops','functions'],
+ 'mcp1':['funcvalues','functions','dicts'],'mcp2':['dicts','getcount','forloops'],'mcp3':['conditions','trycatch','dicts'],'pr1':['strings','functions','dicts'],'pr2':['forloops','strings','functions'],'cb1':['forloops','dicts','conditions'],
  'as-l1':['dicts','funcvalues','listtools'],'as-l2':['comprehensions','dicts','funcvalues'],'as-l3':['getcount','trycatch','funcvalues','dicts'],'as-l4':['dicts','forloops','listtools'],'as-l4b':['dicts','comprehensions'],
  'as-l5':['funcvalues','forloops','dicts'],'as-l5b':['conditions','dicts','forloops'],'as-l6':['comprehensions','tuples','listtools'],'as-l7':['dicts','tuples','conditions']};
 function basics(){return window.PYB&&window.PYB.levels}

@@ -29,10 +29,17 @@ var G=[
  ['sycophancy','sycophancy','Telling people what they want to hear: agreeing with a wrong claim, empty praise, or caving to pushback with no new evidence.','AI Safety, Fluency Fields'],
  ['bias in a neuron (Warden Bias)','bias term (the maths sense)','A neuron\'s <b>bias</b> is a number added to its weighted sum before the squash. It is a setting inside the model, not a fault. See the next row for the other meaning.','AI Foundations'],
  ['grader bias, model bias','bias (skewed or unfair output)','A skew in outputs: a judge that prefers the first answer or long answers, or a model that treats groups differently. Same word, different idea: the neuron bias is maths, this one is about fairness and accuracy.','AI Evals, AI Safety']]],
+['Tools and context',[
+ ['tool server (the pretend server in Agent Proving Grounds)','MCP (Model Context Protocol): servers and clients','A published standard for plugging tools and data into an AI app. We build a tiny pretend version, with no network, so the ideas are clear.','AI Evals'],
+ ['tool (the model decides)','MCP tools (model-controlled)','An action or calculation the model chooses to call. The risky one, so it is where permissions go.','AI Evals'],
+ ['resource (the app decides)','MCP resources (app-controlled)','Data the app reads and attaches, found by name or address.','AI Evals'],
+ ['prompt template (the user picks)','MCP prompts (user-controlled)','A ready-made instruction with blanks that the user chooses from a menu.','AI Evals'],
+ ['permission gate (deny by default, ask for risky)','permissions, human-in-the-loop approval','Rules in code that decide which tools may run and which wait for a person.','AI Evals'],
+ ['rewrite and grade the prompt (Trial Hall)','prompt evaluation workflow, prompt iteration','Change a prompt, score both versions on several cases with the same rubric, and compare the averages.','Fluency Fields'],
+ ['Context Bench (what fits, what it costs)','context management, token budget','Planning what goes into the context window and what each call costs. Prices in the game are made up.','Fluency Fields'],
+ ['caching the unchanged start','prompt caching','Reusing an identical start of a long prompt at a lower price on later calls. It saves money and delay, not room in the window.','Fluency Fields']]],
 ['Words used elsewhere that the game does not teach (yet)',[
- ['(not covered)','MCP: tools, resources, prompts','A standard way to plug tools and data into a model app. Tools are chosen by the model, resources by the app, prompts by the user.','Not in the game yet'],
- ['(not covered)','subagents, agent skills','A helper agent for a sub-task, and reusable packaged instructions for an agent.','Not in the game yet'],
- ['(not covered)','prompt caching','Reusing an earlier part of a long prompt to cut cost and delay.','Not in the game yet']]],
+ ['(not covered)','subagents, agent skills','A helper agent for a sub-task, and reusable packaged instructions for an agent.','Not in the game yet']]],
 ['Game words',[
  ['region','course section','One town on the map, a self-contained lesson block.','Every world'],
  ['Gatekeeper (Warden)','quiz','The questions at the end of a region. Pass to move on.','Every world'],
