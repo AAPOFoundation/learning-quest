@@ -1,7 +1,7 @@
 /* In-game guide clips. A slot is placed at the start of each region's lesson (concept id "<world>-<level id>", e.g. ai-evals-l4)
    and above each Python challenge (concept id = challenge id, e.g. ev-l4). If assets/guide/<concept-id>.mp4 exists it shows a
    short narrated clip with controls (never autoplays; a .webm twin is used by browsers without H.264); if the file does not exist the slot stays empty and invisible.
-   An optional assets/guide/<concept-id>.vtt adds captions. No clip files ship with the game. */
+   An optional assets/guide/<concept-id>.vtt adds captions. Clips that ship are listed in assets/guide/README.md. */
 (function(){
 'use strict';
 var s=document.querySelector('script[src$="shared/guide.js"]'),BASE=s?s.src.replace(/shared\/guide\.js$/,'assets/guide/'):'../assets/guide/',known={};
