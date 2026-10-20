@@ -13,3 +13,7 @@ Shipped clips (H.264/AAC MP4 with faststart, VP9/Opus WebM twin, English caption
 | Concept id | Where it shows | Explains |
 |---|---|---|
 | `ai-evals-l4` | AI Evaluation Skills, Dunes of Measure, first lesson screen | The four tents (true or false, flagged or missed) and the precision/recall trade-off when the bar is raised |
+| `ai-foundations-l3` | AI Foundations, Gradient Hills, first lesson screen | Each step goes downhill, sized by the learning rate: too small crawls, too large leaps over the valley |
+| `ai-evals-lS` | AI Evaluation Skills, Variance Fens, first lesson screen | A hundred cases still wobble by about eight points; testing both on the same cases shrinks the wobble |
+| `ai-foundations-l5` | AI Foundations, Attention Peaks, first lesson screen | Softmax turns scores into shares that add up to one; temperature down sharpens, up spreads |
+| `ai-safety-cp` | AI Safety, Control Keep, first lesson screen | A trusted monitor scores every output: the most suspicious go to audit, the doubtful wait, the rest pass |
