@@ -61,9 +61,9 @@ function blankHtml(k,i){var b=BL[k];if(!b)return '';var rows=Math.max(2,b.code.s
 function primerBody(){return '<p class="cq-say">'+T.lead+'</p><ul class="pp-list">'+T.items.map(function(x){return '<li>'+x[1]+'</li>'}).join('')+'</ul>'}
 /* ---------- the panel shown above each challenge ---------- */
 function prep(q){if(!q)return q;var H=window.LQHow||{},key=q.capstone?A.key+':cap':q.id;if(!(q.walk&&q.walk.length)&&H[key])q.walk=H[key];return q}
-function panel(q){if(q.practice)return '';var open=!solvedAny();
- return '<details class="cq-learn pp-primer"'+(open?' open':'')+'><summary>Python primer for '+esc(T.name)+(open?' (new to Python? start here)':'')+'</summary>'+primerBody()+'<details class="pp-how"><summary>How the Python challenges work</summary>'+HOWTO+'</details></details>'
- +'<details class="cq-learn pp-blanks"'+(q.learn&&q.learn.length?'':' open')+'><summary>Worked example'+(ideasFor(q).length>1?'s':'')+' with a blank (fill it in, then run it)</summary>'+ideasFor(q).map(blankHtml).join('')+'</details>'}
+function panel(q){if(q.practice)return '';var open=!solvedAny()&&!(q.learn&&q.learn.length);
+ return '<details class="cq-learn pp-primer"'+(open?' open':'')+'><summary>'+(open?'Python primer (start here)':'Python primer for '+esc(T.name))+'</summary>'+primerBody()+'<details class="pp-how"><summary>How the Python challenges work</summary>'+HOWTO+'</details></details>'
+ +'<details class="cq-learn pp-blanks"><summary>Worked example'+(ideasFor(q).length>1?'s':'')+' with a blank (fill it in, then run it)</summary>'+ideasFor(q).map(blankHtml).join('')+'</details>'}
 function wire(el,q,run){
  Array.prototype.forEach.call(el.querySelectorAll('.pp-blank'),function(box){var k=box.getAttribute('data-k'),b=BL[k],ta=box.querySelector('.pp-ed'),o=box.querySelector('.pp-out');
   ta.addEventListener('keydown',function(e){if(e.key==='Tab'){e.preventDefault();var a=ta.selectionStart;ta.value=ta.value.slice(0,a)+'    '+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=a+4}e.stopPropagation()});ta.addEventListener('keyup',function(e){e.stopPropagation()});

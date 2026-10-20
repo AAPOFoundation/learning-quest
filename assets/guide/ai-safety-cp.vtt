@@ -1,8 +1,11 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:04.100
+00:00:00.000 --> 00:00:04.200
 In Control Keep, a trusted monitor scores every output.
 
-00:00:04.400 --> 00:00:09.300
+00:00:04.700 --> 00:00:09.800
 The most suspicious go to audit, the doubtful are swapped
-for the trusted model's answer, and the rest pass the gate.
+for the trusted model's answer,
+
+00:00:09.900 --> 00:00:11.600
+and the rest pass the gate.
