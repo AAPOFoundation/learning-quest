@@ -69,5 +69,5 @@ function scratch(el){var saved='';try{saved=localStorage.getItem(SKEY)||''}catch
  ta.addEventListener('input',function(){try{localStorage.setItem(SKEY,ta.value)}catch(e){}});
  el.querySelector('.pyx-scr-run').onclick=function(){runInto(ta.value,el.querySelector('#scr-out'))}}
 if(A&&window.CodeQ){A.tabs=A.tabs||[];if(!A.tabs.some(function(t){return t.id==='scratch'}))A.tabs.push({id:'scratch',label:'Python scratchpad',render:scratch})}
-window.PyPlay={widget:widget,ideaBar:ideaBar,openIdea:openIdea,IDEAS:IDEAS,run:runInto,scratch:scratch};
+window.PyPlay={widget:widget,ideaBar:ideaBar,openIdea:openIdea,IDEAS:IDEAS,FOR:FOR,run:runInto,scratch:scratch};
 })();

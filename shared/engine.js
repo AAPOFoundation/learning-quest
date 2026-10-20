@@ -98,8 +98,8 @@ function runQs(qs,title,fin){var i=0,right=0,box=document.createElement('div');
 function level(i,mode){
  var L=A.levels[i],step=0;MODE=mode||null;
  function lesson(){
-  var c=L.lesson,h='<section class="panel lesson"><p class="kicker">Level '+(i+1)+' · lesson '+(step+1)+' of '+c.length+'</p><h2>'+(step?esc(c[step].h):esc(L.title))+'</h2>'+(step===0?'<h3>'+esc(c[0].h)+'</h3>':'')+c[step].b+'<div class="row"><button class="btn btn-ghost" id="bk">'+(step?'Back':'Exit')+'</button><button class="btn btn-primary" id="fw">'+(step<c.length-1?'Next':(MODE==='lesson'?'Done':'Start the questions'))+'</button></div></section>';
-  shell(h);
+  var c=L.lesson,h='<section class="panel lesson"><p class="kicker">Level '+(i+1)+' · lesson '+(step+1)+' of '+c.length+'</p><h2>'+(step?esc(c[step].h):esc(L.title))+'</h2>'+(step===0&&window.LQGuide?window.LQGuide.slot(A.key+'-'+L.id):'')+(step===0?'<h3>'+esc(c[0].h)+'</h3>':'')+c[step].b+'<div class="row"><button class="btn btn-ghost" id="bk">'+(step?'Back':'Exit')+'</button><button class="btn btn-primary" id="fw">'+(step<c.length-1?'Next':(MODE==='lesson'?'Done':'Start the questions'))+'</button></div></section>';
+  shell(h);if(window.LQGuide)window.LQGuide.scan();
   $('#bk').onclick=function(){step?(step--,lesson()):home()};
   $('#fw').onclick=function(){if(step<c.length-1){step++;lesson()}else if(MODE==='lesson'){E_.lessonDone=true;EXIT()}else quiz()}}
  function quiz(){
