@@ -114,7 +114,7 @@ function level(i,mode){
    if(A.onLevel)A.onLevel(L.id,p,award);
    save();
    var h='<section class="panel"><p class="kicker">'+(pass?'Level cleared':'Not cleared yet')+'</p><h2>'+r+' of '+L.qs.length+' correct</h2>'+stars(pass?starsFor(p):0)+'<p class="dim" style="margin-top:10px">+'+gain+' XP. '+(pass?(p<1?'Replay for three stars; you only need 60% to move on.':'A clean sweep.'):'You need 60% to clear a level. Re-read the lesson and try again, there is no penalty.')+'</p><div class="row"><button class="btn btn-ghost" id="rl">Re-read lesson</button><button class="btn btn-primary" id="nx2">'+('Back to the map')+'</button></div></section>';
-   shell(h);$('#rl').onclick=function(){step=0;MODE=null;lesson()};$('#nx2').onclick=function(){EXIT()}}))}
+   shell(h);if(pass){try{document.dispatchEvent(new CustomEvent('lq:celebrate',{detail:{msg:p===1?'Perfect clear!':'Level cleared!',vfx:'shockwave'}}))}catch(e){}}$('#rl').onclick=function(){step=0;MODE=null;lesson()};$('#nx2').onclick=function(){EXIT()}}))}
  if(mode==='quiz')quiz();else lesson()}
 
 function boss(){
