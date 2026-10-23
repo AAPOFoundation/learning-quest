@@ -15,7 +15,7 @@ body.world{height:100vh;height:100dvh;overflow:hidden;position:fixed;inset:0;wid
 #pm{display:flex;gap:3px;margin-top:5px}
 #pc{display:flex;gap:4px;margin-top:4px}#pc img{width:26px;height:26px;border-radius:6px;border:1px solid var(--gold);background:#0e141c;animation:idlebreath 3.4s ease-in-out infinite}#pc img:nth-child(2){animation-delay:.35s}#pc img:nth-child(3){animation-delay:.7s}#pc img:nth-child(4){animation-delay:1.05s}#pc img.just{animation:arrive .35s ease both,idlebreath 3.4s ease-in-out infinite}
 #pm img{width:24px;height:24px;border-radius:50%;border:1px solid var(--brass-mid);filter:grayscale(1) brightness(.55);opacity:.7;transition:filter .25s,opacity .25s,border-color .25s}
-#pm img.on{filter:none;opacity:1;border-color:var(--gold)}
+#pm img.on{filter:none;opacity:1;border-color:var(--gold)}#pm img.fresh{animation:pop .3s ease}
 #quest{width:min(300px,100%);cursor:pointer}
 #quest .kicker{font-size:12px;margin:0 0 3px}#quest div{font-size:13px;line-height:1.3;color:var(--ink)}
 #tr{position:absolute;right:max(8px,env(safe-area-inset-right));top:8px;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
