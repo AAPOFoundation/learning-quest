@@ -6,11 +6,11 @@
 var cv=document.getElementById('hero');if(!cv||!window.Art)return;
 var Art=window.Art,FX=window.LQFx,S=Art.S,hx=Art.hx,hy=Art.hy,hash=Art.hash,g=cv.getContext('2d');
 var COLS=22,ROWS=8,SEED=7;
-var TOWNS=[{c:3,r:3,biome:'meadow',accent:'#b5532f',name:'Python Basics'},{c:7,r:3,biome:'forest',accent:'#8a3b2a',name:'AI Foundations'},{c:11,r:3,biome:'hills',accent:'#3f5f8f',name:'AI Evaluation'},{c:15,r:3,biome:'tundra',accent:'#3c5a86',name:'AI Safety'}],CAST={c:19,r:3,accent:'#c9a24f',name:'Citadel'};
+var TOWNS=[{c:3,r:3,biome:'meadow',accent:'#b5532f',name:'Python Basics'},{c:7,r:3,biome:'forest',accent:'#8a3b2a',name:'AI Foundations'},{c:11,r:3,biome:'hills',accent:'#3f5f8f',name:'AI Evaluation'},{c:15,r:3,biome:'tundra',accent:'#3c5a86',name:'AI Safety'}],CAST={c:19,r:3,accent:'#c9a24f',name:'Citadel'},STOPS=TOWNS.concat([CAST]);
 var HERO={skin:'#e2b48c',hair:'#3b2a1d',robe:'#274a7a',trim:'#d7b56a',cape:'#7a2e2a',hat:'hood',staff:true};
 function terrain(){var t=[];for(var c=0;c<COLS;c++){t.push([]);for(var r=0;r<ROWS;r++){var h=hash(c,r,SEED),e=Art.vnoise(c*.35,r*.5,SEED),v='grass';
   if(r>=6&&c<6)v=(r===6&&h<.35)?'grass':'water';else if(r===0&&(c>10||h<.3))v=c>16?'mountain':'hills';else if(c>=14&&c<=17&&r!==3)v=(h<.45?'pine':'snow');else if(c>=5&&c<=8&&r!==3)v=(e>.42?'forest':'grass');else if(c>=10&&c<=12&&r!==3&&h<.4)v='hills';else if(r>=6&&c>=19)v='water';else if(r===7&&c>=7&&c<=10)v='water';t[c].push(v)}}
- TOWNS.concat([CAST]).forEach(function(n){t[n.c][n.r]=n.biome==='tundra'?'snow':'grass'});return t}
+ for(var si=0;si<STOPS.length;si++){var sn=STOPS[si];t[sn.c][sn.r]=sn.biome==='tundra'?'snow':'grass'}return t}
 var sc={cols:COLS,rows:ROWS,seed:SEED,t:terrain(),roads:[(function(){var p=[];for(var c=1;c<=CAST.c;c++)p.push([c,3]);return p})()],objs:[],biome:'meadow'};
 sc.objs=TOWNS.map(function(n){return {c:n.c,r:n.r}}).concat([{c:CAST.c,r:CAST.r}]);
 Art.paintScene(sc);
@@ -38,7 +38,8 @@ function draw(dt){var full=X1-X0,z=Math.max(W/full,H/(S*1.5*6.8)),vw=W/z,vh=H/z,
  heroList.length=n;heroList.sort(byY);
  for(i=0;i<n;i++){it=heroList[i];heroOp.t=T;heroOp.pine=heroOp.snow=heroOp.v=heroOp.landmark=heroOp.lit=heroOp.open=heroOp.locked=heroOp.glow=heroOp.lid=heroOp.lift=heroOp.biome=void 0;if(it.kind==='town'){heroOp.accent=it.ref.accent;heroOp.biome=it.ref.biome;Art.building(g,'town',hx(it.ref.c,it.ref.r),hy(it.ref.r),heroOp)}else if(it.kind==='castle'){heroOp.accent=CAST.accent;Art.building(g,'castle',hx(CAST.c,CAST.r),hy(CAST.r),heroOp)}else Art.figure(g,it.hxp,hy(3)+S*.2,HERO,{t:T,moving:it.moving,face:it.face,step:it.step,hop:it.hop,foot:it.foot,turn:it.turn||0})}
  /* name plaques, in the map's own style */
- var fs=Math.min(30,(W<520?10:11)/z),short=W<520;g.font='700 '+fs+'px "Cormorant Garamond",Georgia,serif';g.textAlign='center';TOWNS.concat([CAST]).forEach(function(n,i){var nm=short?n.name.replace(/^(AI |Python )/,''):n.name,label=(i<4?(i+1)+' · ':'')+nm,nk=fs+'|'+label,x=hx(n.c,n.r),y=hy(n.r)+S*1.15,tw=names[nk];if(tw==null)tw=names[nk]=g.measureText(label).width;tw+=fs*1.2;g.fillStyle='rgba(10,15,21,.86)';g.strokeStyle='#c8a86a';g.lineWidth=1/z;g.beginPath();g.rect(x-tw/2,y-fs*.95,tw,fs*1.45);g.fill();g.stroke();g.fillStyle='#f3e2b0';g.fillText(label,x,y+fs*.12)});
+ var fs=Math.min(30,(W<520?10:11)/z),short=W<520,sp,nm,label,nk,px,py,tw;g.font='700 '+fs+'px "Cormorant Garamond",Georgia,serif';g.textAlign='center';
+ for(i=0;i<STOPS.length;i++){sp=STOPS[i];if(sp.short==null)sp.short=sp.name.replace(/^(AI |Python )/,'');nm=short?sp.short:sp.name;label=(i<4?(i+1)+' · ':'')+nm;nk=fs+'|'+label;px=hx(sp.c,sp.r);py=hy(sp.r)+S*1.15;tw=names[nk];if(tw==null)tw=names[nk]=g.measureText(label).width;tw+=fs*1.2;g.fillStyle='rgba(10,15,21,.86)';g.strokeStyle='#c8a86a';g.lineWidth=1/z;g.beginPath();g.rect(px-tw/2,py-fs*.95,tw,fs*1.45);g.fill();g.stroke();g.fillStyle='#f3e2b0';g.fillText(label,px,py+fs*.12)}
  if(!st&&window.LQAnim&&LQAnim.puff&&step<.12&&heroPrev>.7)LQAnim.puff(hxp,hy(3)+S*.45);heroPrev=step;
  if(!FX.low&&window.LQAnim)LQAnim.particles(g,'meadow',1/30,cx,cy,vw,vh,T);
  g.setTransform(1,0,0,1,0,0);if(ov)g.drawImage(ov,0,0)}
