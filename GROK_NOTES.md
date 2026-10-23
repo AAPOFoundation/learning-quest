@@ -131,3 +131,7 @@ Checked in headless Edge: Python (6 rings) and AI Safety (11 rings) after Begin,
 ## Still materials, same day
 
 Water, snow, sand and marsh now carry a soft shaded side inside the baked tile. The highlight on water is baked too, so a still frame and low effects still read as a surface. Shimmer and particles are unchanged and still stop when effects are low or motion is reduced. Home and Python Basics reloaded with no console exceptions. The coast on the Python map shows the darker side and the light streak.
+
+## Title legend, same day
+
+Each world's title card shows a dot for every region and one for the citadel, in that place's tint. Python shows 7, Safety 12, Portfolio 8. The corner HUD is hidden while the title is up, so the painted map frames the card and the panels do not sit underneath it. The HUD returns when the journey starts. Title screens for Python, Safety and Portfolio loaded with no console exceptions. Begin was not clicked on that check.
