@@ -53,3 +53,5 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 - Stepping stones were flat decals. Each slab is now thicker, with a lighter cap, and a meadow frame calls them stones on the dirt path.
 - A woodpile of four short logs sits at (2.15, 0, -0.72), clear of the seats. A meadow frame calls it a pile of sticks by the lantern. It is firewood, not a tool.
 - The tree helper returned a second pine and round-tree after those meshes were already framed and committed. Kept the framed version. The helper did not edit the file.
+- The bedroll sat behind the tent and rarely showed. It now lies at (-2.85, 0, -0.85), scale 1.3. A meadow frame calls it a red bedroll to the right of the tent.
+- A hills frame after the pine branch, cape, book, cup and woodpile still reads as a camp: pines, grey rocks, a cairn, and the same people. Not tried on a phone.

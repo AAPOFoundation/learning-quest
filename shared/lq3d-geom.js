@@ -606,7 +606,7 @@ function buildCamp(opts){
  put(groundMesh(P),0,0,0,0,1,'ground');
  put(tentMesh(),-1.6,0,1.2,0.18,1,'tent');
  put(shade,-1.6,0,1.2,0,1.45,'shadow');
- put(bedMesh(),-2.15,0,0.45,0.5,1,'bed');
+ put(bedMesh(),-2.85,0,-0.85,0.35,1.3,'bed');
  put(chestMesh(),-2.25,0,-0.45,-0.55,1,'chest');
  put(crateMesh(),-3.05,0,0.55,0.4,1,'crate');
  put(fireMesh(),0.12,0,-1.5,0.4,1,'fire');
