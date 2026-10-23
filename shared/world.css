@@ -111,7 +111,7 @@ pre.code{margin:10px 0;padding:10px 12px;background:#070b10;border:1px solid #2b
 .pp-how{margin:4px 0 6px}.pp-how>summary{cursor:pointer;color:var(--gold-hi);font-weight:800;font-size:13px;padding:6px 0}.pp-how ol{margin:6px 0 6px 18px;padding:0;color:var(--ink-dim);font-size:14px}.pp-how p{color:var(--ink-dim);font-size:14px}
 .pp-blank{border-top:1px solid rgba(215,181,106,.18);padding-top:6px}.pp-blank:first-of-type{border-top:0}.pp-blank .cq-exrow{display:flex;flex-wrap:wrap;gap:6px}
 .pp-primer>summary,.pp-blanks>summary{min-height:24px}
-.lq-guide{margin:0 0 14px;padding:8px 10px 10px;border:1px solid var(--brass-mid);border-radius:var(--radius);background:#0b1118}.lq-guide .kicker{margin:0 0 6px}
+.lq-guide{margin:0 0 14px;padding:8px 10px 10px;border:1px solid var(--brass-mid);border-radius:var(--radius);background:#0b1118;animation:ovfade .18s ease}.lq-guide .kicker{margin:0 0 6px}
 .lq-guide-v{display:block;width:100%;max-height:320px;border-radius:8px;background:#000}
 
 /* phone: challenge buttons in a 2-column grid, full 44px targets (Opus review #4) */
