@@ -11,10 +11,10 @@ function make(c){
   var g=look(GR,i,2);g.hat='helm';if(i%2===0)g.beard=true;
   var u=look(GU,i,4);u.hat=['cap','hood','cap','hood'][i%4];u.trim='#c8a86a';if(i%3===1)u.beard=true;
   var out={name:r.name,biome:r.biome,accent:r.accent,teacher:{name:r.teacher[0],title:r.teacher[1],look:t},gate:{name:r.gate[0],title:'Gatekeeper of '+(r.gate[1]||'the region'),look:g},guide:{name:r.guide[0],look:u,hint:r.guide[1]},hall:r.hall,hallKind:r.hallKind||'hall',sim:null};
-  if(typeof r.tint==='string'&&r.tint)out.tint=r.tint;if(typeof r.motif==='string'&&r.motif)out.motif=r.motif;return out});
+  if(typeof r.tint==='string'&&r.tint)out.tint=r.tint;if(typeof r.motif==='string'&&r.motif)out.motif=r.motif;if(typeof r.roof==='string'&&r.roof)out.roof=r.roof;return out});
  var k=c.castle,bl={skin:'#d9a97c',hair:'#e8e4dc',robe:'#6a2f4a',trim:'#f3e2b0',hat:'crown',beard:true},hl={skin:'#e3b896',hair:'#5a3a22',robe:'#274a7a',trim:'#f3e2b0',hat:'cap'};
  var castle={name:k.name,biome:'crown',accent:'#c9a24f',boss:{name:k.boss[0],title:k.boss[1],look:bl},herald:{name:k.herald[0],look:hl,hint:k.herald[1]},chest:k.chest,hall:k.hall||'Great Hall'};
- if(typeof k.tint==='string'&&k.tint)castle.tint=k.tint;if(typeof k.motif==='string'&&k.motif)castle.motif=k.motif;
+ if(typeof k.tint==='string'&&k.tint)castle.tint=k.tint;if(typeof k.motif==='string'&&k.motif)castle.motif=k.motif;if(typeof k.roof==='string'&&k.roof)castle.roof=k.roof;
  var hero=c.hero&&typeof c.hero==='object'?c.hero:{skin:'#e2b48c',hair:'#3b2a1d',robe:'#274a7a',trim:'#d7b56a',cape:'#7a2e2a',hat:'hood',staff:true};
  return {key:c.key,heroName:'Wanderer',hero:hero,intro:c.intro,regions:regs,castle:castle}}
 window.WorldKit={make:make};

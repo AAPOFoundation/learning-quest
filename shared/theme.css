@@ -41,7 +41,9 @@ p{margin:0 0 12px}.dim{color:var(--ink-dim)}.small{font-size:14px}
 @keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .lesson p,.lesson li{color:var(--ink-dim)}.lesson ul{padding-left:20px;margin:0 0 12px}
 .ex{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;background:#070b10;border:1px solid #2b3643;border-radius:8px;padding:10px 12px;margin:0 0 12px;white-space:pre-wrap;color:var(--ink)}
-.badge{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--brass-mid);border-radius:var(--radius);background:var(--panel-lift)}.badge.off{opacity:.4;filter:grayscale(1)}
+.badge{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--brass-mid);border-radius:var(--radius);background:var(--panel-lift)}.badge.off{opacity:.55}
+.realm{position:relative}.realm:before{content:"";position:absolute;left:16px;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:var(--realm,#d7b56a);box-shadow:0 0 0 2px #2a1d0a}
+.r-py{--realm:#6d9a4e}.r-fd{--realm:#c47a48}.r-ev{--realm:#3f5f8f}.r-sf{--realm:#8a4a3a}.r-pf{--realm:#8a6530}
 input[type=number],select{font:800 16px var(--font);color:var(--ink);background:#070b10;border:1px solid var(--brass-mid);border-radius:8px;padding:9px;width:100%;min-height:44px}
 input[type=range]{width:100%;accent-color:#d7b56a}
 .field label{display:block;font-size:13px;color:var(--gold-hi);margin-bottom:3px;font-family:var(--display);letter-spacing:.1em;text-transform:uppercase}

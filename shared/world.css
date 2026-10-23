@@ -38,7 +38,8 @@ body.nopad #pad,body.nopad #acts{display:none!important}
 .ovbar{position:sticky;top:0;z-index:2;display:flex;justify-content:flex-end;padding:8px 12px;background:linear-gradient(#060a0e,#060a0e00)}
 #ovbody .wrap{padding-top:4px}
 #dlg{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(760px,96vw);z-index:15}
-#dlg .panel{display:flex;gap:14px;align-items:flex-start;margin:0;min-height:112px;padding:14px 16px;cursor:pointer}
+#dlg .panel{display:flex;gap:14px;align-items:flex-start;margin:0;min-height:112px;padding:14px 16px;cursor:pointer;animation:dlgIn .16s ease}
+@keyframes dlgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 #dlg img{width:84px;height:84px;border-radius:12px;border:2px solid var(--brass);flex:none;box-shadow:0 0 0 1px var(--brass-ink)}
 #dlg .tx{flex:1;min-width:0}
 #dlg .nameplate{display:inline-block;margin:0 0 4px;padding:1px 12px 2px;font:700 18px/1.2 var(--display);letter-spacing:.08em;color:#1a1208;background:linear-gradient(180deg,#ecd28a,#c9a24f 52%,#b08a38);border:1px solid var(--brass-lo);border-radius:6px}
@@ -105,6 +106,13 @@ pre.code{margin:10px 0;padding:10px 12px;background:#070b10;border:1px solid #2b
 .lesson .pyx p{margin:0 0 6px}
 
 .ib .ico{display:block;margin:auto;color:#e0c070;filter:drop-shadow(0 1px 0 rgba(0,0,0,.5))}.ib:hover .ico,.ib:focus-visible .ico{color:#f3e2b0}.qrow .ico{color:#d7b56a;display:block;margin:auto}
+.stk{display:inline-flex;align-items:center;gap:4px}.stk .mk{color:#e0c070}
+.plate{width:84px;height:84px;border-radius:12px;border:2px solid var(--brass);display:grid;place-items:center;background:#121a24;flex:none;color:#e0c070;box-shadow:0 0 0 1px var(--brass-ink)}
+.plate .mk{width:40px;height:40px}
+.bmk{width:36px;height:36px;display:grid;place-items:center;flex:none;color:#e0c070;border:1px solid var(--brass-mid);border-radius:10px;background:#0a0f15}
+.badge.off .bmk{color:#a89878}
+.sat{display:flex;align-items:flex-start;gap:8px}.sat .mk{color:#e0c070;flex:none;margin-top:4px}
+.lvl .ico .mk{color:#e0c070}
 /* Python primer layer and guide clips (Phase 2) */
 .pp-list{margin:4px 0 10px 18px;padding:0;color:var(--ink-dim);font-size:14px}.pp-list li{margin:3px 0}
 .pp-how{margin:4px 0 6px}.pp-how>summary{cursor:pointer;color:var(--gold-hi);font-weight:800;font-size:13px;padding:6px 0}.pp-how ol{margin:6px 0 6px 18px;padding:0;color:var(--ink-dim);font-size:14px}.pp-how p{color:var(--ink-dim);font-size:14px}

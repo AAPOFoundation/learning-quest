@@ -41,9 +41,9 @@ function homeOld(){
 function path(tb){
  var h='<div class="grid">';
  A.levels.forEach(function(l,i){var s=P.levels[l.id],u=unlocked(i);
-  h+='<button class="lvl" data-go="'+i+'" '+(u?'':'disabled')+'><span class="ico">'+l.icon+'</span><p class="kicker" style="margin-top:6px">Level '+(i+1)+(u?'':' · locked')+'</p><h3 style="margin:0 0 4px">'+esc(l.title)+'</h3><p class="small dim" style="margin:0 0 6px">'+esc(l.blurb)+'</p>'+stars(s?starsFor(s.best):0)+'</button>'});
+  h+='<button class="lvl" data-go="'+i+'" '+(u?'':'disabled')+'><span class="ico">'+((window.LQMark&&window.LQMark(l.icon,26))||esc(l.icon))+'</span><p class="kicker" style="margin-top:6px">Level '+(i+1)+(u?'':' · locked')+'</p><h3 style="margin:0 0 4px">'+esc(l.title)+'</h3><p class="small dim" style="margin:0 0 6px">'+esc(l.blurb)+'</p>'+stars(s?starsFor(s.best):0)+'</button>'});
  var allDone=doneCount()===A.levels.length;
- h+='<button class="lvl" data-boss '+(allDone?'':'disabled')+'><span class="ico">🏆</span><p class="kicker" style="margin-top:6px">Final challenge'+(allDone?'':' · locked')+'</p><h3 style="margin:0 0 4px">'+esc(A.boss.title)+'</h3><p class="small dim" style="margin:0 0 6px">'+esc(A.boss.blurb)+'</p>'+stars(P.boss?starsFor(P.boss.best):0)+'</button></div>';
+ h+='<button class="lvl" data-boss '+(allDone?'':'disabled')+'><span class="ico">'+((window.LQMark&&window.LQMark('cup',26))||'')+'</span><p class="kicker" style="margin-top:6px">Final challenge'+(allDone?'':' · locked')+'</p><h3 style="margin:0 0 4px">'+esc(A.boss.title)+'</h3><p class="small dim" style="margin:0 0 6px">'+esc(A.boss.blurb)+'</p>'+stars(P.boss?starsFor(P.boss.best):0)+'</button></div>';
  h+='<p style="margin-top:18px"><button class="btn btn-ghost btn-sm" data-reset>Reset progress</button></p>';
  tb.innerHTML=h}
 function skills(tb){
@@ -51,8 +51,9 @@ function skills(tb){
  A.skills.forEach(function(s){var l=A.levels.filter(function(x){return x.id===s.level})[0],b=P.levels[s.level]?Math.round(100*P.levels[s.level].best):0;
   h+='<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+esc(s.name)+'</b><span class="dim small">'+b+'%</span></div><div class="bar"><i style="width:'+b+'%"></i></div><div class="small dim">'+esc(s.note)+'</div></div>'});
  tb.innerHTML=h+'</div>'}
+function markBox(icon,z){var mk=window.LQMark&&window.LQMark(icon,z||28);return '<span class="bmk">'+(mk||esc(icon||''))+'</span>'}
 function badges(tb){
- var h='<div class="grid">';A.badges.forEach(function(b){var on=P.badges.indexOf(b.id)>=0;h+='<div class="badge '+(on?'':'off')+'"><span style="font-size:28px">'+b.icon+'</span><div><b>'+esc(b.name)+'</b><div class="small dim">'+esc(b.desc)+'</div></div></div>'});
+ var h='<div class="grid">';A.badges.forEach(function(b){var on=P.badges.indexOf(b.id)>=0;h+='<div class="badge '+(on?'':'off')+'">'+markBox(b.icon)+'<div><b>'+esc(b.name)+'</b><div class="small dim">'+esc(b.desc)+'</div></div></div>'});
  tb.innerHTML=h+'</div>'}
 
 /* ---- questions ---- */

@@ -57,9 +57,9 @@ var Party={crew:CREW,joined:joined,
    H.ask(sp,'Enter the Workshop?',[{t:'Begin',fn:function(){Party.openCapstone(H)}},{t:'Not yet'}])})},
  build:function(){var cap=A.capstone,need=cap.needs,pre=[],rows='',borrowed=0;
   need.forEach(function(n){var m=Satchel.get(n.id),ref=refSolution(n.id);
-   if(m){pre.push(m.code);rows+='<li>✅ <code>'+esc(n.fn)+'</code> <span class="small dim">your version ('+esc(m.title)+')</span></li>'}
-   else if(ref){pre.push(ref);borrowed++;rows+='<li>🔶 <code>'+esc(n.fn)+'</code> <span class="small dim">borrowed reference (solve "'+esc(n.title)+'" yourself to use your own)</span></li>'}
-   else rows+='<li>❌ <code>'+esc(n.fn)+'</code> missing</li>'});
+   if(m){pre.push(m.code);rows+='<li class="sat">'+(window.LQMark?LQMark('ok',16):'')+' <code>'+esc(n.fn)+'</code> <span class="small dim">your version ('+esc(m.title)+')</span></li>'}
+   else if(ref){pre.push(ref);borrowed++;rows+='<li class="sat">'+(window.LQMark?LQMark('borrow',16):'')+' <code>'+esc(n.fn)+'</code> <span class="small dim">borrowed reference (solve "'+esc(n.title)+'" yourself to use your own)</span></li>'}
+   else rows+='<li class="sat">'+(window.LQMark?LQMark('no',16):'')+' <code>'+esc(n.fn)+'</code> missing</li>'});
   return {rows:rows,borrowed:borrowed,q:{t:'code',id:'cap-'+A.key,capstone:true,title:cap.title,q:cap.q,starter:cap.starter,tests:cap.tests,hints:cap.hints,solution:cap.solution,why:cap.why,prelude:pre.join('\n\n')}}},
  openCapstone:function(H){var cap=A.capstone;
   H.openOv(function(){var b=Party.build(),q=b.q;

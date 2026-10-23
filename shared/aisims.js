@@ -20,7 +20,7 @@ function confusion(host,cfg){
  function draw(){var d=sets[mode],tp=0,fp=0,fn=0,tn=0,svg='<rect x="0" y="0" width="600" height="120" rx="8" fill="#0a0f15"/>';
   d.forEach(function(it,i){var fl=it.s>=th;if(it.y&&fl)tp++;else if(!it.y&&fl)fp++;else if(it.y)fn++;else tn++;
    var x=10+it.s*580,y=14+((i*37)%92);svg+='<circle cx="'+x+'" cy="'+y+'" r="5.2" fill="'+(it.y?'#d7b56a':'#4f86c6')+'" opacity="'+(fl?1:.55)+'" stroke="'+(fl?'#f6efe0':'none')+'" stroke-width="1"/>'});
-  var lx=10+th*580;svg+='<line x1="'+lx+'" y1="0" x2="'+lx+'" y2="120" stroke="#e58a7a" stroke-width="2"/><text x="'+Math.min(lx+4,540)+'" y="12" fill="#e58a7a" font-size="11">flag here and above</text>';
+  var lx=10+th*580;svg+='<line x1="'+lx+'" y1="0" x2="'+lx+'" y2="120" stroke="#e58a7a" stroke-width="2"/><text x="'+Math.min(lx+4,430)+'" y="18" fill="#f6efe0" font-size="13">flag here and above</text>';
   $('#cx-svg').innerHTML=svg;
   var prec=tp+fp?tp/(tp+fp):null,rec=tp+fn?tp/(tp+fn):null,acc=(tp+tn)/d.length,f=prec&&rec?2*prec*rec/(prec+rec):null,total=fn*cost+fp;
   var best=1e9,bt=th;for(var t=5;t<=95;t++){var tt=t/100,a=0,b=0;d.forEach(function(it){var fl=it.s>=tt;if(it.y&&!fl)a++;else if(!it.y&&fl)b++});var c=a*cost+b;if(c<best){best=c;bt=tt}}
@@ -38,7 +38,7 @@ function lr(host){
  function draw(){var ws=[W0],w=W0,i;for(i=0;i<steps;i++){w=w-rate*2*(w-W_MIN);ws.push(w)}
   var X=function(v){return 30+(v+8)/22*540},Ymax=140,Y=function(v){return 200-Math.max(0,Math.min(v,Ymax))/Ymax*180};
   var svg='<rect width="600" height="220" rx="8" fill="#0a0f15"/><polyline fill="none" stroke="#c8a86a" stroke-width="2" points="';for(var x=-8;x<=14;x+=.25)svg+=X(x).toFixed(1)+','+Y(f(x)).toFixed(1)+' ';svg+='"/>';
-  svg+='<line x1="'+X(W_MIN)+'" y1="20" x2="'+X(W_MIN)+'" y2="205" stroke="#4f7a3a" stroke-dasharray="4 4"/><text x="'+(X(W_MIN)+4)+'" y="30" fill="#8fbf6a" font-size="11">lowest loss</text>';
+  svg+='<line x1="'+X(W_MIN)+'" y1="20" x2="'+X(W_MIN)+'" y2="205" stroke="#8fbf6a" stroke-dasharray="4 4"/><text x="'+(X(W_MIN)+4)+'" y="34" fill="#f6efe0" font-size="13">lowest loss</text>';
   var pts='';ws.forEach(function(v,k){if(Math.abs(v)>1e6)return;var cx=Math.max(8,Math.min(592,X(v))),cy=Y(f(v));pts+=(k?'L':'M')+cx.toFixed(1)+' '+cy.toFixed(1)+' '});
   svg+='<path d="'+pts+'" fill="none" stroke="#e58a7a" stroke-width="1.2" opacity=".7"/>';
   ws.forEach(function(v,k){var cx=Math.max(8,Math.min(592,X(v))),cy=Y(f(v));svg+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+(k===0?6:4)+'" fill="'+(k===0?'#d7b56a':'#e58a7a')+'"/>'});

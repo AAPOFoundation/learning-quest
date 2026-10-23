@@ -6,7 +6,7 @@
 var cv=document.getElementById('hero');if(!cv||!window.Art)return;
 var Art=window.Art,FX=window.LQFx,S=Art.S,hx=Art.hx,hy=Art.hy,hash=Art.hash,g=cv.getContext('2d');
 var COLS=22,ROWS=8,SEED=7;
-var TOWNS=[{c:3,r:3,biome:'meadow',accent:'#4f7a3a',name:'Python Basics',motif:'seed',tint:'#6d9a4e'},{c:7,r:3,biome:'forest',accent:'#6a3a2a',name:'AI Foundations',motif:'neuron',tint:'#c47a48'},{c:11,r:3,biome:'hills',accent:'#3f5f8f',name:'AI Evaluation',motif:'scale',tint:'#3f5f8f'},{c:15,r:3,biome:'tundra',accent:'#8a4a3a',name:'AI Safety',motif:'shield',tint:'#8a4a3a'}],CAST={c:19,r:3,accent:'#c9a24f',name:'Citadel',motif:'book',tint:'#c9a24f'};
+var TOWNS=[{c:3,r:3,biome:'meadow',accent:'#4f7a3a',name:'Python Basics',motif:'seed',tint:'#6d9a4e',roof:'#7a5a32'},{c:7,r:3,biome:'forest',accent:'#6a3a2a',name:'AI Foundations',motif:'neuron',tint:'#c47a48',roof:'#343e2c'},{c:11,r:3,biome:'hills',accent:'#3f5f8f',name:'AI Evaluation',motif:'scale',tint:'#3f5f8f',roof:'#3a4658'},{c:15,r:3,biome:'tundra',accent:'#8a4a3a',name:'AI Safety',motif:'shield',tint:'#8a4a3a',roof:'#3e4c5a'}],CAST={c:19,r:3,accent:'#c9a24f',name:'Citadel',motif:'book',tint:'#c9a24f',roof:'#8a6528'};
 var HERO={skin:'#e2b48c',hair:'#3b2a1d',robe:'#274a7a',trim:'#d7b56a',cape:'#7a2e2a',hat:'hood',staff:true};
 function terrain(){var t=[];for(var c=0;c<COLS;c++){t.push([]);for(var r=0;r<ROWS;r++){var h=hash(c,r,SEED),e=Art.vnoise(c*.35,r*.5,SEED),v='grass';
   if(r>=6&&c<6)v=(r===6&&h<.35)?'grass':'water';else if(r===0&&(c>10||h<.3))v=c>16?'mountain':'hills';else if(c>=14&&c<=17&&r!==3)v=(h<.45?'pine':'snow');else if(c>=5&&c<=8&&r!==3)v=(e>.42?'forest':'grass');else if(c>=10&&c<=12&&r!==3&&h<.4)v='hills';else if(r>=6&&c>=19)v='water';else if(r===7&&c>=7&&c<=10)v='water';t[c].push(v)}}
@@ -31,8 +31,8 @@ function draw(){var full=X1-X0,z=Math.max(W/full,H/(S*1.5*6.8)),vw=W/z,vh=H/z,to
  g.setTransform(1,0,0,1,0,0);g.fillStyle='#0a0f15';g.fillRect(0,0,cv.width,cv.height);
  g.setTransform(dpr*z,0,0,dpr*z,-cx*dpr*z,-cy*dpr*z);g.drawImage(sc.cv,0,0);
  if(!FX.low&&window.LQAnim)LQAnim.water(g,sc,T,cx,cy,vw,vh);
- var list=TOWNS.map(function(n){return {y:hy(n.r),f:function(){Art.building(g,'town',hx(n.c,n.r),hy(n.r),{accent:n.accent,t:T,biome:n.biome,motif:n.motif})}}});
- list.push({y:hy(CAST.r),f:function(){Art.building(g,'castle',hx(CAST.c,CAST.r),hy(CAST.r),{accent:CAST.accent,t:T,motif:CAST.motif})}});
+ var list=TOWNS.map(function(n){return {y:hy(n.r),f:function(){Art.building(g,'town',hx(n.c,n.r),hy(n.r),{accent:n.accent,t:T,biome:n.biome,motif:n.motif,roof:n.roof})}}});
+ list.push({y:hy(CAST.r),f:function(){Art.building(g,'castle',hx(CAST.c,CAST.r),hy(CAST.r),{accent:CAST.accent,t:T,motif:CAST.motif,roof:CAST.roof})}});
  var st=still(),hxp=st?hx(5,3):hp[0];/* still frame: on the road between towns 1 and 2 */list.push({y:hy(3)+1,f:function(){Art.figure(g,hxp,hy(3)+S*.2,HERO,{t:T,moving:!st,face:st?1:hp[1]})}});
  list.sort(function(a,b){return a.y-b.y}).forEach(function(o){o.f()});
  /* name plaques, in the map's own style */
