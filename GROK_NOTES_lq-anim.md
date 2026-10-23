@@ -17,6 +17,10 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 7. **Performance.** Static trees and rocks are stamped once and blitted (shared by shape: oak, pine, snow, bush, stone). Low effects, or reduced motion, and a hero who is standing still with no key, path, fog, or camera settle, redraw at about 8fps. A held key is never skipped. The tab being hidden skips the frame. Name plaques cache `measureText`. Particle and water drawing avoid `toFixed` in the inner loop.
 8. **Low effects still means the quiet map.** Hop, veil, shake, dust, floaters, NPC waves, and the quest bob are off when Low effects is on or the reduced-motion query matches. The idle redraw cap applies only in that quiet mode.
 
+## Checked
+
+A mock canvas ran the stride, the idle blink, the wave, shared tree stamps, the chest lid and the low-effects skip. Edge drew one frame: four steps, a wave, a pine, an opening chest, the word Cleared and a ring. The full game was not clicked through on a phone.
+
 ## Not done
 
-No phone, Safari, or Firefox pass in this session. No change to lesson text. Building flags, fountains, and town variants were already animated and were left as live drawing (they read the clock).
+No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings were already animated, so they stay live drawing.
