@@ -2,6 +2,7 @@
 body.world{height:100vh;height:100dvh;overflow:hidden;position:fixed;inset:0;width:100%;touch-action:none;user-select:none;-webkit-user-select:none}
 #stage{position:absolute;inset:0;background:#0a0f15}
 #cv{width:100%;height:100%;display:block;outline:none}
+#lqgl{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;visibility:hidden}
 #hud{position:absolute;inset:0;pointer-events:none;z-index:3}
 #hud .panel{pointer-events:auto;margin:0;padding:8px 10px;border-radius:10px;box-shadow:inset 0 0 0 1px #070b10c7,inset 0 0 0 2px #d7b56a4d,0 0 0 1px var(--brass-mid),0 6px 16px #0008}
 #hud .panel:before{opacity:.28}
