@@ -124,3 +124,12 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 ## Check, pass 9
 
 `node shared/lq3d-geom.js` prints `"ok": true`. Hero heading dot is 1. The robe check finds waist facets, and the nose check finds the front of the face. The shelter check finds the back wall, the bench and a roof under 1.7. Headless Edge, low effects, shows the meadow with dark bands on the shelter roof, straw hanging at the open side, and a bench under the roof. The hood, the cape, the stick, the friend's cap and the book still read. Not tried on a phone.
+
+## Pass 10 (same day)
+
+- The lantern was a glowing cube on a pole. It is now a chamber at the same height as its point light (y=1.16), with six brass ribs, a lip, and a peaked cap. The cap is metal, so it picks up the gold grade. The chest bands are wider, so that gold lamp has a rim to hit.
+- Character foot discs follow the sun. The light sits at about (0.62, 0.52, 0.28), so the shade falls toward -X and -Z, and the disc is longer. They are a little darker. Other contact discs stay short. Low effects still has no shadow map.
+
+## Check, pass 10
+
+`node shared/lq3d-geom.js` prints `"ok": true`. The lantern check wants a cap above 1.4, a glow near y=1.16, and both the flame id and the metal id. The hero foot disc reaches past 0.75 in local space. Headless Edge, low effects, shows a peaked lamp by the fire with a bright chamber. Full effects still casts the people onto the grass, and the chest reads with a gold rim. Not tried on a phone.

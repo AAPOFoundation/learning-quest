@@ -264,8 +264,8 @@ function tentMesh(){
 function chestMesh(){
  var b=new Builder(), wood=hex('#7a4e2e'), dark=hex('#4e301c'), gold=hex('#d7b56a');
  b.box(0,0.16,0,0.52,0.28,0.34,wood,0);
- b.box(0,0.22,0,0.54,0.04,0.36,gold,0.55);
- b.box(0,0.1,0,0.54,0.035,0.36,gold,0.55);
+ b.box(0,0.22,0,0.56,0.055,0.38,gold,0.55);
+ b.box(0,0.09,0,0.56,0.045,0.38,gold,0.55);
  var hingeL=[-0.26,0.33,0.16], hingeR=[0.26,0.33,0.16], lipL=[-0.26,0.52,-0.16], lipR=[0.26,0.52,-0.16];
  b.polyOut([hingeL, hingeR, lipR, lipL],[0,-1,0],wood,0);
  b.polyOut([hingeL, lipL, lipR, hingeR],[0,1.4,0],dark,0);
@@ -286,21 +286,27 @@ function fireMesh(){
  return pack(b);
 }
 function flameMesh(h,col){var b=new Builder(); cone(b,0,0,0,h*0.32,h,6,col,1); return pack(b)}
+/* Peaked lamp. The glow sits at y=1.16, which is where the lantern point light is. */
 function lanternMesh(){
- var b=new Builder(), brass=hex('#c8a86a'), dark=hex('#4a4036');
- cyl(b,0,0.52,0,0.032,1.0,6,dark,0);
- b.box(-0.09,1.16,0,0.022,0.22,0.022,brass,0.55);
- b.box(0.09,1.16,0,0.022,0.22,0.022,brass,0.55);
- b.box(0,1.16,-0.09,0.022,0.22,0.022,brass,0.55);
- b.box(0,1.16,0.09,0.022,0.22,0.022,brass,0.55);
- b.box(0,1.16,0,0.07,0.12,0.07,hex('#ffc56a'),1);
- b.box(0,1.29,0,0.2,0.04,0.2,brass,0.55);
- b.box(0,1.04,0,0.18,0.028,0.18,hex('#8a6528'),0.55);
+ var b=new Builder(), brass=hex('#c8a86a'), dark=hex('#4a4036'), glow=hex('#ffc56a'), cap=hex('#8a6528');
+ var i, a;
+ cyl(b,0,0.55,0,0.03,1.06,6,dark,0);
+ cyl(b,0,1.16,0,0.075,0.14,6,glow,1);
+ for(i=0;i<6;i++){
+  a=i/6*TAU;
+  b.box(Math.cos(a)*0.095, 1.16, Math.sin(a)*0.095, 0.016, 0.2, 0.016, brass, 0.55);
+ }
+ cyl(b,0,1.05,0,0.115,0.028,6,brass,0.55);
+ cyl(b,0,1.27,0,0.115,0.026,6,brass,0.55);
+ cone(b,0,1.28,0,0.13,0.16,6,cap,0.55);
+ sphere(b,0,1.47,0,0.026,5,3,brass,0.55);
  return pack(b);
 }
 function shadowMesh(r, person){
- var b=new Builder(), col=person?[0.20,0.22,0.15]:[0.30,0.34,0.22], seg=14, i, a0, a1;
- var dx=-0.46, dz=-0.24, len=Math.sqrt(dx*dx+dz*dz)||1, px, pz, longR=r*1.25, shortR=r*0.82;
+ var b=new Builder(), col=person?[0.18,0.20,0.13]:[0.30,0.34,0.22], seg=14, i, a0, a1;
+ /* People use the sun's ground direction (light is +X +Z, so the shade falls -X -Z) and a longer disc. */
+ var dx=person?-0.62:-0.46, dz=person?-0.28:-0.24, len=Math.sqrt(dx*dx+dz*dz)||1, px, pz;
+ var longR=r*(person?1.65:1.25), shortR=r*(person?0.7:0.82);
  dx/=len; dz/=len; px=-dz; pz=dx;
  function pt(ang){
   var c=Math.cos(ang), s=Math.sin(ang);
@@ -1033,6 +1039,20 @@ function selfCheck(){
     }
     if(!wall)errors.push('shelter wall');
     if(!bench)errors.push('shelter bench');
+   }
+   var lan=meshBy(camp,'lantern');
+   if(!lan||boundsY(lan)[1]<1.4||!band(lan.emissive,0.95,1)||!band(lan.emissive,0.5,0.6))errors.push('lantern cap');
+   else{
+    var lglow=false, lp=lan.positions, le=lan.emissive, gi;
+    for(gi=0;gi<le.length;gi++)if(le[gi]>0.95&&Math.abs(lp[gi*3+1]-1.16)<0.12)lglow=true;
+    if(!lglow)errors.push('lantern core');
+   }
+   var foot=null, fi;
+   if(hero)for(fi=0;fi<camp.meshes.length;fi++)if(camp.meshes[fi].name==='shadow'&&Math.abs(camp.meshes[fi].x-hero.x)<0.02)foot=camp.meshes[fi];
+   if(foot){
+    var fp=foot.positions, far=0, fd, fj;
+    for(fj=0;fj<fp.length;fj+=3){fd=Math.sqrt(fp[fj]*fp[fj]+fp[fj+2]*fp[fj+2]); if(fd>far)far=fd}
+    if(far<0.75)errors.push('hero shadow short '+far.toFixed(2));
    }
   }
   if(biomes[bi]==='marsh'){

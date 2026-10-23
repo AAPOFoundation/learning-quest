@@ -101,3 +101,6 @@ The cliff on the left rim is a battered ridge. Each course steps back, the top o
 
 ## v17: camp people and the trail shelter (23 Oct 2026)
 The robe is an eight-sided shape, so a three-quarter view shows facets instead of a crate. A small nose sits on the front of the face, and each boot has a rounded toe. The trail shelter keeps an open front and gains a plank rail on the camera side, a bench, a back wall, two thatch sheets with dark courses, and a straw fringe. No sign. The hex map stays 2D.
+
+## v18: camp lantern and foot shadows (23 Oct 2026)
+The lantern is a peaked lamp: a glowing chamber, brass ribs, and a cap. Its point light stays at the chamber. The chest bands are a little wider, so the gold lamp has metal to catch. Character foot shadows stretch along the sun (toward -X and -Z) and are a touch darker. Low effects still uses those discs, with the shadow map off. The hex map stays 2D.
