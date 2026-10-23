@@ -93,6 +93,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 83. **Copied gives a small pop.** After a copy, the button word changes to Copied and the button pops, then the old word comes back. Reduced motion removes the pop. The word change stays.
 84. **Figures share one limb.** Each figure used to build a new limb function every frame. One shared limb draws the same legs and arms.
 85. **The loop stepper and the two benches rise.** Step rises, then Reset. Each new log line rises once. Older lines stay still, and a reset does not play it again. Autocomplete Workshop rises, then Context Bench. Switching benches does not play the rise again. The rise lets go, so a press can still sink. Reduced motion removes it.
+86. **Simulator menus ease their edge.** A later border was covering the gold edge on a simulator menu. The snippet picker had the same cover in its own style, so the edge could not ease. Both now ease to gold. Reduced motion removes the ease. The word-list search is still left alone.
 
 ## Checked
 
