@@ -35,4 +35,4 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 
 ## Check, pass 2
 
-`node shared/lq3d-geom.js` prints `"ok": true`. Hero heading dot is 1, height about 1.90, and the meadow picture has skin, tent, fire, ground and sky. Headless Edge rendered the meadow and the forest with full effects: both people, the pointed hood, the cap, the book, the pot, the tent and the pines, with soft ground shadows. Not tried on a phone.
+`node shared/lq3d-geom.js` prints `"ok": true`. Hero heading dot is 1, height about 1.90, and the meadow picture has skin, tent, fire, ground and sky. Headless Edge rendered meadow, forest, desert, marsh and tundra with full effects. The hood has a point, the friend has a cap and a book, the fire has a pot, and the marsh pool has a pale rim and a lily. Desert fog is warm. Tundra pines and ice read as snow. Not tried on a phone.
