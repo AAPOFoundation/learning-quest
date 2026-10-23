@@ -81,6 +81,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 71. **Lesson actions and Check answer rise.** Back or Exit rises, then Next, Done or Start the questions. A quiet setting skips that, the same way it skips the page fade. Check answer rises once with the choices, and a later redraw does not play it again. The rise lets go, so a press can sink. Reduced motion removes it.
 72. **A still crown tips.** When a crowned figure stands, the crown tips a little, then comes back. A walk holds it level. The shape is the same as before.
 73. **The code helpers rise in order.** Walk me through it, Hint, Reset code and the solution button arrive one after another. The rise lets go, so a press can still sink. Reduced motion removes it.
+74. **Warm-up buttons rise in order.** The five practice buttons on the Python primer arrive one after another. The rise lets go, so a press can still sink. Reduced motion removes it.
 
 ## Checked
 
