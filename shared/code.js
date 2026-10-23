@@ -77,7 +77,7 @@ function mount(q,el,ctx){
   var pass=0,rows='',hn=0,hfail=0;d.res.forEach(function(x,i){var t=q.tests[i];if(x.ok)pass++;if(t.hidden){hn++;if(!x.ok)hfail++}else rows+='<div class="cq-t '+(x.ok?'ok':'no')+'">'+(x.ok?'✔ ':'✘ ')+esc(t.n)+(x.ok?'':'<div class="small">'+esc(x.msg||'failed')+'</div>')+'</div>'});
   var hmsgs=[];d.res.forEach(function(x,i){if(q.tests[i].hidden&&!x.ok)hmsgs.push(x.msg||'failed')});
   rows+='<div class="cq-t '+(hfail?'no':'ok')+'">'+(hfail?'✘ ':'✔ ')+'Hidden tests: '+(hn-hfail)+' of '+hn+' passed'+(hmsgs.length?hmsgs.map(function(m){return '<div class="small">Failed: '+esc(m)+'</div>'}).join(''):'')+'</div>';
-  if(pass===d.res.length){out.className='cq-out ok';out.innerHTML='<b>All '+pass+' tests pass.</b>'+rows;finish(true)}
+  if(pass===d.res.length){out.className='cq-out ok cheer';out.innerHTML='<b>All '+pass+' tests pass.</b>'+rows;finish(true)}
   else{out.className='cq-out bad';out.innerHTML='<b>'+pass+' of '+d.res.length+' tests pass.</b>'+rows}})};
  function finish(ok){lock();var E=window.Engine;if(ok&&!q.practice&&E&&E.codeSolved)E.codeSolved(q.id);if(ok&&!q.capstone&&!q.practice&&window.Satchel)window.Satchel.add(q,ed.value);var end=el.querySelector('#cq-end');end.innerHTML='<div class="fb ok"><b>Solved. </b>'+(q.why||'')+'</div><button class="btn btn-primary" id="cq-next">Next</button>';end.querySelector('#cq-next').onclick=function(){ctx.done(true)}}
  function hintBtn(){var b=el.querySelector('#cq-hint'),hs=q.hints||[];if(hints>=hs.length){b.disabled=true;b.textContent='No more hints';return}b.disabled=false;b.textContent=(hints>=1&&tries<hints)?'Next hint (press Check first)':(hints?'Next hint':'Hint')}

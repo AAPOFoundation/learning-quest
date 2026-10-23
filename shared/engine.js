@@ -113,7 +113,7 @@ function level(i,mode){
    if(doneCount()===A.levels.length)award('all');
    if(A.onLevel)A.onLevel(L.id,p,award);
    save();
-   var h='<section class="panel"><p class="kicker">'+(pass?'Level cleared':'Not cleared yet')+'</p><h2>'+r+' of '+L.qs.length+' correct</h2>'+stars(pass?starsFor(p):0)+'<p class="dim" style="margin-top:10px">+'+gain+' XP. '+(pass?(p<1?'Replay for three stars; you only need 60% to move on.':'A clean sweep.'):'You need 60% to clear a level. Re-read the lesson and try again, there is no penalty.')+'</p><div class="row"><button class="btn btn-ghost" id="rl">Re-read lesson</button><button class="btn btn-primary" id="nx2">'+('Back to the map')+'</button></div></section>';
+   var h='<section class="panel'+(pass?' cheer':'')+'"><p class="kicker">'+(pass?'Level cleared':'Not cleared yet')+'</p><h2>'+r+' of '+L.qs.length+' correct</h2>'+stars(pass?starsFor(p):0)+'<p class="dim" style="margin-top:10px">+'+gain+' XP. '+(pass?(p<1?'Replay for three stars; you only need 60% to move on.':'A clean sweep.'):'You need 60% to clear a level. Re-read the lesson and try again, there is no penalty.')+'</p><div class="row"><button class="btn btn-ghost" id="rl">Re-read lesson</button><button class="btn btn-primary" id="nx2">'+('Back to the map')+'</button></div></section>';
    shell(h);$('#rl').onclick=function(){step=0;MODE=null;lesson()};$('#nx2').onclick=function(){EXIT()}}))}
  if(mode==='quiz')quiz();else lesson()}
 
@@ -122,7 +122,7 @@ function boss(){
  function step(){
   if(i>=B.steps.length){touchStreak();var p=pts/B.steps.reduce(function(a,s){return a+Math.max.apply(null,s.opts.map(function(o){return o.pts}))},0);
    var first=!(P.boss&&P.boss.done),gain=Math.round(p*60)+(first?40:0);P.xp+=gain;P.boss={done:true,best:Math.max(P.boss?P.boss.best:0,p)};award('boss');if(p>=.9)award('master');save();
-   shell('<section class="panel"><p class="kicker">Final challenge complete</p><h2>'+Math.round(p*100)+'% design score</h2>'+stars(starsFor(p))+'<p class="dim" style="margin-top:10px">+'+gain+' XP.</p>'+picks.map(function(x){return '<p class="small"><b>'+esc(x.t)+':</b> '+x.why+'</p>'}).join('')+'<div class="row"><button class="btn btn-ghost" id="rp">Replay</button><button class="btn btn-primary" id="hm">Back to the map</button></div></section>');
+   shell('<section class="panel cheer"><p class="kicker">Final challenge complete</p><h2>'+Math.round(p*100)+'% design score</h2>'+stars(starsFor(p))+'<p class="dim" style="margin-top:10px">+'+gain+' XP.</p>'+picks.map(function(x){return '<p class="small"><b>'+esc(x.t)+':</b> '+x.why+'</p>'}).join('')+'<div class="row"><button class="btn btn-ghost" id="rp">Replay</button><button class="btn btn-primary" id="hm">Back to the map</button></div></section>');
    $('#rp').onclick=function(){boss()};$('#hm').onclick=home;return}
   var s=B.steps[i],h='<section class="panel"><p class="kicker">'+esc(B.title)+' · step '+(i+1)+' of '+B.steps.length+'</p>'+(i===0?'<p class="dim">'+B.intro+'</p>':'')+'<h3 style="color:var(--ink);font-family:var(--font);font-size:18px">'+s.q+'</h3>';
   shuf(s.opts.map(function(_,k){return k})).forEach(function(k){var o=s.opts[k];h+='<button class="opt" data-k="'+k+'">'+o.t+'</button>'});
