@@ -40,6 +40,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 30. **A still staff stone pulses.** The pale stone on a staff grows and shrinks a little while the figure stands. It holds one size while the figure walks.
 31. **Hair stirs while a figure stands.** The hairline shifts by about a pixel, on a different beat from the cape. Walking holds it still. Hoods and helms have no loose hair, so they stay put. Low effects draws this with the quiet idle, at about 8 frames a second.
 32. **Mixed colours are remembered.** Robes, skin and walls mix the same pairs every frame. The rgb string is kept, so the hex parse runs once per pair. The picture does not change.
+33. **A name fades in as you walk closer.** Inside about two tiles the name is solid. It fades across the next bit of distance and is gone by three tiles. Low effects and reduced motion keep the old hard edge.
 
 ## Checked
 
