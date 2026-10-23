@@ -128,8 +128,11 @@ var D={lines:[],sp:null,cb:null,choices:null,full:'',i:0,typing:false,shown:0};
 function say(sp,lines,cb){D.lines=(typeof lines==='string'?[lines]:lines).slice();D.sp=sp;D.cb=cb||null;D.choices=null;st.mode='dlg';st.path=null;st.pad=-1;nextLine()}
 function ask(sp,text,opts){D.sp=sp;D.lines=[];D.cb=null;D.choices=opts;D.full=text;st.mode='dlg';st.path=null;draw0()}
 function nextLine(){D.full=D.lines.shift();D.choices=null;draw0()}
+/* NPC look with stable per-name variety, and a portrait mood read from the line being spoken (neutral when unsure) */
+function nl(sp){return sp&&sp.look&&Art.npcLook?Art.npcLook(sp.look,sp.name):(sp&&sp.look)}
+function moodOf(t,q){t=String(t||'');if(/(you found|well done|well studied|you have passed|correct|great work|nicely done|excellent|\+\d+ XP|welcome|well met|hello)/i.test(t))return 'happy';if(/(halt|sealed|locked|oh!|whoa|wow)/i.test(t))return 'surprised';if(q||/\?\s*$/.test(t))return 'thinking';return 'neutral'}
 function draw0(){var el=$('#dlg'),sp=D.sp||{};el.hidden=false;D.i=0;D.typing=true;D.shown=0;document.body.classList.add('indlg');
- var pic=sp.look?'<img alt="" src="'+Art.portrait(sp.look,84)+'">':'<div style="width:84px;height:84px;border-radius:12px;border:2px solid var(--brass);display:grid;place-items:center;font-size:40px;background:var(--panel-lift);flex:none">'+(sp.icon||'📜')+'</div>';
+ var pic=sp.look?'<img alt="" src="'+Art.portrait(nl(sp),84,moodOf(D.full,!!D.choices))+'">':'<div style="width:84px;height:84px;border-radius:12px;border:2px solid var(--brass);display:grid;place-items:center;font-size:40px;background:var(--panel-lift);flex:none">'+(sp.icon||'📜')+'</div>';
  el.innerHTML='<div class="panel">'+pic+'<div class="tx"><span class="nameplate">'+esc(sp.name||'')+'</span>'+(sp.title?'<span class="ti">'+esc(sp.title)+'</span>':'')+'<div class="body"></div><div class="ch"></div></div></div>';
  el.firstChild.onclick=function(e){if(e.target.closest('.opt'))return;adv()};}
 function typeTick(dt){if(!D.typing)return;D.i+=dt*55;var n=Math.min(D.full.length,Math.floor(D.i)),b=$('#dlg .body');if(!b)return;if(n!==D.shown){if(n%3===0)blip(520+(n%7)*18,.04,.012,'square');D.shown=n;b.textContent=D.full.slice(0,n)}if(n>=D.full.length){D.typing=false;finishType()}}
@@ -212,7 +215,7 @@ function buildHud(){var h=$('#hud');
  +'<div id="area"><p class="kicker"></p><b></b></div>'
  +'<div id="pad">'+[['↖',3],['↗',2],['←',1],['→',0],['↙',5],['↘',4]].map(function(a){return '<button class="ib" data-d="'+a[1]+'" aria-label="Move '+['east','west','north-east','north-west','south-east','south-west'][a[1]]+'">'+a[0]+'</button>'}).join('')+'</div>'
  +'<div id="acts"><button class="ib" id="bact" aria-label="Talk or interact">A</button></div>';
- $('#pm').innerHTML=C.regions.map(function(R,i){return '<img alt="'+esc(R.gate.name)+'" title="'+esc(R.gate.name)+'" src="'+Art.portrait(R.gate.look,24)+'">'}).join('');
+ $('#pm').innerHTML=C.regions.map(function(R,i){return '<img alt="'+esc(R.gate.name)+'" title="'+esc(R.gate.name)+'" src="'+Art.portrait(nl(R.gate),24)+'">'}).join('');
  if(window.Party&&$('#pc'))Party.hud($('#pc'));
  $('#bmap').onclick=mapScreen;$('#mm').onclick=mapScreen;$('#bq').onclick=questLog;$('#quest').onclick=questLog;$('#bmenu').onclick=menu;$('#bsnd').onclick=toggleSound;$('#bact').onclick=function(){gest=true;actionKey()};
  [].forEach.call(document.querySelectorAll('#pad button'),function(b){var d=+b.dataset.d;b.addEventListener('pointerdown',function(e){e.preventDefault();gest=true;if(st.mode==='play')st.pad=d});['pointerup','pointerleave','pointercancel'].forEach(function(ev){b.addEventListener(ev,function(){if(st.pad===d)st.pad=-1})})});
@@ -299,7 +302,7 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
  var w=P().w||{chests:{},caches:{}};
  list.forEach(function(it){if(it.hero){Art.figure(g,h.x,h.y,C.hero,{t:T,moving:!!h.mv,face:h.face,celebrate:!h.mv&&st.celUntil>T});return}
   var o=it.o,x=hx(o.c,o.r),y=hy(o.r);if(x<cx-90||x>cx+vw+90||y<cy-130||y>cy+vh+90)return;
-  if(o.type==='npc'){var fc=h.x<x?-1:1;Art.figure(g,x,y,o.sp.look,{t:T+o.c,face:fc});
+  if(o.type==='npc'){var fc=h.x<x?-1:1;Art.figure(g,x,y,nl(o.sp),{t:T+o.c,face:fc});
    if(Math.abs(h.x-x)<S*3&&Math.abs(h.y-y)<S*3){g.font='700 13px "Cormorant Garamond",Georgia,serif';g.textAlign='center';g.lineWidth=4;g.strokeStyle='rgba(10,15,21,.9)';g.strokeText(o.name,x,y-S*1.45);g.fillStyle='#f3e2b0';g.fillText(o.name,x,y-S*1.45)}}
   else{var op={accent:o.accent,t:T,pine:o.pine,snow:o.snow,v:o.v,landmark:o.landmark,biome:o.type==='node'?bio(o.i):null};
    if(o.type==='chest'){op.open=o.i>=NR?!!w.chests[o.i]:!!w.chests[o.i];op.glow=!op.open&&(o.i>=NR?bossDone():levelDone(o.i));op.locked=!(o.i>=NR?bossDone():levelDone(o.i))}
