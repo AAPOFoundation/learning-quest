@@ -24,8 +24,8 @@ function size(){var r=cv.getBoundingClientRect();dpr=Math.min(2,window.devicePix
  var vg=o.createRadialGradient(W/2,H/2,Math.min(W,H)*.4,W/2,H/2,Math.max(W,H)*.7);vg.addColorStop(0,'rgba(8,10,16,0)');vg.addColorStop(1,'rgba(8,10,16,.5)');o.fillStyle=vg;o.fillRect(0,0,W,H)}
 function heroX(){var a=hx(1,3),b=hx(CAST.c-1,3),span=b-a,p=(T*26)%(span*2);return p<span?[a+p,1]:[b-(p-span),-1]}
 var X0=hx(1,3)-S*.6,X1=hx(CAST.c+1,3)+S*.6;
-function draw(){var full=X1-X0,z=Math.max(W/full,H/(S*1.5*6.8)),vw=W/z,vh=H/z,top=Math.max(0,Math.min(sc.H-vh,hy(3)-vh*.55)),hp=heroX(),fits=vw>=full-1,tx=fits?X0-(vw-full)/2:(still()?hx(3,3)-vw*.25:hp[0]-vw*.42);
- if(!fits)tx=Math.max(X0,Math.min(X1-vw,tx));cam=still()||!cam?tx:cam+(tx-cam)*.02;var cx=cam,cy=top;
+function draw(dt){var full=X1-X0,z=Math.max(W/full,H/(S*1.5*6.8)),vw=W/z,vh=H/z,top=Math.max(0,Math.min(sc.H-vh,hy(3)-vh*.55)),hp=heroX(),fits=vw>=full-1,tx=fits?X0-(vw-full)/2:(still()?hx(3,3)-vw*.25:hp[0]-vw*.42);
+ if(!fits)tx=Math.max(X0,Math.min(X1-vw,tx));var hk=1-Math.pow(0.98,Math.min(4,(dt||1/30)*30));cam=still()||!cam?tx:cam+(tx-cam)*hk;var cx=cam,cy=top;
  g.setTransform(1,0,0,1,0,0);g.fillStyle='#0a0f15';g.fillRect(0,0,cv.width,cv.height);
  g.setTransform(dpr*z,0,0,dpr*z,-cx*dpr*z,-cy*dpr*z);g.drawImage(sc.cv,0,0);
  if(!FX.low&&window.LQAnim)LQAnim.water(g,sc,T,cx,cy,vw,vh);
@@ -37,7 +37,7 @@ function draw(){var full=X1-X0,z=Math.max(W/full,H/(S*1.5*6.8)),vw=W/z,vh=H/z,to
  var fs=Math.min(30,(W<520?10:11)/z),short=W<520;g.font='700 '+fs+'px "Cormorant Garamond",Georgia,serif';g.textAlign='center';TOWNS.concat([CAST]).forEach(function(n,i){var nm=short?n.name.replace(/^(AI |Python )/,''):n.name,label=(i<4?(i+1)+' · ':'')+nm,nk=fs+'|'+label,x=hx(n.c,n.r),y=hy(n.r)+S*1.15,tw=names[nk];if(tw==null)tw=names[nk]=g.measureText(label).width;tw+=fs*1.2;g.fillStyle='rgba(10,15,21,.86)';g.strokeStyle='#c8a86a';g.lineWidth=1/z;g.beginPath();g.rect(x-tw/2,y-fs*.95,tw,fs*1.45);g.fill();g.stroke();g.fillStyle='#f3e2b0';g.fillText(label,x,y+fs*.12)});
  if(!FX.low&&window.LQAnim)LQAnim.particles(g,'meadow',1/30,cx,cy,vw,vh,T);
  g.setTransform(1,0,0,1,0,0);if(ov)g.drawImage(ov,0,0)}
-function frame(ts){if(!running)return;requestAnimationFrame(frame);var dt=Math.min(.1,(ts-last)/1000||0);last=ts;acc+=dt;if(acc<1/30)return;T+=acc;acc=0;draw()}
+function frame(ts){if(!running)return;requestAnimationFrame(frame);var dt=Math.min(.1,(ts-last)/1000||0);last=ts;acc+=dt;if(acc<1/30)return;var step=acc;T+=acc;acc=0;draw(step)}
 function update(){var want=!still()&&visible&&!document.hidden;if(want&&!running){running=true;last=performance.now();requestAnimationFrame(frame)}else if(!want){running=false;draw()}}
 size();draw();
 window.addEventListener('resize',function(){size();draw()});
