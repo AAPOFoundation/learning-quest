@@ -2,6 +2,8 @@
    Y-up, right-handed. Character front, tent door and chest lip face local -Z.
    Yaw matches Three.js: ry > 0 turns counter-clockwise from above,
    and a mesh faces direction d with ry = atan2(-d.x, -d.z).
+   The emissive float is a material id: 0 diffuse, 0.35 water, 0.55 metal,
+   0.9 steady unlit, 1 flickering unlit.
    No image files. Flat faces, one normal per triangle. */
 (function(root){
 'use strict';
@@ -20,9 +22,10 @@ Builder.prototype._tri=function(a,b,c,col,em){
  var bx=c[0]-a[0], by=c[1]-a[1], bz=c[2]-a[2];
  var nx=ay*bz-az*by, ny=az*bx-ax*bz, nz=ax*by-ay*bx, len=Math.sqrt(nx*nx+ny*ny+nz*nz);
  if(len<1e-10)return; nx/=len;ny/=len;nz/=len;
- var lift=1; if(!em){lift=ny<0?1+ny*0.34:1+ny*0.14}
+ var ev=em||0, lift=1;
+ if(!ev){lift=ny<0?1+ny*0.34:1+ny*0.14}
  var cr=clamp(col[0]*lift,0,1), cg=clamp(col[1]*lift,0,1), cb=clamp(col[2]*lift,0,1);
- var base=this.p.length/3, ev=em?1:0, pts=[a,b,c], i;
+ var base=this.p.length/3, pts=[a,b,c], i;
  for(i=0;i<3;i++){this.p.push(pts[i][0],pts[i][1],pts[i][2]);this.n.push(nx,ny,nz);this.c.push(cr,cg,cb);this.e.push(ev)}
  this.idx.push(base, base+1, base+2);
 };
@@ -117,113 +120,160 @@ function linkRings(b,a,c,inside,col){
  for(i=0;i<4;i++){j=(i+1)%4; b.polyOut([a[i],a[j],c[j],c[i]], inside, col, 0)}
 }
 function hood(b,col){
- /* A rim around the hair and a short cloth down the back. Stays clear of the eyes. */
- cyl(b, 0, 1.6, -0.02, 0.3, 0.055, 8, col, 0);
- b.polyOut([[-0.24,1.52,0.02],[0.24,1.52,0.02],[0.3,0.62,0.26],[-0.3,0.62,0.26]],[0,1.0,-0.5],col,0);
+ /* Pointed cowl: brim over the eyes, cloth on the shoulders, drape down the back. */
+ cyl(b, 0, 1.62, 0.02, 0.3, 0.045, 8, col, 0);
+ b.box(0, 1.66, -0.16, 0.4, 0.04, 0.24, col, 0);
+ b.polyOut([[-0.1,1.68,0.02],[0.1,1.68,0.02],[0,1.9,0.05]],[0,1.3,-1],col,0);
+ b.polyOut([[0,1.9,0.05],[0.1,1.68,0.02],[-0.1,1.68,0.02]],[0,1.3,1],col,0);
+ b.box(-0.2, 1.2, 0.02, 0.08, 0.38, 0.14, col, 0);
+ b.box(0.2, 1.2, 0.02, 0.08, 0.38, 0.14, col, 0);
+ b.polyOut([[-0.24,1.5,0.1],[0.24,1.5,0.1],[0.3,0.48,0.32],[-0.3,0.48,0.32]],[0,1,-0.6],col,0);
 }
 
+function arm(b, shoulder, elbow, hand, rad, col){
+ limb(b, shoulder, elbow, rad, col);
+ limb(b, elbow, hand, rad*0.86, col);
+}
+function shaft(b, a, c, rad, col, em){
+ var d=[c[0]-a[0],c[1]-a[1],c[2]-a[2]], len=Math.sqrt(d[0]*d[0]+d[1]*d[1]+d[2]*d[2])||0.001;
+ var mid=[(a[0]+c[0])/2,(a[1]+c[1])/2,(a[2]+c[2])/2], fr=frameY(d);
+ b.axesBox(mid, fr.x, fr.y, fr.z, rad*2, len, rad*2, col, em||0);
+}
 function person(o){
  var b=new Builder();
  o=o||{};
  var skin=hex(o.skin||'#e2b48c'), hair=hex(o.hair||'#3b2a1d'), robe=hex(o.robe||'#274a7a'), trim=hex(o.trim||'#d7b56a');
- var boot=hex('#3a2a22'), trouser=hex('#2a3138'), hs=o.head||1, hr=0.25*hs, hy=1.40+ (hs-1)*0.06;
- var top=ring(1.06, 0.30, 0.16), waist=ring(0.76, 0.18, 0.125), hem=ring(0.50, 0.34, 0.22);
- linkRings(b, top, waist, [0,0.8,0], robe);
- linkRings(b, waist, hem, [0,0.7,0], robe);
+ var boot=hex('#3a2a22'), trouser=hex('#2a3138'), hs=o.head||1, hr=0.26*hs, hy=1.42;
+ var top=ring(1.08, 0.34, 0.18), waist=ring(0.74, 0.19, 0.13), hem=ring(0.40, 0.36, 0.22);
+ var eyeY=hy+0.03, eyeZ=-0.33, brow=hex('#241812');
+ linkRings(b, top, waist, [0,0.9,0], robe);
+ linkRings(b, waist, hem, [0,0.55,0], robe);
  b.polyOut([hem[0],hem[3],hem[2],hem[1]], [0,2,0], mix(robe,[0,0,0],0.15), 0);
- b.box(0, 0.98, -0.155, 0.18, 0.055, 0.04, trim, 0);
- b.box(0, 0.72, -0.145, 0.26, 0.045, 0.035, trim, 0);
- cyl(b, 0, 1.16, 0, 0.07, 0.14, 6, skin, 0);
+ b.box(0, 1.00, -0.18, 0.24, 0.042, 0.04, trim, 0.55);
+ b.box(0, 0.68, -0.15, 0.30, 0.038, 0.035, trim, 0.55);
+ cyl(b, 0, 1.22, 0, 0.065, 0.12, 6, skin, 0);
  sphere(b, 0, hy, 0, hr, 8, 6, skin, 0);
- hemi(b, 0, hy+0.06, 0.02, hr+0.025, 8, hair);
- var eyeY=hy+0.02, eyeZ=-hr*0.95;
- sphere(b, 0.085, eyeY, eyeZ, 0.055*hs, 6, 4, hex('#f7f1e6'), 0);
- sphere(b, -0.085, eyeY, eyeZ, 0.055*hs, 6, 4, hex('#f7f1e6'), 0);
- sphere(b, 0.085, eyeY, eyeZ-0.03, 0.028*hs, 5, 3, hex('#241812'), 0);
- sphere(b, -0.085, eyeY, eyeZ-0.03, 0.028*hs, 5, 3, hex('#241812'), 0);
- sphere(b, 0.1, eyeY+0.018, eyeZ-0.05, 0.012, 4, 2, hex('#fff6d8'), 1);
- sphere(b, -0.07, eyeY+0.018, eyeZ-0.05, 0.012, 4, 2, hex('#fff6d8'), 1);
- sphere(b, 0, hy-0.055, eyeZ-0.015, 0.038, 5, 3, skin, 0);
- b.box(0, hy-0.105, eyeZ-0.01, 0.09, 0.018, 0.02, hex('#c47a74'), 0);
+ if(o.hat!=='cap')hemi(b, 0, hy+0.05, 0.04, hr+0.02, 8, hair);
+ sphere(b, 0.09, eyeY, eyeZ, 0.058, 6, 4, hex('#f7f1e6'), 0);
+ sphere(b, -0.09, eyeY, eyeZ, 0.058, 6, 4, hex('#f7f1e6'), 0);
+ sphere(b, 0.09, eyeY, eyeZ-0.04, 0.028, 5, 3, brow, 0);
+ sphere(b, -0.09, eyeY, eyeZ-0.04, 0.028, 5, 3, brow, 0);
+ sphere(b, 0.105, eyeY+0.02, eyeZ-0.055, 0.012, 4, 2, hex('#fff6d8'), 0.9);
+ sphere(b, -0.075, eyeY+0.02, eyeZ-0.055, 0.012, 4, 2, hex('#fff6d8'), 0.9);
+ b.box(0.09, eyeY+0.075, eyeZ+0.01, 0.07, 0.016, 0.018, brow, 0);
+ b.box(-0.09, eyeY+0.075, eyeZ+0.01, 0.07, 0.016, 0.018, brow, 0);
+ sphere(b, 0, hy-0.04, eyeZ+0.02, 0.032, 5, 3, skin, 0);
+ b.box(0, hy-0.09, eyeZ+0.015, 0.08, 0.016, 0.018, hex('#c47a74'), 0);
  if(o.hat==='cap'){
-  cyl(b, 0, hy+hr+0.02, 0, hr*0.72, 0.12, 8, hair, 0);
-  cyl(b, 0, hy+hr*0.55, -0.02, hr*1.15, 0.03, 8, trim, 0);
+  cyl(b, 0, hy+hr*0.78, 0.02, hr*1.12, 0.16, 8, robe, 0);
+  b.box(0, hy+hr*0.5, -hr*0.5, hr*2.2, 0.028, hr*1.1, trim, 0.55);
+  b.box(0, hy+0.04, -hr*0.9, hr*1.15, 0.045, 0.035, hair, 0);
  }else if(o.hat!=='none'){
-  hood(b, mix(robe,[0.04,0.05,0.08],0.4));
+  hood(b, mix(robe,[0.04,0.05,0.08],0.35));
  }
  if(o.cape){
   var cape=hex(o.cape);
-  b.polyOut([[-0.16,1.05,0.02],[-0.4,0.98,0.08],[-0.46,0.46,0.22],[-0.14,0.5,0.08]],[0,0.75,-0.8],cape,0);
-  b.polyOut([[0.16,1.05,0.02],[0.14,0.5,0.08],[0.46,0.46,0.22],[0.4,0.98,0.08]],[0,0.75,-0.8],cape,0);
+  b.polyOut([[-0.22,1.06,0.14],[0.22,1.06,0.14],[0.32,0.40,0.30],[-0.32,0.40,0.30]],[0,0.75,-0.4],cape,0);
  }
- limb(b, [-0.32,1.02,0], [-0.4,0.58,0.02], 0.055, skin);
- limb(b, [0.34,1.0,-0.02], [0.44,0.64,-0.16], 0.055, skin);
- limb(b, [-0.1,0.52,0.02], [-0.11,0.14,0.02], 0.065, trouser);
- limb(b, [0.1,0.52,0.02], [0.12,0.14,0], 0.065, trouser);
- b.box(-0.11, 0.06, -0.03, 0.14, 0.12, 0.24, boot, 0);
- b.box(0.12, 0.06, -0.03, 0.14, 0.12, 0.24, boot, 0);
+ b.box(-0.11, 0.06, -0.03, 0.15, 0.12, 0.26, boot, 0);
+ b.box(0.12, 0.06, -0.03, 0.15, 0.12, 0.26, boot, 0);
+ limb(b, [-0.10,0.46,0.02], [-0.12,0.26,-0.05], 0.068, trouser);
+ limb(b, [-0.12,0.26,-0.05], [-0.11,0.13,0.0], 0.055, trouser);
+ limb(b, [0.10,0.46,0.02], [0.13,0.26,-0.05], 0.068, trouser);
+ limb(b, [0.13,0.26,-0.05], [0.12,0.13,0.0], 0.055, trouser);
  if(o.stick){
-  var fr=frameY([0.06,-1,-0.18]);
-  b.axesBox([0.5,0.46,-0.18], fr.x, fr.y, fr.z, 0.04, 0.7, 0.04, hex('#6b4428'), 0);
-  sphere(b, 0.47, 0.82, -0.1, 0.05, 6, 4, trim, 0);
+  arm(b, [-0.30,1.02,0], [-0.40,0.66,-0.08], [-0.32,0.42,-0.16], 0.05, skin);
+  arm(b, [0.28,1.02,-0.02], [0.42,0.74,-0.12], [0.48,0.52,-0.18], 0.05, skin);
+  shaft(b, [0.52,0.08,-0.22], [0.46,0.96,-0.08], 0.022, hex('#6b4428'), 0);
+  sphere(b, 0.45, 1.00, -0.06, 0.048, 6, 4, trim, 0.55);
+ }else{
+  arm(b, [-0.28,1.02,0], [-0.16,0.84,-0.10], [-0.08,0.74,-0.22], 0.048, skin);
+  arm(b, [0.28,1.02,-0.02], [0.16,0.84,-0.10], [0.08,0.74,-0.22], 0.048, skin);
+  b.box(0, 0.76, -0.28, 0.16, 0.11, 0.035, hex('#27406a'), 0);
+  b.box(0, 0.76, -0.30, 0.13, 0.09, 0.012, hex('#f4ead8'), 0);
  }
  if(o.pack!==false){
-  b.box(0, 0.8, 0.24, 0.26, 0.28, 0.14, hex('#6b4428'), 0);
-  b.box(0, 0.96, 0.25, 0.2, 0.06, 0.16, hex('#5a3824'), 0);
-  b.box(0.18, 0.72, 0.2, 0.1, 0.14, 0.1, trim, 0);
+  b.box(0, 0.78, 0.30, 0.24, 0.26, 0.12, hex('#6b4428'), 0);
+  b.box(0, 0.93, 0.31, 0.18, 0.05, 0.13, hex('#5a3824'), 0);
+  b.box(0.02, 0.78, 0.37, 0.07, 0.08, 0.02, trim, 0.55);
+  shaft(b, [-0.12,1.02,0.06], [-0.08,0.70,0.32], 0.012, hex('#4a3424'), 0);
  }
  return pack(b);
 }
 
 function tentMesh(){
- var b=new Builder(), cloth=hex('#f4ead4'), shade=hex('#e4d2ae'), dark=hex('#3d2c22'), pole=hex('#6b4428');
- var ridgeL=[-0.72,1.06,0], ridgeR=[0.72,1.06,0];
- var fl=[-0.98,0.02,-0.82], fr=[0.98,0.02,-0.82], bl=[-0.98,0.02,0.82], br=[0.98,0.02,0.82];
- b.polyOut([[-0.9,0.025,-0.75],[0.9,0.025,-0.75],[0.9,0.025,0.75],[-0.9,0.025,0.75]],[0,-3,0],hex('#6a5038'),0);
- b.polyOut([ridgeL, ridgeR, br, bl],[0,0.45,0],cloth,0);
- b.polyOut([ridgeL, fl, [-0.14,0.02,-0.9], [-0.06,0.58,-0.06]],[0,0.45,0],shade,0);
- b.polyOut([ridgeR, [0.06,0.58,-0.06], [0.14,0.02,-0.9], fr],[0,0.45,0],cloth,0);
- b.polyOut([ridgeL, bl, fl],[0,0.45,0],shade,0);
- b.polyOut([ridgeR, fr, br],[0,0.45,0],shade,0);
- b.polyOut([[-0.45,0.72,0.2],[0.45,0.72,0.2],[0.55,0.06,0.48],[-0.55,0.06,0.48]],[0,0.4,-1.2],dark,0);
- cyl(b,-0.72,0.52,0,0.035,1.04,5,pole,0);
- cyl(b,0.72,0.52,0,0.035,1.04,5,pole,0);
- var fr=frameY([1,0,0]);
- b.axesBox([0,1.06,0], fr.x, fr.y, fr.z, 0.05, 1.55, 0.05, pole, 0);
+ var b=new Builder(), cloth=hex('#f4ead4'), shade=hex('#e4d2ae'), dark=hex('#3d2c22'), pole=hex('#6b4428'), rope=hex('#8a7a64');
+ var peak=[0,1.36,0];
+ var fl=[-1.02,0.02,-0.92], fr=[1.02,0.02,-0.92], bl=[-1.02,0.02,0.96], br=[1.02,0.02,0.96];
+ b.polyOut([[-0.92,0.03,-0.78],[0.92,0.03,-0.78],[0.92,0.03,0.82],[-0.92,0.03,0.82]],[0,-3,0],hex('#6a5038'),0);
+ b.polyOut([peak, bl, br],[0,0.5,-1.2],cloth,0);
+ b.polyOut([peak, bl, fl],[0,0.5,0],shade,0);
+ b.polyOut([peak, fr, br],[0,0.5,0],shade,0);
+ b.polyOut([peak, fl, [-0.18,0.02,-1.02]],[0,0.45,1.2],shade,0);
+ b.polyOut([peak, [0.18,0.02,-1.02], fr],[0,0.45,1.2],cloth,0);
+ b.polyOut([[-0.42,0.78,0.18],[0.42,0.78,0.18],[0.5,0.08,0.42],[-0.5,0.08,0.42]],[0,0.45,-1.4],dark,0);
+ cyl(b,-0.55,0.48,0,0.028,0.9,5,pole,0);
+ cyl(b,0.55,0.48,0,0.028,0.9,5,pole,0);
+ sphere(b,-0.58,0.62,-0.78,0.085,6,4,shade,0);
+ sphere(b,-0.58,0.46,-0.84,0.07,6,4,cloth,0);
+ sphere(b,-0.58,0.32,-0.88,0.055,5,3,shade,0);
+ function guy(a,c){
+  shaft(b, a, c, 0.012, rope, 0);
+  cyl(b, c[0], 0.045, c[2], 0.028, 0.09, 5, pole, 0);
+ }
+ guy([-0.82,0.62,-0.72], [-1.32,0.08,-1.18]);
+ guy([0.82,0.62,-0.72], [1.32,0.08,-1.18]);
+ guy([-0.82,0.62,0.78], [-1.32,0.08,1.22]);
+ guy([0.82,0.62,0.78], [1.32,0.08,1.22]);
  return pack(b);
 }
 function chestMesh(){
  var b=new Builder(), wood=hex('#7a4e2e'), dark=hex('#4e301c'), gold=hex('#d7b56a');
  b.box(0,0.16,0,0.52,0.28,0.34,wood,0);
- b.box(0,0.2,0,0.54,0.055,0.36,gold,0);
+ b.box(0,0.22,0,0.54,0.04,0.36,gold,0.55);
+ b.box(0,0.1,0,0.54,0.035,0.36,gold,0.55);
  var hingeL=[-0.26,0.33,0.16], hingeR=[0.26,0.33,0.16], lipL=[-0.26,0.52,-0.16], lipR=[0.26,0.52,-0.16];
  b.polyOut([hingeL, hingeR, lipR, lipL],[0,-1,0],wood,0);
  b.polyOut([hingeL, lipL, lipR, hingeR],[0,1.4,0],dark,0);
  b.polyOut([hingeL, lipL, [-0.26,0.3,0.16]],[ -0.5,0.4,0],wood,0);
  b.polyOut([hingeR, [0.26,0.3,0.16], lipR],[0.5,0.4,0],wood,0);
- b.box(0,0.24,-0.19,0.07,0.09,0.035,gold,0);
+ b.box(0,0.24,-0.19,0.07,0.09,0.035,gold,0.55);
  return pack(b);
 }
 function fireMesh(){
- var b=new Builder(), i, a, fr;
- for(i=0;i<7;i++){a=i/7*TAU; b.box(Math.cos(a)*0.34, 0.07, Math.sin(a)*0.34, 0.14, 0.11, 0.12, i%2?hex('#6a645c'):hex('#4a4640'), 0)}
- fr=frameY([1,0.04,0.2]); b.axesBox([0,0.1,0], fr.x, fr.y, fr.z, 0.08, 0.52, 0.08, hex('#5c3a28'), 0);
- fr=frameY([-0.25,0.06,1]); b.axesBox([0,0.13,0], fr.x, fr.y, fr.z, 0.07, 0.44, 0.07, hex('#6b4428'), 0);
+ var b=new Builder(), i, a, fr, sy;
+ for(i=0;i<7;i++){
+  a=i/7*TAU; sy=0.09+(i%3)*0.015;
+  fr=frameY([Math.cos(a)*0.2, 1, Math.sin(a)*0.2]);
+  b.axesBox([Math.cos(a)*0.38, sy*0.5+0.04, Math.sin(a)*0.38], fr.x, fr.y, fr.z, 0.16+(i%2)*0.04, sy, 0.13, i%2?hex('#6a645c'):hex('#4a4640'), 0);
+ }
+ fr=frameY([1,0.04,0.22]); b.axesBox([0,0.08,0], fr.x, fr.y, fr.z, 0.07, 0.56, 0.07, hex('#5c3a28'), 0);
+ fr=frameY([-0.28,0.05,1]); b.axesBox([0,0.1,0], fr.x, fr.y, fr.z, 0.06, 0.46, 0.06, hex('#6b4428'), 0);
  return pack(b);
 }
 function flameMesh(h,col){var b=new Builder(); cone(b,0,0,0,h*0.32,h,6,col,1); return pack(b)}
 function lanternMesh(){
- var b=new Builder();
- cyl(b,0,0.55,0,0.04,1.1,6,hex('#4a4036'),0);
- b.box(0,1.18,0,0.18,0.22,0.18,hex('#c8a86a'),0);
- b.box(0,1.18,0,0.09,0.12,0.09,hex('#ffc56a'),1);
- b.box(0,1.32,0,0.22,0.05,0.22,hex('#8a6528'),0);
+ var b=new Builder(), brass=hex('#c8a86a'), dark=hex('#4a4036');
+ cyl(b,0,0.52,0,0.032,1.0,6,dark,0);
+ b.box(-0.09,1.16,0,0.022,0.22,0.022,brass,0.55);
+ b.box(0.09,1.16,0,0.022,0.22,0.022,brass,0.55);
+ b.box(0,1.16,-0.09,0.022,0.22,0.022,brass,0.55);
+ b.box(0,1.16,0.09,0.022,0.22,0.022,brass,0.55);
+ b.box(0,1.16,0,0.07,0.12,0.07,hex('#ffc56a'),1);
+ b.box(0,1.29,0,0.2,0.04,0.2,brass,0.55);
+ b.box(0,1.04,0,0.18,0.028,0.18,hex('#8a6528'),0.55);
  return pack(b);
 }
 function shadowMesh(r){
- var b=new Builder(), col=[0.07,0.075,0.055], seg=12, i, a0, a1;
+ var b=new Builder(), col=[0.30,0.34,0.22], seg=14, i, a0, a1;
+ var dx=-0.46, dz=-0.24, len=Math.sqrt(dx*dx+dz*dz)||1, px, pz, longR=r*1.25, shortR=r*0.82;
+ dx/=len; dz/=len; px=-dz; pz=dx;
+ function pt(ang){
+  var c=Math.cos(ang), s=Math.sin(ang);
+  return [c*longR*dx+s*shortR*px, 0.06, c*longR*dz+s*shortR*pz];
+ }
  for(i=0;i<seg;i++){a0=i/seg*TAU; a1=(i+1)/seg*TAU;
-  b.polyOut([[0,0.06,0],[Math.cos(a0)*r,0.06,Math.sin(a0)*r],[Math.cos(a1)*r,0.06,Math.sin(a1)*r]],[0,-4,0],col,0);
+  b.polyOut([[0,0.06,0], pt(a0), pt(a1)],[0,-4,0],col,0);
  }
  return pack(b);
 }
@@ -274,10 +324,16 @@ function roundTreeMesh(leaf,leaf2,trunk){
 }
 function bushMesh(col){var b=new Builder(); sphere(b,0,0.16,0,0.22,6,4,col,0); sphere(b,0.14,0.12,0.05,0.15,5,3,mix(col,[1,1,1],0.12),0); return pack(b)}
 function rockMesh(col){
- var b=new Builder();
- b.box(0,0.16,0,0.48,0.26,0.36,col,0);
- b.box(0.16,0.26,0.06,0.28,0.2,0.22,mix(col,[1,1,1],0.08),0);
- b.box(-0.14,0.14,-0.08,0.22,0.16,0.2,mix(col,[0,0,0],0.12),0);
+ var b=new Builder(), lumps=[
+  [0,0.16,0, 0.12,1,0.08, 0.48,0.26,0.36, col],
+  [0.14,0.24,0.05, 0.4,1,0.15, 0.26,0.16,0.22, mix(col,[1,1,1],0.1)],
+  [-0.12,0.14,-0.05, -0.2,1,0.35, 0.22,0.16,0.22, mix(col,[0,0,0],0.12)],
+  [0.02,0.30,-0.02, 0.15,1,-0.2, 0.16,0.12,0.14, mix(col,[1,1,1],0.16)]
+ ], i, d, fr;
+ for(i=0;i<lumps.length;i++){
+  d=lumps[i]; fr=frameY([d[3],d[4],d[5]]);
+  b.axesBox([d[0],d[1],d[2]], fr.x, fr.y, fr.z, d[6], d[7], d[8], d[9], 0);
+ }
  return pack(b);
 }
 function palmMesh(){
@@ -301,15 +357,107 @@ function cattailMesh(){var b=new Builder(); cyl(b,0,0.26,0,0.016,0.52,4,hex('#3a
 function stumpMesh(col){var b=new Builder(); cyl(b,0,0.12,0,0.16,0.24,6,col,0); cyl(b,0,0.25,0,0.18,0.05,6,hex('#c4a574'),0); return pack(b)}
 function iceMesh(){var b=new Builder(); b.box(0,0.22,0,0.18,0.44,0.14,hex('#d7eef6'),0); b.box(0.1,0.36,0.04,0.1,0.32,0.1,hex('#f4fbff'),0); return pack(b)}
 function cairnMesh(col){var b=new Builder(); b.box(0,0.1,0,0.36,0.16,0.28,col,0); b.box(0.04,0.24,0.02,0.24,0.14,0.2,mix(col,[1,1,1],0.06),0); b.box(-0.02,0.36,0,0.14,0.12,0.12,mix(col,[0,0,0],0.08),0); return pack(b)}
-function flowerMesh(col){var b=new Builder(); cyl(b,0,0.08,0,0.012,0.16,4,hex('#2f6a32'),0); sphere(b,0,0.18,0,0.045,5,3,col,0); return pack(b)}
-function waterMesh(r){
- var b=new Builder(), col=hex('#2c7580'), seg=14, i, a0, a1;
- for(i=0;i<seg;i++){a0=i/seg*TAU; a1=(i+1)/seg*TAU;
-  b.polyOut([[0,0.045,0],[Math.cos(a0)*r,0.045,Math.sin(a0)*r],[Math.cos(a1)*r,0.045,Math.sin(a1)*r]],[0,-4,0],col,0)}
+function flowerMesh(col){
+ var b=new Builder(), i, a, dir, fr, leaf=hex('#2f6a32');
+ cyl(b,0,0.07,0,0.012,0.14,4,leaf,0);
+ for(i=0;i<5;i++){
+  a=i/5*TAU; dir=[Math.cos(a), 0.35, Math.sin(a)]; fr=frameY(dir);
+  b.axesBox([Math.cos(a)*0.045, 0.155, Math.sin(a)*0.045], fr.x, fr.y, fr.z, 0.026, 0.07, 0.038, col, 0);
+ }
+ sphere(b,0,0.16,0,0.018,5,3,hex('#f3e2b0'),0);
  return pack(b);
 }
-function bedMesh(){var b=new Builder(), fr=frameY([1,0.05,0.15]); b.axesBox([0,0.08,0], fr.x, fr.y, fr.z, 0.16, 0.58, 0.16, hex('#7a2e2a'), 0); return pack(b)}
-function seatMesh(){var b=new Builder(), fr=frameY([1,0,0.1]); b.axesBox([0,0.12,0], fr.x, fr.y, fr.z, 0.16, 0.72, 0.16, hex('#6b4428'), 0); return pack(b)}
+function card(b, pts, col){
+ b.poly(pts, col, 0);
+ b.poly([pts[0], pts[3], pts[2], pts[1]], col, 0);
+}
+function grassMesh(){
+ var b=new Builder(), i, a, c, s, h, cols=[hex('#3f7a34'), hex('#67a048'), hex('#2c6230')];
+ for(i=0;i<3;i++){
+  a=i*Math.PI/3; c=Math.cos(a)*0.11; s=Math.sin(a)*0.11; h=0.22+i*0.04;
+  card(b, [[-c,0,-s],[c,0,s],[c*0.4,h,s*0.4],[-c*0.4,h,-s*0.4]], cols[i]);
+ }
+ return pack(b);
+}
+function fernMesh(){
+ var b=new Builder(), i, a, c, s, cols=[hex('#2f6a38'), hex('#3e8a42'), hex('#245c30'), hex('#4a7a3a')];
+ for(i=0;i<4;i++){
+  a=-0.6+i*0.4; c=Math.cos(a)*0.22; s=Math.sin(a)*0.1;
+  card(b, [[0,0.02,0],[c,0.04,s],[c*0.85,0.2,s*0.5],[c*0.15,0.22,-0.02]], cols[i]);
+ }
+ return pack(b);
+}
+function waterMesh(r){
+ var b=new Builder(), col=hex('#2a6e78'), rim=hex('#8fd0cc'), seg=16, i, a0, a1, r0=r*0.78;
+ for(i=0;i<seg;i++){
+  a0=i/seg*TAU; a1=(i+1)/seg*TAU;
+  b.polyOut([[0,0.045,0],[Math.cos(a0)*r0,0.048,Math.sin(a0)*r0],[Math.cos(a1)*r0,0.048,Math.sin(a1)*r0]],[0,-4,0],col,0.35);
+  b.polyOut([[Math.cos(a0)*r0,0.048,Math.sin(a0)*r0],[Math.cos(a0)*r,0.055,Math.sin(a0)*r],[Math.cos(a1)*r,0.055,Math.sin(a1)*r],[Math.cos(a1)*r0,0.048,Math.sin(a1)*r0]],[0,-4,0],rim,0.35);
+ }
+ return pack(b);
+}
+function lilyMesh(){
+ var b=new Builder(), seg=8, i, a0, a1, leaf=hex('#3e8a42');
+ for(i=0;i<seg;i++){a0=i/seg*TAU; a1=(i+1)/seg*TAU;
+  b.polyOut([[0,0.06,0],[Math.cos(a0)*0.16,0.06,Math.sin(a0)*0.16],[Math.cos(a1)*0.16,0.06,Math.sin(a1)*0.16]],[0,-2,0],leaf,0)}
+ sphere(b,0.03,0.08,0.02,0.035,5,3,hex('#f0b4c4'),0);
+ return pack(b);
+}
+function bedMesh(){
+ var b=new Builder(), cloth=hex('#7a3a3a'), band=hex('#d7b56a');
+ sphere(b,-0.22,0.12,0,0.1,6,4,cloth,0);
+ sphere(b,0.22,0.12,0,0.1,6,4,mix(cloth,[0,0,0],0.12),0);
+ b.box(0,0.12,0,0.4,0.16,0.16,cloth,0);
+ b.box(0,0.1,0,0.06,0.18,0.18,band,0.55);
+ return pack(b);
+}
+function logMesh(){
+ var b=new Builder(), bark=hex('#5c4030'), cut=hex('#c4a574'), fr=frameY([1,0.04,0]);
+ b.axesBox([0,0.14,0], fr.x, fr.y, fr.z, 0.16, 0.86, 0.15, bark, 0);
+ b.box(-0.43,0.14,0,0.04,0.13,0.13,cut,0);
+ b.box(0.43,0.14,0,0.04,0.13,0.13,cut,0);
+ return pack(b);
+}
+function potMesh(){
+ var b=new Builder(), iron=hex('#3a3532'), brass=hex('#d7b56a'), wood=hex('#5c3a28');
+ var apex=[0,0.98,0], feet=[[0.26,0.08,0.14],[-0.26,0.08,0.14],[0.02,0.08,-0.28]], i;
+ for(i=0;i<feet.length;i++)shaft(b, feet[i], apex, 0.016, wood, 0);
+ cyl(b,0,0.8,0,0.13,0.12,8,iron,0);
+ cyl(b,0,0.87,0,0.155,0.03,8,brass,0.55);
+ b.box(0.16,0.84,0,0.08,0.02,0.02,iron,0);
+ return pack(b);
+}
+function crateMesh(){
+ var b=new Builder(), wood=hex('#8a5a32'), dark=hex('#5c3a22');
+ b.box(0,0.16,0,0.36,0.32,0.28,wood,0);
+ b.box(0,0.33,0,0.38,0.045,0.3,dark,0);
+ b.box(0,0.2,-0.145,0.22,0.035,0.02,dark,0);
+ return pack(b);
+}
+function pennantMesh(){
+ var b=new Builder(), cloth=hex('#d7b56a'), pole=hex('#5c4030');
+ cyl(b,0,0.5,0,0.028,0.96,5,pole,0);
+ b.polyOut([[0.04,0.92,0],[0.62,0.78,0.02],[0.04,0.58,0]],[0,0.8,-1],cloth,0);
+ b.polyOut([[0.04,0.58,0],[0.62,0.78,0.02],[0.04,0.92,0]],[0,0.8,1],cloth,0);
+ return pack(b);
+}
+function stoneMesh(){
+ var b=new Builder();
+ b.box(0,0.04,0,0.28,0.045,0.2,hex('#8a8178'),0);
+ return pack(b);
+}
+function pebbleMesh(){
+ var b=new Builder(), col=hex('#a09078');
+ b.box(-0.08,0.04,0.02,0.1,0.06,0.08,col,0);
+ b.box(0.06,0.035,-0.04,0.08,0.05,0.07,mix(col,[1,1,1],0.12),0);
+ b.box(0.01,0.03,0.08,0.06,0.04,0.05,mix(col,[0,0,0],0.1),0);
+ return pack(b);
+}
+function snowMesh(){
+ var b=new Builder();
+ hemi(b,0,0.08,0,0.28,8,hex('#f4f7fb'));
+ return pack(b);
+}
 
 var PAL={
  meadow:{g:'#5c8a3e',g2:'#3e6b32',dirt:'#8a6840',leaf:'#2f6a34',leaf2:'#6a9a3c',rock:'#7d7368',trunk:'#6b4428'},
@@ -330,19 +478,23 @@ function dress(biome,P,put,key,shade){
   put(palmMesh(), 3.45,0,1.7,-0.4,0.9,'palm'); put(shade,3.45,0,1.7,0,1.15,'shadow');
   put(cactusMesh(), -3.15,0,-1.25,0,1,'cactus'); put(cactusMesh(), 2.7,0,2.85,0,0.85,'cactus');
   put(rockMesh(rock), 3.55,0,-1.45,0.4,1.05,'rock'); put(rockMesh(rock), -2.15,0,3.25,0.2,0.75,'rock');
+  put(pebbleMesh(), 1.7,0,2.4,0.4,1,'pebble'); put(pebbleMesh(), -1.55,0,-2.15,1.1,0.8,'pebble');
   return;
  }
  if(biome==='tundra'){
   put(pineMesh(true), -3.55,0,2.05,0,1.05,'pine'); put(shade,-3.55,0,2.05,0,1.15,'shadow');
   put(pineMesh(true), 3.5,0,2.35,0,0.85,'pine'); put(pineMesh(true), -3.7,0,-0.7,0,0.7,'pine');
   put(iceMesh(), 3.15,0,-1.25,0.4,1,'ice'); put(iceMesh(), -2.35,0,3.15,0.8,0.8,'ice');
-  put(rockMesh(rock), 2.15,0,3.35,0,0.7,'rock'); return;
+  put(rockMesh(rock), 2.15,0,3.35,0,0.7,'rock');
+  put(snowMesh(), -1.15,0,2.85,0.3,1,'snow'); return;
  }
  if(biome==='marsh'){
   put(roundTreeMesh(leaf,leaf2,trunk), -3.5+shift,0,2.15,0,1,'tree'); put(shade,-3.5+shift,0,2.15,0,1.2,'shadow');
   put(roundTreeMesh(leaf,leaf2,trunk), 3.4,0,2.45,0,0.85,'tree');
   put(waterMesh(1.15), 2.45,0,1.25,0,1,'water');
+  put(lilyMesh(), 2.15,0,1.05,0.4,1,'lily');
   put(cattailMesh(), 1.65,0,0.65,0,1,'cattail'); put(cattailMesh(), 3.15,0,0.85,0,1.1,'cattail'); put(cattailMesh(), 2.15,0,2.05,0,0.9,'cattail');
+  put(fernMesh(), -1.85,0,2.35,0.5,1,'fern');
   put(mushroomMesh(), -2.55,0,-1.35,0,1,'mushroom'); put(mushroomMesh(), -3.2,0,0.35,0,0.8,'mushroom');
   return;
  }
@@ -351,6 +503,7 @@ function dress(biome,P,put,key,shade){
   put(pineMesh(false), 3.55,0,2.15,0,0.95,'pine'); put(pineMesh(false), -3.3,0,-1.55,0,0.8,'pine'); put(pineMesh(false), 3.15,0,-1.7,0,0.72,'pine');
   put(mushroomMesh(), -2.15,0,2.55,0,1,'mushroom'); put(mushroomMesh(), 1.95,0,3.15,0,0.85,'mushroom');
   put(stumpMesh(trunk), -2.75,0,0.15,0.5,1,'stump'); put(rockMesh(rock), 2.35,0,3.25,0,0.65,'rock');
+  put(fernMesh(), -1.7,0,2.65,0.8,1,'fern'); put(fernMesh(), 1.35,0,2.15,0.2,0.85,'fern');
   return;
  }
  if(biome==='hills'||biome==='highland'){
@@ -360,7 +513,8 @@ function dress(biome,P,put,key,shade){
   put(rockMesh(rock), -3.15,0,-1.35,0.3,1.25,'rock'); put(rockMesh(rock), 2.95,0,-1.55,0.8,1.05,'rock');
   put(rockMesh(rock), 0.35,0,3.55,0.2,1.35,'rock'); put(rockMesh(rock), -2.15,0,3.25,1,0.8,'rock');
   put(cairnMesh(rock), 2.55,0,3.05,0.4,1,'cairn');
-  if(biome==='hills')put(bushMesh(leaf2), -2.45,0,-1.9,0,1,'bush');
+  put(rockMesh(rock), 3.35,0,0.35,1.2,0.55,'rock');
+  if(biome==='hills'){put(bushMesh(leaf2), -2.45,0,-1.9,0,1,'bush'); put(grassMesh(), 1.85,0,0.55,0.4,1,'grass'); put(grassMesh(), -1.15,0,2.55,1,0.9,'grass')}
   return;
  }
  put(roundTreeMesh(leaf,leaf2,trunk), -3.55+shift,0,2.15,0.3,1.05,'tree'); put(shade,-3.55+shift,0,2.15,0,1.25,'shadow');
@@ -369,11 +523,13 @@ function dress(biome,P,put,key,shade){
  put(rockMesh(rock), 3.35,0,-1.35,0.6,0.8,'rock'); put(rockMesh(rock), -3.75,0,0.15,0.2,0.55,'rock');
  var cols=['#e07a8a','#f3e2b0','#d7b56a','#e7e2ef','#f0c36a'];
  var spots=[[-1.35,-0.65],[1.55,-0.5],[-1.75,0.45],[2.05,0.4],[-0.35,1.05]];
+ var tufts=[[-2.35,-0.85],[2.15,0.15],[0.95,1.7],[-0.55,2.35]];
  for(i=0;i<spots.length;i++)put(flowerMesh(hex(cols[i])), spots[i][0],0,spots[i][1], i*0.2, 1, 'flower');
+ for(i=0;i<tufts.length;i++)put(grassMesh(), tufts[i][0],0,tufts[i][1], i*0.4, 1, 'grass');
 }
 
 function casts(name){
- if(name==='ground'||name==='shadow'||name==='water')return false;
+ if(name==='ground'||name==='shadow'||name==='water'||name==='grass'||name==='fern'||name==='lily')return false;
  if(name.indexOf('flame')===0)return false;
  return true;
 }
@@ -389,7 +545,9 @@ function buildCamp(opts){
  put(shade,-1.6,0,1.2,0,1.45,'shadow');
  put(bedMesh(),-2.15,0,0.45,0.5,1,'bed');
  put(chestMesh(),-2.25,0,-0.45,-0.55,1,'chest');
+ put(crateMesh(),-3.05,0,0.55,0.4,1,'crate');
  put(fireMesh(),0.12,0,-1.5,0.4,1,'fire');
+ put(potMesh(),0.12,0,-1.5,0.3,1,'pot');
  put(shade,0.12,0,-1.5,0,0.7,'shadow');
  put(flameMesh(0.46, hex('#ffb03a')), 0.12,0.2,-1.5, 0,1,'flame');
  put(flameMesh(0.34, hex('#ffe08a')), 0.22,0.18,-1.4, 0.4,1,'flame');
@@ -401,15 +559,31 @@ function buildCamp(opts){
  put(person({skin:'#e8bd94',hair:'#8a4a22',robe:'#4a5f8a',trim:'#c8a86a',cape:null,hat:'cap',stick:false,pack:true,head:1.12}), fx2,0,fz2, yawToward(fx2,fz2,fx,fz), 0.84, 'friend');
  put(shade,fx2,0,fz2,0,0.5,'shadow');
  put(lanternMesh(), 1.9,0,-1.75, 0,1,'lantern');
- put(seatMesh(), 1.45,0,-0.72, 0.35,1,'seat');
+ put(logMesh(), 1.25,0,-1.05, 0.55,1,'log');
+ put(logMesh(), -1.05,0,-1.15, -0.4,1,'log');
+ put(pennantMesh(), -2.55,0,2.05, 0.9,1,'pennant');
+ var stones=[[-1.35,0.15],[-1.05,0.05],[-0.35,-0.45],[0.05,-0.95]];
+ for(var si=0;si<stones.length;si++)put(stoneMesh(), stones[si][0],0,stones[si][1], si*0.3, 1, 'stone');
  dress(biome, P, put, opts.key||'', shade);
+ var air={
+  meadow:{fog:[0.16,0.22,0.32],sky:[0.52,0.62,0.74],gnd:[0.28,0.24,0.16],far:20},
+  forest:{fog:[0.10,0.16,0.14],sky:[0.32,0.46,0.40],gnd:[0.16,0.18,0.12],far:18},
+  hills:{fog:[0.18,0.24,0.30],sky:[0.50,0.60,0.70],gnd:[0.26,0.24,0.16],far:20},
+  desert:{fog:[0.34,0.26,0.16],sky:[0.70,0.55,0.36],gnd:[0.40,0.30,0.16],far:18},
+  tundra:{fog:[0.24,0.30,0.36],sky:[0.60,0.70,0.78],gnd:[0.32,0.34,0.36],far:20},
+  marsh:{fog:[0.12,0.20,0.20],sky:[0.30,0.46,0.48],gnd:[0.16,0.20,0.16],far:18},
+  highland:{fog:[0.18,0.20,0.26],sky:[0.46,0.52,0.64],gnd:[0.24,0.22,0.20],far:20}
+ }[biome];
  return {
   meshes:items,
-  fog:[0.110,0.153,0.200], fogNear:9, fogFar:20,
+  fog:air.fog, fogNear:8.5, fogFar:air.far,
   lightDir:norm([0.46,0.84,0.24]),
   lightColor:[1.0,0.93,0.78],
-  skyAmb:[0.48,0.58,0.70],
-  groundAmb:[0.30,0.24,0.18]
+  skyAmb:air.sky,
+  groundAmb:air.gnd,
+  firePos:[0.12,0.55,-1.5],
+  fireColor:[1.0,0.48,0.16],
+  fireRadius:3.6
  };
 }
 
@@ -435,6 +609,7 @@ function validateMesh(m, errors, tag){
  }
 }
 function meshBy(camp,name){var i;for(i=0;i<camp.meshes.length;i++)if(camp.meshes[i].name===name)return camp.meshes[i];return null}
+function band(arr,lo,hi){var i;for(i=0;i<arr.length;i++)if(arr[i]>=lo&&arr[i]<=hi)return true;return false}
 function boundsY(m){
  var p=m.positions, s=m.s||1, y0=1e9, y1=-1e9, i;
  for(i=1;i<p.length;i+=3){var y=p[i]*s+m.y; if(y<y0)y0=y; if(y>y1)y1=y}
@@ -541,6 +716,21 @@ function selfCheck(){
   var upN=0, upT=0, g=meshBy(camp,'ground'), gt;
   if(g)for(gt=0;gt<g.indices.length;gt+=3){upT++; if(triNormal(g.positions,g.indices[gt],g.indices[gt+1],g.indices[gt+2])[1]>0.45)upN++}
   if(upT&&upN/upT<0.55)errors.push(biomes[bi]+' ground up '+upN+'/'+upT);
+  var mi, mp, my, yv, sunk;
+  for(mi=0;mi<camp.meshes.length;mi++){
+   if(camp.meshes[mi].name==='ground')continue;
+   mp=camp.meshes[mi].positions; my=camp.meshes[mi].y||0; sunk=false;
+   for(yv=1;yv<mp.length;yv+=3)if(mp[yv]*(camp.meshes[mi].s||1)+my<-0.08){sunk=true;break}
+   if(sunk)errors.push(biomes[bi]+' '+camp.meshes[mi].name+' below ground');
+  }
+  if(biomes[bi]==='meadow'){
+   if(!meshBy(camp,'pot')||!meshBy(camp,'crate')||!meshBy(camp,'pennant')||!meshBy(camp,'grass')||!meshBy(camp,'log'))errors.push('meadow furniture');
+   if(hero&&(!band(hero.emissive,0.5,0.6)||!band(hero.emissive,0.85,0.95)))errors.push('hero materials');
+  }
+  if(biomes[bi]==='marsh'){
+   var water=meshBy(camp,'water');
+   if(!water||!band(water.emissive,0.3,0.4))errors.push('marsh water');
+  }
  }
  var img=raster(buildCamp({biome:'meadow', key:'ai-evals'}));
  var skin=hex('#e2b48c'), tent=hex('#f4ead4'), grass=hex('#5c8a3e'), grass2=hex('#3e6b32'), dirt=hex('#8a6840');
