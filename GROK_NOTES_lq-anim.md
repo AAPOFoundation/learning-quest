@@ -33,6 +33,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 23. **The home path arrives in order.** The four world buttons, then the portfolio button, rise one after another. Reduced motion removes it.
 24. **Skills bars grow, badges rise.** A skills bar starts empty and eases to the saved score. Badges rise without a fade, so a locked badge stays dim. The rise stops adding delay after the twelfth badge.
 25. **A new companion fades in.** The first time the party is drawn, the faces you already have stay steady. A later join fades the newest face in. The fade is opacity only, so the breath can still move the face. Reduced motion removes it.
+26. **The title actions rise.** Continue or Begin, then New journey when there is a save, then All games. The heading stays still. Reduced motion removes the rise.
 
 ## Checked
 

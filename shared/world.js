@@ -258,9 +258,9 @@ function mapScreen(){if(st.mode!=='play')return;openOv(function(){var wc=st.worl
 function title(){st.mode='title';var t=$('#ttl'),p=P(),has=!!p.w||p.xp>0||E.doneCount()>0,v1=!p.w&&(p.xp>0||E.doneCount()>0);
  t.style.display='flex';
  t.innerHTML='<section class="panel"><p class="kicker">'+esc(A.kicker)+' · exploration edition</p><h1>'+esc(A.title)+'</h1><p class="dim">'+esc(A.tagline.split('.')[0])+'. Walk a painted map, meet teachers, face gatekeepers and open chests.</p><div class="rule"></div>'
- +(has?'<button class="btn btn-primary" id="tc" style="margin-bottom:10px">Continue'+(v1?' (version 1 progress found: '+E.doneCount()+' of '+NR+' levels cleared, '+p.xp+' XP)':'')+'</button>':'<button class="btn btn-primary" id="tn" style="margin-bottom:10px">Begin your journey</button>')
- +(has?'<button class="btn btn-ghost" id="tn" style="margin-bottom:10px">New journey (erases saved progress)</button>':'')
- +'<a class="btn btn-ghost" href="../index.html" style="margin-bottom:12px">All games</a>'+controls()+'<p class="small dim">Progress saves in this browser only and is never sent anywhere.</p><p class="disc">'+esc(A.disclaimer)+'</p></section>';
+ +(has?'<button class="btn btn-primary" id="tc" style="margin-bottom:10px;animation:pop .28s ease both">Continue'+(v1?' (version 1 progress found: '+E.doneCount()+' of '+NR+' levels cleared, '+p.xp+' XP)':'')+'</button>':'<button class="btn btn-primary" id="tn" style="margin-bottom:10px;animation:pop .28s ease both">Begin your journey</button>')
+ +(has?'<button class="btn btn-ghost" id="tn" style="margin-bottom:10px;animation:pop .28s ease both;animation-delay:.08s">New journey (erases saved progress)</button>':'')
+ +'<a class="btn btn-ghost" href="../index.html" style="margin-bottom:12px;animation:pop .28s ease both;animation-delay:.16s">All games</a>'+controls()+'<p class="small dim">Progress saves in this browser only and is never sent anywhere.</p><p class="disc">'+esc(A.disclaimer)+'</p></section>';
  var c=$('#tc');if(c)c.onclick=function(){gest=true;start(false)};$('#tn').onclick=function(){gest=true;if(!has||confirm('Erase all saved progress for this game and start again?'))start(true)}}
 function start(fresh){var t=$('#ttl');if(fresh){E.reset()}var p=P(),w;
  if(!p.w){w=PW();var nd=NODES[0],pos=nd;for(var d=0;d<6;d++){var n=neigh(nd[0],nd[1],d);if(walkable(st.world,n[0],n[1])&&!st.world.omap[n[0]+','+n[1]]){pos=n;break}}w.c=pos[0];w.r=pos[1];A.levels.forEach(function(L,i){if(levelDone(i))w.taught[i]=1});if(E.doneCount()>0||p.xp>0)w.intro=1}
