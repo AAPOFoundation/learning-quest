@@ -454,6 +454,13 @@ function potMesh(){
  b.box(0.16,0.84,0,0.08,0.02,0.02,iron,0);
  return pack(b);
 }
+function cupMesh(){
+ var b=new Builder(), clay=hex('#c4785a'), rim=hex('#e8a882');
+ cyl(b, 0, 0.07, 0, 0.055, 0.12, 6, clay, 0);
+ cyl(b, 0, 0.135, 0, 0.072, 0.022, 6, rim, 0);
+ shaft(b, [0.05, 0.08, 0], [0.12, 0.1, 0.02], 0.016, clay, 0);
+ return pack(b);
+}
 function crateMesh(){
  var b=new Builder(), wood=hex('#8a5a32'), dark=hex('#5c3a22');
  b.box(0,0.16,0,0.36,0.32,0.28,wood,0);
@@ -593,6 +600,7 @@ function buildCamp(opts){
  put(shade,fx2,0,fz2,0,0.5,'shadow');
  put(lanternMesh(), 1.9,0,-1.75, 0,1,'lantern');
  put(logMesh(), 1.25,0,-1.05, 0.55,1,'log');
+ put(cupMesh(), 0.72,0,-1.02, 0.8,1.35,'cup');
  put(blanketMesh(), 1.25,0,-1.05, 0.55,1,'blanket');
  put(logMesh(), -1.05,0,-1.15, -0.4,1,'log');
  /* ry faces the cloth at the default camp camera. It sits on open grass, clear of the tent guys. */
