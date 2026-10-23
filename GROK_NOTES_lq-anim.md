@@ -26,6 +26,10 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 16. **The camera keeps one pace.** Follow uses the time since the last frame. At 60 frames a second it matches the old step. The home-page wanderer does the same at its 30-frame cap. The mini-map picture still refreshes about six times a second. The hero dot and the gold ring draw every frame.
 17. **A new question arrives in a short beat.** Choices ease in one after another, and the level bar grows from empty. Choosing an answer does not replay that entrance. Reduced motion already removes the animation.
 18. **Lesson charts glide.** The learning-rate dots ease toward the new steps. The bowl is painted once. The threshold line slides, and a dot fades when it falls below the line. Reduced motion snaps both.
+19. **Review cards match the quiz.** Choices arrive one after another. The reply and the next button rise after a pick. Every choice sinks a pixel while it is held. Reduced motion removes that.
+20. **Quest marks keep one gold.** The cleared name edge and the quest ring used to build a new colour string each frame. They now set the opacity on one gold.
+21. **Dialogue stays put between lines.** A new line from the same speaker no longer rebuilds the box, so it does not rise again. A different speaker still gets the short rise. Closing the box clears that memory, so the next talk rises once.
+22. **Lists arrive in turn.** The pause menu, the quest log and the world-map rows each rise a little after the one above. The delay stops growing after the tenth row.
 
 ## Checked
 
@@ -33,4 +37,4 @@ A mock canvas ran the stride, the idle blink, the wave, shared tree stamps, the 
 
 ## Not done
 
-No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings still move, but in full effects they move from a shared sprite at about 15 frames a second rather than being redrawn every frame. Headless Edge loaded the two lesson charts: 16 step dots, 60 score dots, the bowl stayed put, and both the step dot and the threshold line moved when the dial changed. That run did not wait for the slide to finish, and nothing was clicked on a phone.
+No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings still move, but in full effects they move from a shared sprite at about 15 frames a second rather than being redrawn every frame. Headless Edge loaded the two lesson charts: 16 step dots, 60 score dots, the bowl stayed put, and both the step dot and the threshold line moved when the dial changed. That run did not wait for the slide to finish. The review cards, the pause menu and the dialogue box were syntax-checked and not clicked. Nothing was tried on a phone.
