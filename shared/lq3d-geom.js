@@ -373,7 +373,14 @@ function cactusMesh(){
  sphere(b, 0.02, 0.86, -0.1, 0.035, 5, 3, hex('#e07a8a'), 0);
  return pack(b);
 }
-function mushroomMesh(){var b=new Builder(); cyl(b,0,0.08,0,0.028,0.14,5,hex('#eadcc4'),0); cone(b,0,0.14,0,0.11,0.09,6,hex('#b5453a'),0); return pack(b)}
+function mushroomMesh(){
+ var b=new Builder(), cap=hex('#b5453a'), stem=hex('#eadcc4');
+ cyl(b,0,0.1,0,0.04,0.18,5,stem,0);
+ cone(b,0,0.18,0,0.16,0.11,7,cap,0);
+ sphere(b,0.05,0.24,-0.02,0.028,4,3,hex('#f4ead8'),0);
+ sphere(b,-0.03,0.23,0.04,0.02,4,2,hex('#f7f1e6'),0);
+ return pack(b);
+}
 function cattailMesh(){var b=new Builder(); cyl(b,0,0.26,0,0.016,0.52,4,hex('#3a5a32'),0); cyl(b,0,0.54,0,0.032,0.14,5,hex('#6a4a32'),0); return pack(b)}
 function stumpMesh(col){var b=new Builder(); cyl(b,0,0.12,0,0.16,0.24,6,col,0); cyl(b,0,0.25,0,0.18,0.05,6,hex('#c4a574'),0); return pack(b)}
 function iceMesh(){var b=new Builder(); b.box(0,0.22,0,0.18,0.44,0.14,hex('#d7eef6'),0); b.box(0.1,0.36,0.04,0.1,0.32,0.1,hex('#f4fbff'),0); return pack(b)}
