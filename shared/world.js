@@ -290,7 +290,7 @@ function update(dt){st.time+=dt;
 function figDraw(g,sp,x,y,o){Art.figure(g,x,y,sp.look||sp,o)}
 function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=st.hero,g=ctx;g.setTransform(1,0,0,1,0,0);g.fillStyle='#0a0f15';g.fillRect(0,0,cv.width,cv.height);
  var tx=h.x-vw/2,ty=h.y-vh/2;if(st.mode==='title'&&sc.id==='w'){tx=hx(NODES[0][0],NODES[0][1])-vw/2+Math.sin(st.time*.2)*40;ty=hy(NODES[0][1])-vh/2}
- var mx=sc.W-vw,my=sc.H-vh;tx=mx<0?mx/2:Math.max(0,Math.min(mx,tx));ty=my<0?my/2:Math.max(0,Math.min(my,ty));
+ var mx=sc.W-vw,my=sc.H-vh,hp=window.LQHudPad,pt=hp&&hp.on?hp.t/z:0,pb=hp&&hp.on?hp.b/z:0;tx=mx<0?mx/2:Math.max(0,Math.min(mx,tx));ty=my<0?my/2:Math.max(-pt,Math.min(my+pb,ty));/* phone: camera may scroll past the map edge by the HUD height (guide.js) so the hero never sits under the HUD */
  if(st.cam.snap){st.cam.x=tx;st.cam.y=ty;st.cam.snap=false}else{st.cam.x+=(tx-st.cam.x)*.18;st.cam.y+=(ty-st.cam.y)*.18}
  var cx=st.cam.x,cy=st.cam.y;g.setTransform(dpr*z,0,0,dpr*z,-cx*dpr*z,-cy*dpr*z);g.drawImage(sc.cv,0,0);if(!FX.low&&window.LQAnim)LQAnim.water(g,sc,st.time,cx,cy,vw,vh);
  var list=[],T=st.time,world=sc.id==='w',cur=st.obj&&st.obj.target;
