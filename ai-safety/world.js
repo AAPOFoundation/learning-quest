@@ -21,7 +21,7 @@ function R(g,x,y,w,h,c){g.fillStyle=c;g.fillRect(x,y,w,h)}
 function T(g,a,b,c,d,e,f,col){g.fillStyle=col;g.beginPath();g.moveTo(a,b);g.lineTo(c,d);g.lineTo(e,f);g.fill()}
 function L(g,pts,c,w){g.strokeStyle=c;g.lineWidth=w;g.lineCap='round';g.beginPath();g.moveTo(pts[0],pts[1]);for(var i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);g.stroke()}
 function glow(g,x,y,r,col,a){var gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,col.replace('A',a));gr.addColorStop(1,col.replace('A',0));g.fillStyle=gr;g.fillRect(x-r,y-r,2*r,2*r)}
-function plinth(g,u,w,col){E(g,0,0,w*1.2*u,w*.45*u,'rgba(0,0,0,.28)');R(g,-w*u,-5*u,2*w*u,5*u,col);R(g,-w*u,-5*u,2*w*u,1.4*u,'rgba(255,255,255,.22)');R(g,(w-3)*u,-5*u,3*u,5*u,'rgba(0,0,0,.18)')}
+function plinth(g,u,w,col){if(window.Art&&Art.stoneBase)Art.stoneBase(g,false,w*1.2*u,w*.6*u,14*u,col);else E(g,0,0,w*1.2*u,w*.45*u,'rgba(0,0,0,.28)');R(g,-w*u,-5*u,2*w*u,5*u,col);R(g,-w*u,-5*u,2*w*u,1.4*u,'rgba(255,255,255,.22)');R(g,(w-3)*u,-5*u,3*u,5*u,'rgba(0,0,0,.18)')}
 /* AI Safety: a guardian coast. Landmark = a shield-stone beacon with a calm, steady lamp and a watch-light sweep; map prop = a small shield banner with a check. */
 function shield(g,u,s,col,edge){g.fillStyle=edge;g.beginPath();g.moveTo(0,-14*u*s);g.lineTo(10*u*s,-10*u*s);g.quadraticCurveTo(10*u*s,4*u*s,0,10*u*s);g.quadraticCurveTo(-10*u*s,4*u*s,-10*u*s,-10*u*s);g.closePath();g.fill();
  g.fillStyle=col;g.beginPath();g.moveTo(0,-11.5*u*s);g.lineTo(7.8*u*s,-8.4*u*s);g.quadraticCurveTo(7.8*u*s,3*u*s,0,7.6*u*s);g.quadraticCurveTo(-7.8*u*s,3*u*s,-7.8*u*s,-8.4*u*s);g.closePath();g.fill();

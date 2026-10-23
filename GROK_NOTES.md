@@ -201,3 +201,33 @@ Walking still steps when motion is reduced. The oblique view stays up in that ca
 Phone icon buttons are 48px in a two-by-two grid, from the merged phone HUD. The old 42px note is out of date.
 
 On a phone overworld the hero can sit just above the move pad, with night beside the island. Say if that band should be smaller.
+
+## Stone steps, same day
+
+`origin/main` is still `0f7c4d1`. It was already in this branch. No new merge.
+
+Cliffs already had a three-facet wall. Buildings and landmarks were upright pictures on a soft oval, so the lean did not give them any height. They now stand on a stone step.
+
+### What changed
+
+`shared/art.js`. `stoneBase` draws a pad on the leaned ground and a short front wall. The wall matches the cliff: lit left, mid tone, shaded right. It is drawn only when effects are full and the camera leans (`camSkew.y` below 0.95). A flat view, the home strip and Low effects keep the old soft shadow. Halls, guilds, smithies, vaults, towers, great halls, towns, castles, fountains, gates, chests and the shared landmarks use it. The step is about 14 to 20px tall, so it reads beside a forest cliff. `Art.stoneBase` is exported for the course landmarks.
+
+Each course `world.js` (`python-basics`, `ai-foundations`, `ai-safety`, `ai-evals`, `portfolio-guide`). The landmark plinth calls `stoneBase`, then keeps the upright slab the sculpture stands on.
+
+### Checked
+
+Headless Edge, effects forced full, local static server on port 8901. Home, then Begin on all five worlds, then the first town of each. Python again at 390×844 with the guide caption up and the dialogue closed. Shader error empty and the overlay visible. No console exceptions. The camera shear was −0.36 and the vertical scale 0.62. At 390×844 the objective ended at y=199, the caption ran y=205 to 299, the banner ran y=305 to 359, and the move pad started at y=646. They did not meet. Low effects hid the overlay and set the shear to flat. Begin wrote a save only in that temporary profile. Mark as done was not clicked. Not tested on a real phone, Safari, or Firefox.
+
+### Open for Jensen
+
+Home `data-n` stays 6, 7, 10 and 7. Portfolio stays off the progress strip.
+
+Low effects still draws cached tile light and seeded grain. It skips the lights, the lean, the cliff lift and these stone steps.
+
+Citadel trim stays `#c9a24f`. Safety's citadel roof stays `#6a5830`.
+
+Walking still steps when motion is reduced. The oblique view stays up in that case, and so does the stone step, because it does not move.
+
+On a phone overworld the hero can sit just above the move pad, with night beside the island. Say if that band should be smaller.
+
+The shared marsh lantern is not what Low effects draws. Low effects draws the tree. Full effects draws the course landmark, which has its own lamp and now a stone step.
