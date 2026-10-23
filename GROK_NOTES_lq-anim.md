@@ -69,6 +69,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 59. **A number box and a menu ease their edge.** The fields in the simulators pick up the same gold edge as a code box, over the same short time. Reduced motion removes it. The word-list search is left alone.
 60. **The home effects button sinks.** It picks up the gold edge, then sinks a pixel while it is held, the same as the other buttons. Reduced motion removes both.
 61. **Review buttons rise, and a wrong card settles.** The deck actions, each choice, Next and Back to deck rise, then let go, so a press can still sink. A wrong choice drops the entrance so the sideways settle can play, and the right one pops. Reduced motion removes all of it.
+62. **A still hood stirs.** When a hooded figure stands, the cloth shifts a little, the same slow sway as hair. A walk holds the hood still. The home wanderer wears a hood, so this shows while that figure is standing.
 
 ## Checked
 
