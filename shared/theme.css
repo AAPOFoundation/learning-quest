@@ -54,6 +54,8 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:7px 6px;b
 @keyframes toastin{from{opacity:0;transform:translateX(-50%) translateY(4px)}to{opacity:1;transform:translateX(-50%)}}
 @keyframes toastout{to{opacity:0;transform:translateX(-50%)}}
 @keyframes panelcheer{50%{filter:drop-shadow(0 0 14px #d7b56ad9)}}
+@keyframes stepin{from{opacity:0}to{opacity:1}}
+.panel.stepin{animation:stepin .18s ease}
 .panel.cheer{animation:panelcheer .6s ease}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 /* home page hero (Phase 3): painted with the game's procedural art, no image files */
