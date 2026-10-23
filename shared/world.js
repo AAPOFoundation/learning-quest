@@ -7,7 +7,7 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp
 var NR=A.levels.length; /* 7 */
 var P=function(){return E.P()};
 function PW(){var p=P();if(!p.w)p.w={sid:'w',c:-1,r:-1,chests:{},caches:{},taught:{},sim:{},visited:{},intro:0};return p.w}
-var st={mode:'title',scene:null,sid:'w',hero:{c:0,r:0,x:0,y:0,face:1,mv:null,foot:1,step:0,hop:0,turn:0},path:null,keys:{},pad:-1,zig:false,time:0,cam:{x:0,y:0,snap:true,err:99},fog:[],fogTgt:[],speed:1,after:null,worlds:null,scenes:{},mmT:0,banner:0,shake:0,bumpAt:-1,veil:0,lw:{},idleAcc:0,rip:null,xpVis:null,xpFrom:0,xpTo:0,xpT:1,seenOpen:null};
+var st={mode:'title',scene:null,sid:'w',hero:{c:0,r:0,x:0,y:0,face:1,mv:null,foot:1,step:0,hop:0,turn:0},path:null,keys:{},pad:-1,zig:false,time:0,cam:{x:0,y:0,snap:true,err:99},fog:[],fogTgt:[],speed:1,after:null,worlds:null,scenes:{},mmT:0,banner:0,shake:0,bumpAt:-1,veil:0,idleAcc:0,rip:null,xpVis:null,xpFrom:0,xpTo:0,xpT:1,seenOpen:null};
 /* ---------- config / badges ---------- */
 A.badges=A.badges.concat(C.regions.map(function(R,i){return {id:'seal_'+A.levels[i].id,icon:'🏅',name:'Seal of '+R.name,desc:'Open the chest in '+R.name}}),[{id:'crown',icon:'👑',name:C.castle.chest,desc:'Open the chest in the final keep'},{id:'scout',icon:'🧭',name:'Pathfinder',desc:'Find every supply cache on the map'}]);
 function levelDone(i){var r=P().levels[A.levels[i].id];return !!(r&&r.done)}
@@ -345,8 +345,8 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
    if(o.type==='node'){var cl=o.i<NR?levelDone(o.i):bossDone();if(cl)op.accent='#c9a24f'}
    if(o.kind==='gate'){var gt=Art.hdist(h.c,h.r,o.c,o.r)<=2?1:0;if(o._lift==null)o._lift=0;if(!motionOn())o._lift=gt;else if(o._lift!==gt){var gd=gt-o._lift;o._lift+=Math.sign(gd)*Math.min(Math.abs(gd),(st.dtRaw||0)*2.6)}op.lift=o._lift}
    Art.building(g,o.kind,x,y,op);
-   if(o.type==='node'&&(zoneOpen(o.i)||st.fog[o.i]<.8)){var nm=o.i<NR?C.regions[o.i].name:C.castle.name,cl2=o.i<NR?levelDone(o.i):bossDone(),nf2='700 15px "Cormorant Garamond",Georgia,serif';g.textAlign='center';var tw=nameW(g,nf2,(cl2?'★ ':'')+nm)+22,by=y-S*(o.kind==='castle'?2.7:2.15);
-    g.fillStyle='rgba(10,15,21,.88)';g.lineWidth=1.3;g.beginPath();g.rect(x-tw/2,by-13,tw,21);g.fill();if(cl2&&motionOn()){g.strokeStyle='#f3e2b0';g.globalAlpha=.55+.45*Math.abs(Math.sin(T*2));g.stroke();g.globalAlpha=1}else{g.strokeStyle='#c8a86a';g.stroke()}g.fillStyle=cl2?'#f3e2b0':'#e8dcc4';g.fillText((cl2?'★ ':'')+nm,x,by+2)}}}
+   if(o.type==='node'&&(zoneOpen(o.i)||st.fog[o.i]<.8)){var nm=o.i<NR?C.regions[o.i].name:C.castle.name,cl2=o.i<NR?levelDone(o.i):bossDone(),label=(cl2?'★ ':'')+nm,by=y-S*(o.kind==='castle'?2.7:2.15),pl2=placePlate(label,cl2);
+    g.drawImage(pl2,x-pl2._w/2,by-13,pl2._w,pl2._h);g.lineWidth=1.3;g.beginPath();g.rect(x-pl2._w/2,by-13,pl2._w,21);if(cl2&&motionOn()){g.strokeStyle='#f3e2b0';g.globalAlpha=.55+.45*Math.abs(Math.sin(T*2));g.stroke();g.globalAlpha=1}else{g.strokeStyle='#c8a86a';g.stroke()}}}}
  if(!FX.low&&window.LQAnim){var zb=world?sc.zone[h.c]&&sc.zone[h.c][h.r]:null;LQAnim.particles(g,world?bio(zb==null||zb<0?0:zb):(sc.biome||'meadow'),st.dtRaw||0,cx,cy,vw,vh,T)}
  drawRoute(g,true);
  if(world){g.drawImage(sc.fogCv,0,0,sc.W,sc.H)}
@@ -368,7 +368,10 @@ function drawMM(rebake){if(!mm||!st.scene)return;var sc=st.scene,g=mmg,W=mm.widt
  g.setTransform(1,0,0,1,0,0);g.drawImage(mmBg,0,0);
  var tgt=st.obj&&st.obj.target;if(tgt&&tgt.sid===sc.id){g.strokeStyle='#ffd25a';g.lineWidth=3;g.beginPath();g.arc(ox+hx(tgt.c,tgt.r)*k,oy+hy(tgt.r)*k,9+(motionOn()?Math.sin(st.time*5)*2:0),0,7);g.stroke()}
  g.fillStyle='#fff';g.strokeStyle='#c0392b';g.lineWidth=3;g.beginPath();g.arc(ox+st.hero.x*k,oy+st.hero.y*k,motionOn()?6+Math.sin(st.time*4):6,0,7);g.fill();g.stroke()}
-function nameW(g,font,text){var k=font+'\0'+text,w=st.lw[k];if(w==null){g.font=font;w=st.lw[k]=g.measureText(text).width}else g.font=font;return w}
+var placePlates={},placeProbe=null,PLACE_FONT='700 15px "Cormorant Garamond",Georgia,serif';
+function placePlate(text,gold){var ready=true;try{if(document.fonts&&document.fonts.check)ready=document.fonts.check(PLACE_FONT)}catch(e){}var k=text+'\0'+(ready?1:0),c=placePlates[k];if(c)return c;
+ if(!placeProbe)placeProbe=document.createElement('canvas').getContext('2d');placeProbe.font=PLACE_FONT;var w=placeProbe.measureText(text).width+22,h=21;
+ c=document.createElement('canvas');c.width=Math.max(1,Math.ceil(w))*2;c.height=h*2;var sg=c.getContext('2d');sg.scale(2,2);sg.font=PLACE_FONT;sg.textAlign='center';sg.fillStyle='rgba(10,15,21,.88)';sg.fillRect(0,0,w,h);sg.fillStyle=gold?'#f3e2b0':'#e8dcc4';sg.fillText(text,w/2,15);c._w=w;c._h=h;placePlates[k]=c;return c}
 var plates={};function namePlate(g,text){var c=plates[text];if(c)return c;var font='700 13px "Cormorant Garamond",Georgia,serif';g.font=font;var w=Math.ceil(g.measureText(text).width)+8,h=22;c=document.createElement('canvas');c.width=w*2;c.height=h*2;var sg=c.getContext('2d');sg.scale(2,2);sg.font=font;sg.textAlign='center';sg.lineWidth=4;sg.lineJoin='round';sg.strokeStyle='rgba(10,15,21,.9)';sg.strokeText(text,w/2,16);sg.fillStyle='#f3e2b0';sg.fillText(text,w/2,16);c._w=w;c._h=h;plates[text]=c;return c}
 var last=0;function frame(ts){requestAnimationFrame(frame);if(document.hidden){last=ts;return}var dt=Math.min(.05,(ts-last)/1000||0);last=ts;st.dtRaw=dt;
  var kk=st.keys,busyIn=!motionOn()&&st.mode==='play'&&st.scene&&!st.hero.mv&&!st.path&&st.pad<0&&!kk.left&&!kk.right&&!kk.up&&!kk.down&&st.veil<=0&&st.shake<=0&&!fogBusy()&&st.cam.err<.5;if(busyIn){st.idleAcc+=dt;if(st.idleAcc<.12)return;st.idleAcc=0}else st.idleAcc=0
