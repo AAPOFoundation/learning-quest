@@ -52,8 +52,8 @@ var Art=window.Art,FX=window.LQFx;if(!Art||!FX)return;
 var S=Art.S,hx=Art.hx,hy=Art.hy,hash=Art.hash;
 function waterList(sc){if(sc._wl)return sc._wl;var l=[];for(var c=0;c<sc.cols;c++)for(var r=0;r<sc.rows;r++)if(sc.t[c][r]==='water')l.push([hx(c,r),hy(r),hash(c,r,99)]);sc._wl=l;return l}
 /* water: two drifting highlight strokes and an occasional glint per visible water tile */
-function water(g,sc,T,cx,cy,vw,vh){if(FX.low||(FX.rm&&FX.rm.matches))return;var l=waterList(sc);if(!l.length)return;g.save();g.lineCap='round';g.lineWidth=1.3;
- for(var i=0;i<l.length;i++){var w=l[i],x=w[0],y=w[1];if(x<cx-S||x>cx+vw+S||y<cy-S||y>cy+vh+S)continue;var ph=w[2]*6.28;
+function water(g,sc,T,cx,cy,vw,vh,map){if(FX.low||(FX.rm&&FX.rm.matches))return;var l=waterList(sc);if(!l.length)return;g.save();g.lineCap='round';g.lineWidth=1.3;
+ for(var i=0;i<l.length;i++){var w=l[i],x=w[0],y=w[1];if(map){var m=map(x,y);x=m[0];y=m[1]}if(x<cx-S*2||x>cx+vw+S*2||y<cy-S*2||y>cy+vh+S*2)continue;var ph=w[2]*6.28;
   for(var k=0;k<2;k++){var a=.07+.09*(.5+.5*Math.sin(T*1.3+ph+k*2.1)),dx=Math.sin(T*.45+ph+k)*S*.22,yy=y-S*.22+k*S*.42+Math.sin(T*.8+ph)*1.5,xx=x-S*.18+k*S*.3+dx;
    g.strokeStyle='rgba(225,244,255,'+a.toFixed(3)+')';g.beginPath();g.moveTo(xx-7,yy);g.quadraticCurveTo(xx,yy-2.6,xx+7,yy);g.stroke()}
   var gl=Math.sin(T*2.2+ph*3);if(gl>.92){g.fillStyle='rgba(255,252,235,'+((gl-.92)*8).toFixed(3)+')';g.beginPath();g.arc(x+(w[2]-.5)*S*.8,y+(w[2]*7%1-.5)*S*.6,1.6,0,6.3);g.fill()}}
