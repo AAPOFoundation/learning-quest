@@ -72,6 +72,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 62. **A still hood stirs.** When a hooded figure stands, the cloth shifts a little, the same slow sway as hair. A walk holds the hood still. The home wanderer wears a hood, so this shows while that figure is standing.
 63. **A talk choice lets go after it rises.** Each reply still arrives on its own beat. The rise no longer holds the button, so a press can sink it. Reduced motion removes the rise.
 64. **Leave the Workshop rises.** The way out of the Citadel Workshop uses the same short rise as the other way-back buttons. The rise lets go, so a press can still sink it. Reduced motion removes it.
+65. **A question choice lets go after it rises.** Lesson choices, grade buttons and final-challenge choices still arrive on their own beat. The rise no longer holds them, so a press can sink. A marked answer is still drawn again, so the right one pops and a wrong one settles. Reduced motion removes the rise.
 
 ## Checked
 
