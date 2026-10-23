@@ -60,3 +60,4 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 - Highland rock colour was #9a948c, which the frame called white. It is now #6e6860. The same frame calls the rocks grey.
 - The door roll was still easy to read as a post. It is thicker now, with two rope bands and a short cloth tail on the ground. A meadow frame calls it rolled tent fabric secured with rope. That geometry was saved by an outside snapshot commit before the note landed.
 - Mushrooms were a plain red cone. The cap is wider now and has two pale spots. A forest frame calls out a red mushroom with white spots. The pine branch, cape, book and crate still read in that frame.
+- The forest stump was a short dark cylinder behind the camp. It now has a pale cut top and a ring, and it stands at (2.35, 0, 0.15). A forest frame calls it a stump with a light top near the flag.

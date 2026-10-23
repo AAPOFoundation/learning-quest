@@ -382,7 +382,13 @@ function mushroomMesh(){
  return pack(b);
 }
 function cattailMesh(){var b=new Builder(); cyl(b,0,0.26,0,0.016,0.52,4,hex('#3a5a32'),0); cyl(b,0,0.54,0,0.032,0.14,5,hex('#6a4a32'),0); return pack(b)}
-function stumpMesh(col){var b=new Builder(); cyl(b,0,0.12,0,0.16,0.24,6,col,0); cyl(b,0,0.25,0,0.18,0.05,6,hex('#c4a574'),0); return pack(b)}
+function stumpMesh(col){
+ var b=new Builder(), cut=hex('#c4a574'), ring=hex('#a88858');
+ cyl(b,0,0.13,0,0.16,0.26,6,col,0);
+ cyl(b,0,0.27,0,0.19,0.04,7,cut,0);
+ cyl(b,0,0.29,0,0.1,0.02,6,ring,0);
+ return pack(b);
+}
 function iceMesh(){var b=new Builder(); b.box(0,0.22,0,0.18,0.44,0.14,hex('#d7eef6'),0); b.box(0.1,0.36,0.04,0.1,0.32,0.1,hex('#f4fbff'),0); return pack(b)}
 function cairnMesh(col){
  var b=new Builder(), i, d, fr, stone=mix(col,[0.25,0.22,0.2],0.35), lumps=[
@@ -586,7 +592,7 @@ function dress(biome,P,put,key,shade){
   put(pineMesh(false), -3.65,0,1.85,0,1.12,'pine'); put(shade,-3.65,0,1.85,0,1.2,'shadow');
   put(pineMesh(false), 3.55,0,2.15,0,0.95,'pine'); put(pineMesh(false), -3.3,0,-1.55,0,0.8,'pine'); put(pineMesh(false), 3.15,0,-1.7,0,0.72,'pine');
   put(mushroomMesh(), -2.15,0,2.55,0,1,'mushroom'); put(mushroomMesh(), 1.95,0,3.15,0,0.85,'mushroom');
-  put(stumpMesh(trunk), -2.75,0,0.15,0.5,1,'stump'); put(rockMesh(rock), 2.35,0,3.25,0,0.65,'rock');
+  put(stumpMesh(trunk), 2.35,0,0.15,0.4,1.15,'stump'); put(rockMesh(rock), 2.35,0,3.25,0,0.65,'rock');
   put(fernMesh(), -1.7,0,2.65,0.8,1,'fern'); put(fernMesh(), 1.35,0,2.15,0.2,0.85,'fern');
   return;
  }
