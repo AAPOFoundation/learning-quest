@@ -19,7 +19,7 @@ Heights, in view pixels: water 0, sand and marsh 3, grass, crown and road 5, sno
 
 Full effects bake `sc.view` once per scene. Tops are the painted tiles, clipped per height and stamped with that shear. Each cliff is two triangles. A drop of 16 or more is grey stone, 8 or more is earth, and a short drop is a sand bank. The dark face stays near rgb 83, 79, 72. A darkened copy of the cap went near black (about 29, 27, 25) and read as a hole. Tall faces get one or two strata lines. The lip is a warm parchment stroke. The old 2–4px lift is gone. The minimap and the full map stay top-down on `sc.cv`.
 
-People, labels and buildings stay upright. Feet use the tile height, and a step lerps the height. Halls, guilds, smithies, vaults, towers, towns, castles, gates, fountains and landmarks get a low-poly plinth with the same shear. The sprite shadow covers about 8px under the feet, so the plinth's south face is tall enough to show beneath it. Chests, trees and banners do not. Course landmarks still draw their own flat slab on top of this step.
+People, labels and buildings stay upright. Feet use the tile height, and a step lerps the height. Halls, guilds, smithies, vaults, towers, towns, castles, gates, fountains and landmarks get a low-poly plinth with the same shear. The sprite shadow covers about 8px under the feet, so the south face clears that. The face stops near 18px down. A person on the next row stands about 29px down, on the ground. Chests, trees and banners do not. Course landmarks still draw their own flat slab on top of this step.
 
 A tap tests nearby tiles on their own height plane. If several caps contain the point, the southern one wins, because it is drawn later. A mountain top covers the tile to its north. That is the visible surface.
 
@@ -41,7 +41,7 @@ Reduced motion still shows the angled map. Say if it should force the flat map i
 
 Cliff sizes are one number per terrain type. Say if mountains should stand taller, or if the shore bank (grass 5, water 0) should be flatter.
 
-Plinths are fairly thick so they clear the sprite shadow. Say if the castle and the hall should sit lower.
+Plinths clear the sprite shadow and stop short of the next row. Say if the castle and the hall should sit lower or taller.
 
 Chests have no plinth. Say if they should.
 

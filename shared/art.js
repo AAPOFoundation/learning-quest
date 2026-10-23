@@ -125,8 +125,9 @@ function paintRelief(sc){
  sc.view=cv;sc.viewOx=ox;sc.viewOy=oy}
 /* Low-poly plinth under a building or landmark. (0,0) is the ground contact in upright sprite space.
    The footprint uses the same shear and v as the ground, then extrudes straight up. West face is lit.
-   The sprite shadow reaches about 8px below the feet, so the south face is tall enough to show beneath it. */
-function podium(g,kind){var spec={hall:[34,18,14],guild:[32,18,13],smithy:[32,18,13],vault:[30,16,12],tower:[20,14,12],great:[44,20,15],town:[36,18,13],castle:[42,20,15],gate:[30,14,10],fountain:[24,14,11],landmark:[22,14,10]}[kind];if(!spec)return;
+   The sprite shadow reaches about 8px below the feet, so the south face clears that.
+   The face stops near 18px down. The next row's feet are about 29px down, so a neighbour stays on the ground. */
+function podium(g,kind){var spec={hall:[32,14,10],guild:[30,14,10],smithy:[30,14,10],vault:[28,13,9],tower:[18,12,10],great:[40,14,10],town:[34,14,10],castle:[38,14,10],gate:[28,12,8],fountain:[22,12,8],landmark:[20,12,8]}[kind];if(!spec)return;
  var u=S/34,hw=spec[0]*u,hd=spec[1]*u,ht=spec[2]*u,sh=CAM.shear,v=CAM.v;
  function gp(gx,gy,up){return [gx+sh*gy,gy*v-up]}
  /* Top is the foot line (up 0). The block hangs down-screen so the sprite stands on it. */
