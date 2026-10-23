@@ -441,10 +441,11 @@ function crateMesh(){
  return pack(b);
 }
 function pennantMesh(){
- var b=new Builder(), cloth=hex('#d7b56a'), pole=hex('#5c4030');
- cyl(b,0,0.5,0,0.028,0.96,5,pole,0);
- b.polyOut([[0.04,0.92,0],[0.62,0.78,0.02],[0.04,0.58,0]],[0,0.8,-1],cloth,0);
- b.polyOut([[0.04,0.58,0],[0.62,0.78,0.02],[0.04,0.92,0]],[0,0.8,1],cloth,0);
+ var b=new Builder(), cloth=hex('#d7b56a'), fold=hex('#c4a05a'), pole=hex('#5c4030');
+ cyl(b,0,0.62,0,0.03,1.2,5,pole,0);
+ sphere(b,0,1.26,0,0.05,6,4,cloth,0.55);
+ card(b, [[0.05,1.14,0],[0.05,0.64,0],[0.46,0.78,0.05],[0.40,1.04,0.03]], cloth);
+ card(b, [[0.38,1.02,0.03],[0.44,0.76,0.05],[0.74,0.88,0.01],[0.66,1.00,-0.02]], fold);
  return pack(b);
 }
 function stoneMesh(){
@@ -572,7 +573,8 @@ function buildCamp(opts){
  put(lanternMesh(), 1.9,0,-1.75, 0,1,'lantern');
  put(logMesh(), 1.25,0,-1.05, 0.55,1,'log');
  put(logMesh(), -1.05,0,-1.15, -0.4,1,'log');
- put(pennantMesh(), -2.55,0,2.05, 0.9,1,'pennant');
+ /* ry faces the cloth at the default camp camera. It sits on open grass, clear of the tent guys. */
+ put(pennantMesh(), 2.7,0,0.85, 0.14,1,'pennant');
  var stones=[[-1.35,0.15],[-1.05,0.05],[-0.35,-0.45],[0.05,-0.95]];
  for(var si=0;si<stones.length;si++)put(stoneMesh(), stones[si][0],0,stones[si][1], si*0.3, 1, 'stone');
  var rim=mix(hex(P.g2),[0.12,0.13,0.12],0.4);
