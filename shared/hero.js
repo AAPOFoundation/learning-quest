@@ -6,13 +6,15 @@
 var cv=document.getElementById('hero');if(!cv||!window.Art)return;
 var Art=window.Art,FX=window.LQFx,S=Art.S,hx=Art.hx,hy=Art.hy,hash=Art.hash,g=cv.getContext('2d');
 var COLS=22,ROWS=8,SEED=7;
-var TOWNS=[{c:3,r:3,biome:'meadow',accent:'#b5532f',name:'Python Basics'},{c:7,r:3,biome:'forest',accent:'#8a3b2a',name:'AI Foundations'},{c:11,r:3,biome:'hills',accent:'#3f5f8f',name:'AI Evaluation'},{c:15,r:3,biome:'tundra',accent:'#3c5a86',name:'AI Safety'}],CAST={c:19,r:3,accent:'#c9a24f',name:'Citadel'},STOPS=TOWNS.concat([CAST]);
+var TOWNS=[{c:3,r:3,biome:'meadow',accent:'#4f7a3a',name:'Python Basics',motif:'seed',tint:'#6d9a4e',roof:'#7a5a32'},{c:7,r:3,biome:'forest',accent:'#6a3a2a',name:'AI Foundations',motif:'neuron',tint:'#c47a48',roof:'#343e2c'},{c:11,r:3,biome:'hills',accent:'#3f5f8f',name:'AI Evaluation',motif:'scale',tint:'#3f5f8f',roof:'#3a4658'},{c:15,r:3,biome:'tundra',accent:'#8a4a3a',name:'AI Safety',motif:'shield',tint:'#8a4a3a',roof:'#3e4c5a'}],CAST={c:19,r:3,accent:'#c9a24f',name:'Citadel',motif:'book',tint:'#c9a24f',roof:'#8a6528'},STOPS=TOWNS.concat([CAST]);
 var HERO={skin:'#e2b48c',hair:'#3b2a1d',robe:'#274a7a',trim:'#d7b56a',cape:'#7a2e2a',hat:'hood',staff:true};
 function terrain(){var t=[];for(var c=0;c<COLS;c++){t.push([]);for(var r=0;r<ROWS;r++){var h=hash(c,r,SEED),e=Art.vnoise(c*.35,r*.5,SEED),v='grass';
   if(r>=6&&c<6)v=(r===6&&h<.35)?'grass':'water';else if(r===0&&(c>10||h<.3))v=c>16?'mountain':'hills';else if(c>=14&&c<=17&&r!==3)v=(h<.45?'pine':'snow');else if(c>=5&&c<=8&&r!==3)v=(e>.42?'forest':'grass');else if(c>=10&&c<=12&&r!==3&&h<.4)v='hills';else if(r>=6&&c>=19)v='water';else if(r===7&&c>=7&&c<=10)v='water';t[c].push(v)}}
  for(var si=0;si<STOPS.length;si++){var sn=STOPS[si];t[sn.c][sn.r]=sn.biome==='tundra'?'snow':'grass'}return t}
 var sc={cols:COLS,rows:ROWS,seed:SEED,t:terrain(),roads:[(function(){var p=[];for(var c=1;c<=CAST.c;c++)p.push([c,3]);return p})()],objs:[],biome:'meadow',relief:false};
 sc.objs=TOWNS.map(function(n){return {c:n.c,r:n.r}}).concat([{c:CAST.c,r:CAST.r}]);
+var nodes=TOWNS.concat([CAST]);sc.zone=[];for(var c=0;c<COLS;c++){sc.zone.push([]);for(var r=0;r<ROWS;r++){var bi=0,bd=99,ii;for(ii=0;ii<nodes.length;ii++){var dd=Math.abs(c-nodes[ii].c)+Math.abs(r-nodes[ii].r)*.25;if(dd<bd){bd=dd;bi=ii}}sc.zone[c].push(bi)}}
+sc.zoneTint=nodes.map(function(n){return n.tint});
 Art.paintScene(sc);
 var W=0,H=0,dpr=1,cam=0,T=0,last=0,acc=0,running=false,visible=true,ov=null,names={},RM=FX.rm||{matches:false};
 function still(){return FX.low||RM.matches}
@@ -36,7 +38,7 @@ function draw(dt){var full=X1-X0,z=Math.max(W/full,H/(S*1.5*6.8)),vw=W/z,vh=H/z,
  if(st)heroTurn=0;else{if(heroFace!=null&&face!==heroFace)heroTurn=1;heroFace=face;if(heroTurn>0)heroTurn=Math.max(0,heroTurn-(dt||1/30)/.14)}
  it=heroList[n]||(heroList[n]={});it.y=hy(3)+1;it.kind='hero';it.hxp=hxp;it.moving=!st;it.face=face;it.turn=heroTurn;it.step=step;it.hop=st?0:Math.sin(step*Math.PI)*4.5;it.foot=foot;n++;
  heroList.length=n;heroList.sort(byY);
- for(i=0;i<n;i++){it=heroList[i];heroOp.t=T;heroOp.pine=heroOp.snow=heroOp.v=heroOp.landmark=heroOp.lit=heroOp.open=heroOp.locked=heroOp.glow=heroOp.lid=heroOp.lift=heroOp.biome=void 0;if(it.kind==='town'){heroOp.accent=it.ref.accent;heroOp.biome=it.ref.biome;Art.building(g,'town',hx(it.ref.c,it.ref.r),hy(it.ref.r),heroOp)}else if(it.kind==='castle'){heroOp.accent=CAST.accent;Art.building(g,'castle',hx(CAST.c,CAST.r),hy(CAST.r),heroOp)}else Art.figure(g,it.hxp,hy(3)+S*.2,HERO,{t:T,moving:it.moving,face:it.face,step:it.step,hop:it.hop,foot:it.foot,turn:it.turn||0})}
+ for(i=0;i<n;i++){it=heroList[i];heroOp.t=T;heroOp.pine=heroOp.snow=heroOp.v=heroOp.landmark=heroOp.lit=heroOp.open=heroOp.locked=heroOp.glow=heroOp.lid=heroOp.lift=heroOp.biome=heroOp.motif=heroOp.roof=void 0;if(it.kind==='town'){heroOp.accent=it.ref.accent;heroOp.biome=it.ref.biome;heroOp.motif=it.ref.motif;heroOp.roof=it.ref.roof;Art.building(g,'town',hx(it.ref.c,it.ref.r),hy(it.ref.r),heroOp)}else if(it.kind==='castle'){heroOp.accent=CAST.accent;heroOp.motif=CAST.motif;heroOp.roof=CAST.roof;Art.building(g,'castle',hx(CAST.c,CAST.r),hy(CAST.r),heroOp)}else Art.figure(g,it.hxp,hy(3)+S*.2,HERO,{t:T,moving:it.moving,face:it.face,step:it.step,hop:it.hop,foot:it.foot,turn:it.turn||0})}
  /* name plaques, in the map's own style */
  var fs=Math.min(30,(W<520?10:11)/z),short=W<520,sp,nm,label,nk,px,py,tw;g.font='700 '+fs+'px "Cormorant Garamond",Georgia,serif';g.textAlign='center';
  for(i=0;i<STOPS.length;i++){sp=STOPS[i];if(sp.short==null)sp.short=sp.name.replace(/^(AI |Python )/,'');nm=short?sp.short:sp.name;label=(i<4?(i+1)+' · ':'')+nm;nk=fs+'|'+label;px=hx(sp.c,sp.r);py=hy(sp.r)+S*1.15;tw=names[nk];if(tw==null)tw=names[nk]=g.measureText(label).width;tw+=fs*1.2;g.fillStyle='rgba(10,15,21,.86)';g.strokeStyle='#c8a86a';g.lineWidth=1/z;g.beginPath();g.rect(px-tw/2,py-fs*.95,tw,fs*1.45);g.fill();g.stroke();g.fillStyle='#f3e2b0';g.fillText(label,px,py+fs*.12)}

@@ -20,14 +20,14 @@ function confusion(host,cfg){
  +'<div id="cx-out"></div><p class="small dim" id="cx-note"></p></section>';
  var $=function(s){return host.querySelector(s)};
  var cxAt=null,cxTo=0,cxRaf=0,cxLast=0;
- function paintCx(){var line=$('#cx-line'),lab=$('#cx-lab');if(!line)return;var x=cxAt==null?cxTo:cxAt;line.setAttribute('x1',x);line.setAttribute('x2',x);if(lab)lab.setAttribute('x',Math.min(x+4,540))}
+ function paintCx(){var line=$('#cx-line'),lab=$('#cx-lab');if(!line)return;var x=cxAt==null?cxTo:cxAt;line.setAttribute('x1',x);line.setAttribute('x2',x);if(lab)lab.setAttribute('x',Math.min(x+4,430))}
  function aimCx(x){cxTo=x;if(cxAt==null||calm()){cxAt=x;if(cxRaf){cancelAnimationFrame(cxRaf);cxRaf=0}paintCx();return}paintCx();if(Math.abs(cxTo-cxAt)<.4){cxAt=cxTo;paintCx();return}if(cxRaf)return;cxLast=performance.now();
   function tick(now){var dt=Math.min(.05,(now-cxLast)/1000||0);cxLast=now;cxAt+=(cxTo-cxAt)*(1-Math.exp(-dt/.08));if(Math.abs(cxTo-cxAt)<.4){cxAt=cxTo;cxRaf=0;paintCx();return}paintCx();cxRaf=requestAnimationFrame(tick)}
   cxRaf=requestAnimationFrame(tick)}
  function draw(){var d=sets[mode],tp=0,fp=0,fn=0,tn=0,svgEl=$('#cx-svg');
-  if(svgEl.dataset.mode!==mode){svgEl.dataset.mode=mode;var h='<rect x="0" y="0" width="600" height="120" rx="8" fill="#0b1118"/>';d.forEach(function(it,i){var x=10+it.s*580,y=14+((i*37)%92);h+='<circle cx="'+x+'" cy="'+y+'" r="5.2" fill="'+(it.y?'#d7b56a':'#4f86c6')+'"/>'});h+='<line id="cx-line" y1="0" y2="120" stroke="#e58a7a" stroke-width="2"/><text id="cx-lab" y="12" fill="#e58a7a" font-size="11">flag here and above</text>';svgEl.innerHTML=h}
+  if(svgEl.dataset.mode!==mode){svgEl.dataset.mode=mode;var h='<rect x="0" y="0" width="600" height="120" rx="8" fill="#0a0f15"/>';d.forEach(function(it,i){var x=10+it.s*580,y=14+((i*37)%92);h+='<circle cx="'+x+'" cy="'+y+'" r="5.2" fill="'+(it.y?'#d7b56a':'#4f86c6')+'"/>'});h+='<line id="cx-line" y1="0" y2="120" stroke="#e58a7a" stroke-width="2"/><text id="cx-lab" y="18" fill="#f6efe0" font-size="13">flag here and above</text>';svgEl.innerHTML=h}
   var nodes=svgEl.querySelectorAll('circle');
-  d.forEach(function(it,i){var fl=it.s>=th;if(it.y&&fl)tp++;else if(!it.y&&fl)fp++;else if(it.y)fn++;else tn++;var c=nodes[i];if(!c)return;c.style.opacity=fl?'1':'.55';c.setAttribute('stroke',fl?'#fff':'none');c.setAttribute('stroke-width','1')});
+  d.forEach(function(it,i){var fl=it.s>=th;if(it.y&&fl)tp++;else if(!it.y&&fl)fp++;else if(it.y)fn++;else tn++;var c=nodes[i];if(!c)return;c.style.opacity=fl?'1':'.55';c.setAttribute('stroke',fl?'#f6efe0':'none');c.setAttribute('stroke-width','1')});
   aimCx(10+th*580);
   var prec=tp+fp?tp/(tp+fp):null,rec=tp+fn?tp/(tp+fn):null,acc=(tp+tn)/d.length,f=prec&&rec?2*prec*rec/(prec+rec):null,total=fn*cost+fp;
   var best=1e9,bt=th;for(var t=5;t<=95;t++){var tt=t/100,a=0,b=0;d.forEach(function(it){var fl=it.s>=tt;if(it.y&&!fl)a++;else if(!it.y&&fl)b++});var c=a*cost+b;if(c<best){best=c;bt=tt}}
@@ -47,8 +47,8 @@ function lr(host){
  function Y(v){var Ymax=140;return 200-Math.max(0,Math.min(v,Ymax))/Ymax*180}
  function ensure(){var svg=$('#lr-svg');if(svg.dataset.ready)return;svg.dataset.ready='1';
   var bowl='',x;for(x=-8;x<=14;x+=.25)bowl+=X(x).toFixed(1)+','+Y(f(x)).toFixed(1)+' ';
-  var gx=X(W_MIN),h='<rect width="600" height="220" rx="8" fill="#0b1118"/><polyline fill="none" stroke="#6a7886" stroke-width="2" points="'+bowl+'"/>';
-  h+='<line x1="'+gx+'" y1="20" x2="'+gx+'" y2="205" stroke="#4f7a3a" stroke-dasharray="4 4"/><text x="'+(gx+4)+'" y="30" fill="#8fbf6a" font-size="11">lowest loss</text>';
+  var gx=X(W_MIN),h='<rect width="600" height="220" rx="8" fill="#0a0f15"/><polyline fill="none" stroke="#c8a86a" stroke-width="2" points="'+bowl+'"/>';
+  h+='<line x1="'+gx+'" y1="20" x2="'+gx+'" y2="205" stroke="#8fbf6a" stroke-dasharray="4 4"/><text x="'+(gx+4)+'" y="34" fill="#f6efe0" font-size="13">lowest loss</text>';
   h+='<path id="lr-path" d="" fill="none" stroke="#e58a7a" stroke-width="1.2" opacity=".7"/>';
   for(var i=0;i<steps+1;i++)h+='<circle r="'+(i===0?6:4)+'" fill="'+(i===0?'#d7b56a':'#e58a7a')+'" cx="30" cy="200"/>';
   svg.innerHTML=h}

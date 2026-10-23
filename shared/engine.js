@@ -44,9 +44,9 @@ function homeOld(){
 function path(tb){
  var h='<div class="grid">';
  A.levels.forEach(function(l,i){var s=P.levels[l.id],u=unlocked(i);
-  h+='<button class="lvl" data-go="'+i+'" '+(u?'':'disabled')+'><span class="ico">'+l.icon+'</span><p class="kicker" style="margin-top:6px">Level '+(i+1)+(u?'':' · locked')+'</p><h3 style="margin:0 0 4px">'+esc(l.title)+'</h3><p class="small dim" style="margin:0 0 6px">'+esc(l.blurb)+'</p>'+stars(s?starsFor(s.best):0)+'</button>'});
+  h+='<button class="lvl" data-go="'+i+'" '+(u?'':'disabled')+'><span class="ico">'+((window.LQMark&&window.LQMark(l.icon,26))||esc(l.icon))+'</span><p class="kicker" style="margin-top:6px">Level '+(i+1)+(u?'':' · locked')+'</p><h3 style="margin:0 0 4px">'+esc(l.title)+'</h3><p class="small dim" style="margin:0 0 6px">'+esc(l.blurb)+'</p>'+stars(s?starsFor(s.best):0)+'</button>'});
  var allDone=doneCount()===A.levels.length;
- h+='<button class="lvl" data-boss '+(allDone?'':'disabled')+'><span class="ico">🏆</span><p class="kicker" style="margin-top:6px">Final challenge'+(allDone?'':' · locked')+'</p><h3 style="margin:0 0 4px">'+esc(A.boss.title)+'</h3><p class="small dim" style="margin:0 0 6px">'+esc(A.boss.blurb)+'</p>'+stars(P.boss?starsFor(P.boss.best):0)+'</button></div>';
+ h+='<button class="lvl" data-boss '+(allDone?'':'disabled')+'><span class="ico">'+((window.LQMark&&window.LQMark('cup',26))||'')+'</span><p class="kicker" style="margin-top:6px">Final challenge'+(allDone?'':' · locked')+'</p><h3 style="margin:0 0 4px">'+esc(A.boss.title)+'</h3><p class="small dim" style="margin:0 0 6px">'+esc(A.boss.blurb)+'</p>'+stars(P.boss?starsFor(P.boss.best):0)+'</button></div>';
  h+='<p style="margin-top:18px"><button class="btn btn-ghost btn-sm" data-reset>Reset progress</button></p>';
  tb.innerHTML=h}
 function skills(tb){
@@ -61,6 +61,7 @@ var SEAL_WORLD={'python-basics':1,'ai-foundations':1,'ai-evals':1,'ai-safety':1,
 function badgeName(id){if(/^seal_/.test(id)||id==='seal')return (A.key&&SEAL_WORLD[A.key])?'seal-'+A.key:'seal';return id}
 function badgeSrc(id){var name=badgeName(id);if(name.indexOf('seal-')===0||BADGE_ART[name])return '../assets/art/badges/'+name+'.svg';return ''}
 function badgeMark(id){var src=badgeSrc(id);if(!src)return '';return '<img class="mk" alt="" width="40" height="40" src="'+src+'">'}
+function markBox(icon,z){var mk=window.LQMark&&window.LQMark(icon,z||28);return '<span class="bmk">'+(mk||esc(icon||''))+'</span>'}
 function badges(tb){
  var h='<div class="grid">';A.badges.forEach(function(b,i){var on=P.badges.indexOf(b.id)>=0,art=badgeMark(b.id);h+='<div class="badge '+(on?'':'off')+'" style="animation:rise .22s ease both;animation-delay:'+(Math.min(i,12)*40)+'ms"><span class="mk-slot">'+(art||b.icon)+'</span><div><b>'+esc(b.name)+'</b><div class="small dim">'+esc(b.desc)+'</div></div></div>'});
  tb.innerHTML=h+'</div>'}

@@ -21,7 +21,7 @@ function bench(host){
   var parts=[['Instructions',SYS,'#6a8a3a'],['Tools',TOOLS,'#3f5f8f'],['Document',s.doc,'#8a5a2a'],['Conversation',kept,'#6a4a8f'],['Your question',Q,'#2f6a62'],['Answer room',s.room,'#7a2f3a']];
   var used=parts.reduce(function(a,p){return a+p[1]},0),free=Math.max(0,s.win-used);
   var box=$('#cb-bar'),row=box.querySelector('.segs');
-  if(!row){box.innerHTML='<div class="segs" style="display:flex;height:26px;border:1px solid #6b4a0e;border-radius:8px;overflow:hidden;background:#0b1118">'+parts.map(function(p){return '<span style="width:0;background:'+p[2]+'"></span>'}).join('')+'</div><p class="small" id="cb-key" style="margin:6px 0"></p>';row=box.querySelector('.segs')}
+  if(!row){box.innerHTML='<div class="segs" style="display:flex;height:26px;border:1px solid #6b4a0e;border-radius:8px;overflow:hidden;background:#0a0f15">'+parts.map(function(p){return '<span style="width:0;background:'+p[2]+'"></span>'}).join('')+'</div><p class="small" id="cb-key" style="margin:6px 0"></p>';row=box.querySelector('.segs')}
   [].forEach.call(row.children,function(el,i){var w=Math.min(100,parts[i][1]/Math.max(s.win,used)*100);el.title=parts[i][0]+': '+parts[i][1]+' tokens';if(!el.dataset.set){el.dataset.set='1';el.style.width='0%';requestAnimationFrame(function(){el.style.width=w+'%'})}else el.style.width=w+'%'});
   box.querySelector('#cb-key').innerHTML=parts.map(function(p){return '<span style="color:'+p[2]+'">&#9632;</span> '+esc(p[0])+' '+k(p[1])}).join(' &nbsp; ');
   var msg;
