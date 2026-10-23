@@ -51,8 +51,11 @@ function skills(tb){
  A.skills.forEach(function(s){var l=A.levels.filter(function(x){return x.id===s.level})[0],b=P.levels[s.level]?Math.round(100*P.levels[s.level].best):0;
   h+='<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+esc(s.name)+'</b><span class="dim small">'+b+'%</span></div><div class="bar"><i style="width:'+b+'%"></i></div><div class="small dim">'+esc(s.note)+'</div></div>'});
  tb.innerHTML=h+'</div>'}
+/* brass medallions in assets/art/badges; seal_* shares seal.svg; missing file keeps the emoji */
+var BADGE_ART={first:1,perfect:1,streak3:1,all:1,boss:1,master:1,coder:1,pythonista:1,camp:1,expedition:1,capstone:1,crown:1,scout:1,seal:1,lab:1};
+function badgeMark(id){var name=/^seal_/.test(id)?'seal':id;if(!BADGE_ART[name])return '';return '<img class="mk" alt="" width="40" height="40" src="../assets/art/badges/'+name+'.svg">'}
 function badges(tb){
- var h='<div class="grid">';A.badges.forEach(function(b){var on=P.badges.indexOf(b.id)>=0;h+='<div class="badge '+(on?'':'off')+'"><span style="font-size:28px">'+b.icon+'</span><div><b>'+esc(b.name)+'</b><div class="small dim">'+esc(b.desc)+'</div></div></div>'});
+ var h='<div class="grid">';A.badges.forEach(function(b){var on=P.badges.indexOf(b.id)>=0,art=badgeMark(b.id);h+='<div class="badge '+(on?'':'off')+'"><span class="mk-slot">'+(art||b.icon)+'</span><div><b>'+esc(b.name)+'</b><div class="small dim">'+esc(b.desc)+'</div></div></div>'});
  tb.innerHTML=h+'</div>'}
 
 /* ---- questions ---- */

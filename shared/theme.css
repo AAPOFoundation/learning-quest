@@ -41,6 +41,25 @@ p{margin:0 0 12px}.dim{color:var(--ink-dim)}.small{font-size:14px}
 .lesson p,.lesson li{color:var(--ink-dim)}.lesson ul{padding-left:20px;margin:0 0 12px}
 .ex{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;background:#070b10;border:1px solid #2b3643;border-radius:8px;padding:10px 12px;margin:0 0 12px;white-space:pre-wrap;color:var(--ink)}
 .badge{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--brass-mid);border-radius:var(--radius);background:var(--panel-lift)}.badge.off{opacity:.4;filter:grayscale(1)}
+.mk-slot{width:40px;height:40px;flex:none;display:grid;place-items:center;font-size:28px;line-height:1}
+.mk-slot .mk{width:40px;height:40px;display:block}
+.world-cover{margin:0 0 12px;border-radius:10px;overflow:hidden;border:1px solid var(--brass-mid);background:#0a0f15;line-height:0}
+.world-cover img{display:block;width:100%;height:180px;object-fit:cover}
+.journey{display:grid;grid-template-columns:minmax(112px,34%) 1fr;gap:0;margin:0 0 12px;text-decoration:none;color:inherit;background:var(--panel-lift);border:1px solid var(--brass-mid);border-radius:var(--radius);overflow:hidden;min-height:112px;box-shadow:inset 0 1px #f3e2b01f}
+.journey:hover,.journey:focus-visible{border-color:var(--gold-hi)}
+.journey:active{transform:translateY(1px)}
+.journey .cover{width:100%;height:100%;min-height:112px;object-fit:cover;display:block;background:#0a0f15}
+.journey-copy{padding:10px 12px 12px;background-repeat:repeat;background-size:120px 120px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.journey-title{display:block;font:800 17px/1.25 var(--font);color:var(--ink);margin:0 0 4px}
+.journey .dim{margin:0}
+.journey .prog{display:block;margin-top:6px;color:var(--gold-hi)}
+.journey[data-world="python-basics"] .journey-copy{background-image:url("../assets/art/bg/python-basics.svg")}
+.journey[data-world="ai-foundations"] .journey-copy{background-image:url("../assets/art/bg/ai-foundations.svg")}
+.journey[data-world="ai-safety"] .journey-copy{background-image:url("../assets/art/bg/ai-safety.svg")}
+.journey[data-world="ai-evals"] .journey-copy{background-image:url("../assets/art/bg/ai-evals.svg")}
+.journey[data-world="portfolio-guide"] .journey-copy{background-image:url("../assets/art/bg/portfolio-guide.svg")}
+.journey.separate{background:var(--panel)}
+@media(max-width:560px){.journey{grid-template-columns:1fr}.journey .cover{height:148px;min-height:0}}
 input[type=number],select{font:800 16px var(--font);color:var(--ink);background:#070b10;border:1px solid var(--brass-mid);border-radius:8px;padding:9px;width:100%;min-height:44px}
 input[type=range]{width:100%;accent-color:#d7b56a}
 .field label{display:block;font-size:13px;color:var(--gold-hi);margin-bottom:3px;font-family:var(--display);letter-spacing:.1em;text-transform:uppercase}

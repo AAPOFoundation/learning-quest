@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">
+<defs>
+<linearGradient id="ev-sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#243044"/><stop offset=".5" stop-color="#1c2733"/><stop offset="1" stop-color="#0e141c"/>
+</linearGradient>
+<radialGradient id="ev-moon" cx="32%" cy="32%" r="68%">
+<stop offset="0" stop-color="#f6efe0"/><stop offset="1" stop-color="#d7b56a"/>
+</radialGradient>
+
+</defs>
+<rect width="640" height="360" fill="url(#ev-sky)"/>
+<g fill="#f3e2b0">
+<circle cx="70" cy="48" r="1.3"/><circle cx="150" cy="36" r="1"/><circle cx="230" cy="64" r="1.2"/>
+<circle cx="340" cy="42" r="1"/><circle cx="430" cy="58" r="1.4"/><circle cx="560" cy="40" r="1"/>
+</g>
+<circle cx="90" cy="70" r="22" fill="url(#ev-moon)"/>
+<path d="M0 200C140 168 220 196 340 170C460 144 540 186 640 166V360H0Z" fill="#1a2830"/>
+<path d="M0 250C160 220 260 248 400 226C520 208 580 240 640 228V360H0Z" fill="#314a32"/>
+<rect x="108" y="292" width="16" height="42" rx="2" fill="#5a3c14"/>
+<rect x="516" y="292" width="16" height="42" rx="2" fill="#5a3c14"/>
+<rect x="64" y="262" width="512" height="32" rx="5" fill="#6b4a0e"/>
+<rect x="64" y="262" width="512" height="8" rx="3" fill="#c8a86a"/>
+<g transform="translate(150 168)" fill="none" stroke="#d7b56a" stroke-width="3" stroke-linecap="round">
+<path d="M78 70V22" stroke="#8a6528" stroke-width="4"/>
+<path d="M64 70h28" stroke="#6b4a0e" stroke-width="5"/>
+<path d="M22 22h112"/>
+<path d="M36 22v18"/><path d="M120 22v18"/>
+<path d="M22 40h28" stroke-width="4"/><path d="M106 40h28" stroke-width="4"/>
+<circle cx="78" cy="22" r="4" fill="#f3e2b0" stroke="#6b4a0e"/>
+<rect x="24" y="44" width="24" height="30" rx="2" fill="#f6efe0" stroke="#c8a86a" stroke-width="1.5"/>
+<rect x="108" y="44" width="24" height="30" rx="2" fill="#f6efe0" stroke="#c8a86a" stroke-width="1.5"/>
+</g>
+<g transform="translate(430 196)">
+<circle cx="36" cy="36" r="28" fill="none" stroke="#d7b56a" stroke-width="6"/>
+<circle cx="36" cy="36" r="20" fill="#121a24" stroke="#8a6528" stroke-width="2"/>
+<line x1="56" y1="56" x2="84" y2="86" stroke="#c8a86a" stroke-width="8" stroke-linecap="round"/>
+<line x1="56" y1="56" x2="80" y2="80" stroke="#f3e2b0" stroke-width="3" stroke-linecap="round"/>
+</g>
+<g fill="#ffd25a" stroke="#6b4a0e" stroke-width="1.3" stroke-linejoin="round">
+<path d="M300 150l3.2 6.6 7.2.8-5.4 4.8 1.5 7-6.5-3.6-6.5 3.6 1.5-7-5.4-4.8 7.2-.8z"/>
+</g>
+<g fill="none" stroke="#d7b56a" stroke-width="1.6" stroke-linejoin="round">
+<path d="M258 158l3.2 6.6 7.2.8-5.4 4.8 1.5 7-6.5-3.6-6.5 3.6 1.5-7-5.4-4.8 7.2-.8z"/>
+<path d="M342 158l3.2 6.6 7.2.8-5.4 4.8 1.5 7-6.5-3.6-6.5 3.6 1.5-7-5.4-4.8 7.2-.8z"/>
+</g>
+<rect x="8" y="8" width="624" height="344" rx="8" fill="none" stroke="#d7b56a" stroke-opacity=".35"/>
+<g stroke="#f3e2b0" stroke-width="2" fill="none" stroke-linecap="square">
+<path d="M18 30V18H30"/><path d="M610 18H622V30"/><path d="M18 330V342H30"/><path d="M610 342H622V330"/>
+</g>
+</svg>
