@@ -62,6 +62,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 52. **The home strip reuses its draw list.** Each frame used to build a new list of the four towns, the citadel and the wanderer. The same slots are filled again. The picture does not change.
 53. **A failed test settles sideways.** A passing test still rises. A failing one shifts a few pixels, then rests, on the same beat as a wrong quiz choice. Reduced motion removes it.
 54. **The way back rises.** Leave, Back, Got it and Back to the map rise when that page opens. The rise lets go, so a press can still sink the button. Reduced motion removes it. The menu rows already arrive on their own.
+55. **The home wanderer kicks up dust.** Once each stride, a small puff lands at the feet, the same puff the map uses. A still frame and a quiet setting do not puff. The puff is drawn with the other motes, so it does not need its own loop.
 
 ## Checked
 
