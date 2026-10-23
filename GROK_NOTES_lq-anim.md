@@ -74,6 +74,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 64. **Leave the Workshop rises.** The way out of the Citadel Workshop uses the same short rise as the other way-back buttons. The rise lets go, so a press can still sink it. Reduced motion removes it.
 65. **A question choice lets go after it rises.** Lesson choices, grade buttons and final-challenge choices still arrive on their own beat. The rise no longer holds them, so a press can sink. A marked answer is still drawn again, so the right one pops and a wrong one settles. Reduced motion removes the rise.
 66. **Home and title actions let go after they rise.** The four path buttons, Portfolio Guide, Begin your journey, Continue, New journey and All games still arrive in order. The rise no longer holds them, so a press can sink. Reduced motion removes the rise.
+67. **Run and Check rise.** On a Python challenge, Run rises, then Check. The rise lets go, so a press can still sink. Reduced motion removes it.
 
 ## Checked
 
