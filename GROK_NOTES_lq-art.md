@@ -30,7 +30,7 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - Every region has a 160×100 plate at `assets/art/plates/<world>/<level id>.svg`, and each world has `citadel.svg`. They share one night frame, brass corner ticks, and the Pocket Reserve colours. A missing file hides itself.
 - Plates show on the first screen of a lesson, on the skills map, in the quest log, and on the world-map list.
 - Compass ticks stay inside the ring. Plates use no letters, weapons, crosses, or church shapes. The forge hammer is a tool on an anvil.
-- The plate set was drawn to one frame in this session. Parallel drawing passes were still only reading the tree, so they did not replace these files.
+- The plate set was drawn to one frame in this session. The safety plates were then redrawn with fuller scenes in that same frame. Compass ticks stay inside the ring. The shield is a brass circle and a tick, with no red ring. The marsh mirror sits above the water.
 
 ## Not done
 
