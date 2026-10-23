@@ -82,6 +82,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 72. **A still crown tips.** When a crowned figure stands, the crown tips a little, then comes back. A walk holds it level. The shape is the same as before.
 73. **The code helpers rise in order.** Walk me through it, Hint, Reset code and the solution button arrive one after another. The rise lets go, so a press can still sink. Reduced motion removes it.
 74. **Warm-up buttons rise in order.** The five practice buttons on the Python primer arrive one after another. The rise lets go, so a press can still sink. Reduced motion removes it.
+75. **A Python idea card fades in.** The dim page fades, and the lesson card rises. A topic chip picks up the gold edge, then sinks a pixel while it is held. Reduced motion removes all of it. The close button still sinks on its own.
 
 ## Checked
 
