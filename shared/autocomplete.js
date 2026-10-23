@@ -35,7 +35,7 @@ function workshop(host){
   $('#ac-info').textContent=chain.n+' words read, '+chain.v+' different words have a next word.'}
  function bars(){var c=chain.m[st.start];if(!c){$('#ac-bars').innerHTML='<p class="small dim">That word was never followed by anything in the text.</p>';return}
   var d=dist(c,st.T,st.k,st.top);
-  $('#ac-bars').innerHTML=d.map(function(o){return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0;opacity:'+(o.kept?1:.4)+'"><span style="width:90px">'+esc(o.w==='.'?'. (end)':o.w)+'</span><span style="flex:1;background:#0b1118;border-radius:6px;overflow:hidden;height:14px"><span style="display:block;height:14px;width:'+Math.round(o.p*100)+'%;background:'+(o.kept?'#d7b56a':'#4a5663')+'"></span></span><span class="small" style="width:150px">'+(o.kept?Math.round(o.p*100)+'%':'cut off')+' <span class="dim">(raw '+Math.round(o.raw*100)+'%)</span></span></div>'}).join('')}
+  $('#ac-bars').innerHTML=d.map(function(o){return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0;opacity:'+(o.kept?1:.4)+'"><span style="width:90px">'+esc(o.w==='.'?'. (end)':o.w)+'</span><span style="flex:1;background:#0a0f15;border-radius:6px;overflow:hidden;height:14px"><span style="display:block;height:14px;width:'+Math.round(o.p*100)+'%;background:'+(o.kept?'#d7b56a':'#6b4a0e')+'"></span></span><span class="small" style="width:150px">'+(o.kept?Math.round(o.p*100)+'%':'cut off')+' <span class="dim">(raw '+Math.round(o.raw*100)+'%)</span></span></div>'}).join('')}
  function gen(){var r=lcg(st.seed*7919+13),out=[],sent=0,w=st.start==='.'?'the':st.start,cur=[],guard=0;
   if(!chain.m[w]){$('#ac-out').textContent='Pick a word that has followers.';return}
   cur.push(w);

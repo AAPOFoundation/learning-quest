@@ -17,9 +17,9 @@ function confusion(host,cfg){
  +'<svg id="cx-svg" viewBox="0 0 600 120" role="img" aria-label="Scores of test items with the threshold line" style="width:100%;height:auto"></svg>'
  +'<div id="cx-out"></div><p class="small dim" id="cx-note"></p></section>';
  var $=function(s){return host.querySelector(s)};
- function draw(){var d=sets[mode],tp=0,fp=0,fn=0,tn=0,svg='<rect x="0" y="0" width="600" height="120" rx="8" fill="#0b1118"/>';
+ function draw(){var d=sets[mode],tp=0,fp=0,fn=0,tn=0,svg='<rect x="0" y="0" width="600" height="120" rx="8" fill="#0a0f15"/>';
   d.forEach(function(it,i){var fl=it.s>=th;if(it.y&&fl)tp++;else if(!it.y&&fl)fp++;else if(it.y)fn++;else tn++;
-   var x=10+it.s*580,y=14+((i*37)%92);svg+='<circle cx="'+x+'" cy="'+y+'" r="5.2" fill="'+(it.y?'#d7b56a':'#4f86c6')+'" opacity="'+(fl?1:.55)+'" stroke="'+(fl?'#fff':'none')+'" stroke-width="1"/>'});
+   var x=10+it.s*580,y=14+((i*37)%92);svg+='<circle cx="'+x+'" cy="'+y+'" r="5.2" fill="'+(it.y?'#d7b56a':'#4f86c6')+'" opacity="'+(fl?1:.55)+'" stroke="'+(fl?'#f6efe0':'none')+'" stroke-width="1"/>'});
   var lx=10+th*580;svg+='<line x1="'+lx+'" y1="0" x2="'+lx+'" y2="120" stroke="#e58a7a" stroke-width="2"/><text x="'+Math.min(lx+4,540)+'" y="12" fill="#e58a7a" font-size="11">flag here and above</text>';
   $('#cx-svg').innerHTML=svg;
   var prec=tp+fp?tp/(tp+fp):null,rec=tp+fn?tp/(tp+fn):null,acc=(tp+tn)/d.length,f=prec&&rec?2*prec*rec/(prec+rec):null,total=fn*cost+fp;
@@ -37,7 +37,7 @@ function lr(host){
  function f(w){return (w-W_MIN)*(w-W_MIN)}
  function draw(){var ws=[W0],w=W0,i;for(i=0;i<steps;i++){w=w-rate*2*(w-W_MIN);ws.push(w)}
   var X=function(v){return 30+(v+8)/22*540},Ymax=140,Y=function(v){return 200-Math.max(0,Math.min(v,Ymax))/Ymax*180};
-  var svg='<rect width="600" height="220" rx="8" fill="#0b1118"/><polyline fill="none" stroke="#6a7886" stroke-width="2" points="';for(var x=-8;x<=14;x+=.25)svg+=X(x).toFixed(1)+','+Y(f(x)).toFixed(1)+' ';svg+='"/>';
+  var svg='<rect width="600" height="220" rx="8" fill="#0a0f15"/><polyline fill="none" stroke="#c8a86a" stroke-width="2" points="';for(var x=-8;x<=14;x+=.25)svg+=X(x).toFixed(1)+','+Y(f(x)).toFixed(1)+' ';svg+='"/>';
   svg+='<line x1="'+X(W_MIN)+'" y1="20" x2="'+X(W_MIN)+'" y2="205" stroke="#4f7a3a" stroke-dasharray="4 4"/><text x="'+(X(W_MIN)+4)+'" y="30" fill="#8fbf6a" font-size="11">lowest loss</text>';
   var pts='';ws.forEach(function(v,k){if(Math.abs(v)>1e6)return;var cx=Math.max(8,Math.min(592,X(v))),cy=Y(f(v));pts+=(k?'L':'M')+cx.toFixed(1)+' '+cy.toFixed(1)+' '});
   svg+='<path d="'+pts+'" fill="none" stroke="#e58a7a" stroke-width="1.2" opacity=".7"/>';

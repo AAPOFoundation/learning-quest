@@ -20,7 +20,7 @@ function bench(host){
    keptTurns=impossible?0:Math.min(s.turns,Math.floor(avail/TURN)),kept=keptTurns*TURN,droppedTurns=s.turns-keptTurns;
   var parts=[['Instructions',SYS,'#6a8a3a'],['Tools',TOOLS,'#3f5f8f'],['Document',s.doc,'#8a5a2a'],['Conversation',kept,'#6a4a8f'],['Your question',Q,'#2f6a62'],['Answer room',s.room,'#7a2f3a']];
   var used=parts.reduce(function(a,p){return a+p[1]},0),free=Math.max(0,s.win-used);
-  var h='<div style="display:flex;height:26px;border:1px solid #6b4a0e;border-radius:8px;overflow:hidden;background:#0b1118">';
+  var h='<div style="display:flex;height:26px;border:1px solid #6b4a0e;border-radius:8px;overflow:hidden;background:#0a0f15">';
   parts.forEach(function(p){var w=Math.min(100,p[1]/Math.max(s.win,used)*100);if(w>0)h+='<span title="'+esc(p[0])+': '+p[1]+' tokens" style="width:'+w+'%;background:'+p[2]+'"></span>'});
   h+='</div><p class="small" style="margin:6px 0">'+parts.map(function(p){return '<span style="color:'+p[2]+'">&#9632;</span> '+esc(p[0])+' '+k(p[1])}).join(' &nbsp; ')+'</p>';
   $('#cb-bar').innerHTML=h;
