@@ -21,9 +21,9 @@ function still(){return FX.low||RM.matches}
 /* the three light/shade overlays are baked once per size into one offscreen canvas */
 function size(){var r=cv.getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));cv.width=W*dpr;cv.height=H*dpr;
  ov=document.createElement('canvas');ov.width=cv.width;ov.height=cv.height;var o=ov.getContext('2d');o.setTransform(dpr,0,0,dpr,0,0);
- var lg=o.createRadialGradient(W*.15,-H*.2,0,W*.15,-H*.2,W*.9);lg.addColorStop(0,'rgba(255,220,160,.16)');lg.addColorStop(1,'rgba(255,220,160,0)');o.fillStyle=lg;o.fillRect(0,0,W,H);
- var bg=o.createLinearGradient(0,H*.75,0,H);bg.addColorStop(0,'rgba(14,20,28,0)');bg.addColorStop(1,'rgba(14,20,28,.6)');o.fillStyle=bg;o.fillRect(0,0,W,H);
- var vg=o.createRadialGradient(W/2,H/2,Math.min(W,H)*.4,W/2,H/2,Math.max(W,H)*.7);vg.addColorStop(0,'rgba(8,10,16,0)');vg.addColorStop(1,'rgba(8,10,16,.5)');o.fillStyle=vg;o.fillRect(0,0,W,H)}
+ var lg=o.createRadialGradient(W*.15,-H*.2,0,W*.15,-H*.2,W*.9);lg.addColorStop(0,'rgba(255,226,160,.26)');lg.addColorStop(1,'rgba(255,226,160,0)');o.fillStyle=lg;o.fillRect(0,0,W,H);
+ var bg=o.createLinearGradient(0,H*.75,0,H);bg.addColorStop(0,'rgba(14,20,28,0)');bg.addColorStop(1,'rgba(14,20,28,.35)');o.fillStyle=bg;o.fillRect(0,0,W,H);
+ var vg=o.createRadialGradient(W/2,H/2,Math.min(W,H)*.4,W/2,H/2,Math.max(W,H)*.7);vg.addColorStop(0,'rgba(8,10,16,0)');vg.addColorStop(1,'rgba(8,10,16,.3)');o.fillStyle=vg;o.fillRect(0,0,W,H)}
 function heroX(){var a=hx(1,3),b=hx(CAST.c-1,3),span=b-a,p=(T*26)%(span*2);return p<span?[a+p,1]:[b-(p-span),-1]}
 var X0=hx(1,3)-S*.6,X1=hx(CAST.c+1,3)+S*.6;
 function draw(){var full=X1-X0,z=Math.max(W/full,H/(S*1.5*6.8)),vw=W/z,vh=H/z,top=Math.max(0,Math.min(sc.H-vh,hy(3)-vh*.55)),hp=heroX(),fits=vw>=full-1,tx=fits?X0-(vw-full)/2:(still()?hx(3,3)-vw*.25:hp[0]-vw*.42);
@@ -37,6 +37,7 @@ function draw(){var full=X1-X0,z=Math.max(W/full,H/(S*1.5*6.8)),vw=W/z,vh=H/z,to
  list.sort(function(a,b){return a.y-b.y}).forEach(function(o){o.f()});
  /* name plaques, in the map's own style */
  var fs=Math.min(30,(W<520?10:11)/z),short=W<520;g.font='700 '+fs+'px "Cormorant Garamond",Georgia,serif';g.textAlign='center';TOWNS.concat([CAST]).forEach(function(n,i){var nm=short?n.name.replace(/^(AI |Python )/,''):n.name,x=hx(n.c,n.r),y=hy(n.r)+S*1.15,tw=g.measureText((i<4?(i+1)+' · ':'')+nm).width+fs*1.2;g.fillStyle='rgba(10,15,21,.86)';g.strokeStyle='#c8a86a';g.lineWidth=1/z;g.beginPath();g.rect(x-tw/2,y-fs*.95,tw,fs*1.45);g.fill();g.stroke();g.fillStyle='#f3e2b0';g.fillText((i<4?(i+1)+' · ':'')+nm,x,y+fs*.12)});
+ if(!FX.low){g.save();for(var ci=0;ci<3;ci++){var ccx=X0+((T*6+ci*sc.W/3)%(X1-X0+S*8))-S*4,ccy=hy(1+ci*2)+Math.sin(ci*2.1)*S*.5;g.fillStyle='rgba(20,30,50,.10)';g.beginPath();g.ellipse(ccx,ccy,S*2.6,S*.9,0,0,Math.PI*2);g.ellipse(ccx+S*1.4,ccy+S*.3,S*1.6,S*.7,0,0,Math.PI*2);g.fill()}g.restore()}
  if(!FX.low&&window.LQAnim)LQAnim.particles(g,'meadow',1/30,cx,cy,vw,vh,T);
  g.setTransform(1,0,0,1,0,0);if(ov)g.drawImage(ov,0,0)}
 function frame(ts){if(!running)return;requestAnimationFrame(frame);var dt=Math.min(.1,(ts-last)/1000||0);last=ts;acc+=dt;if(acc<1/30)return;T+=acc;acc=0;draw()}

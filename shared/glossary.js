@@ -46,15 +46,16 @@ var G=[
  ['Trial Hall','exercise','The Python challenges for a region (hidden tests, hints, 15 XP each).','Every world'],
  ['Expedition','hands-on project','Real work on your own computer, outside the game.','AI Evals, AI Safety'],
  ['chest, badge, XP','completion badge','Rewards that show progress. They are not marks from any course.','Every world']]]];
-function render(el){var q='';
- function draw(){var h='<div class="panel lesson"><p class="kicker">Also called</p><h3>Same ideas, other names</h3><p>When you read or watch other AI courses you will meet different words for ideas you already know. This page lists our word on the left and what you may see elsewhere on the right. The game keeps its own words.</p>'
+function rowsHTML(q){var h='',n=0,ql=q.toLowerCase();G.forEach(function(g){var rows=g[1].filter(function(r){return !ql||r.join(' ').toLowerCase().indexOf(ql)>=0});if(!rows.length)return;n+=rows.length;
+   h+='<div class="panel lesson"><h3>'+esc(g[0])+'</h3>'+rows.map(function(r){return '<div class="gl-row"><p style="margin:0"><b>'+esc(r[0])+'</b> <span class="dim">&rarr; also called</span> <b>'+esc(r[1])+'</b></p><p class="small" style="margin:4px 0">'+r[2]+'</p><p class="small dim" style="margin:0">Where: '+esc(r[3])+'</p></div>'}).join('')+'</div>'});
+  return n?h:'<div class="panel lesson"><p>No match. Try a shorter word.</p></div>'}
+/* the search box is built once; typing only redraws the results (at most once per frame), so focus and the caret are never lost */
+function render(el){var raf=0;
+ el.innerHTML='<div class="panel lesson"><p class="kicker">Also called</p><h3>Same ideas, other names</h3><p>When you read or watch other AI courses you will meet different words for ideas you already know. This page lists our word on the left and what you may see elsewhere on the right. The game keeps its own words.</p>'
   +'<p class="small dim">The other names come from the public course pages of Claude Academy (academy.claude.com), checked 17 Oct 2026. Names and courses change, so treat this as a guide to recognise words, not an official glossary. Rows marked "not covered" are ideas the game does not teach yet.</p>'
-  +'<p><input id="gl-q" type="search" placeholder="Search a word, for example context window" value="'+esc(q)+'" aria-label="Search the glossary" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--line,#6b4a0e);background:#0a0f15;color:inherit"></p></div>';
-  var n=0;G.forEach(function(g){var rows=g[1].filter(function(r){return !q||r.join(' ').toLowerCase().indexOf(q.toLowerCase())>=0});if(!rows.length)return;n+=rows.length;
-   h+='<div class="panel lesson"><h3>'+esc(g[0])+'</h3>'+rows.map(function(r){return '<div class="gl-row" style="padding:8px 0;border-top:1px solid rgba(215,181,106,.18)"><p style="margin:0"><b>'+esc(r[0])+'</b> <span class="dim">&rarr; also called</span> <b>'+esc(r[1])+'</b></p><p class="small" style="margin:4px 0">'+r[2]+'</p><p class="small dim" style="margin:0">Where: '+esc(r[3])+'</p></div>'}).join('')+'</div>'});
-  if(!n)h+='<div class="panel lesson"><p>No match. Try a shorter word.</p></div>';
-  el.innerHTML=h;var inp=el.querySelector('#gl-q');inp.oninput=function(){q=inp.value;var p=inp.selectionStart;draw();var i2=el.querySelector('#gl-q');i2.focus();i2.setSelectionRange(p,p)}}
- draw()}
+  +'<p style="margin:0"><input id="gl-q" class="lq-search" type="search" placeholder="Search a word, for example context window" aria-label="Search the glossary" aria-controls="gl-res" autocomplete="off"></p></div><div id="gl-res" aria-live="polite"></div>';
+ var inp=el.querySelector('#gl-q'),res=el.querySelector('#gl-res');res.innerHTML=rowsHTML('');
+ inp.oninput=function(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;res.innerHTML=rowsHTML(inp.value.trim())})}}
 A.tabs=A.tabs||[];A.tabs.push({id:'gloss',label:'Also called (glossary)',render:render});
 window.LQGlossary=G;
 })();
