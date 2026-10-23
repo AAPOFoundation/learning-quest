@@ -42,6 +42,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 32. **Mixed colours are remembered.** Robes, skin and walls mix the same pairs every frame. The rgb string is kept, so the hex parse runs once per pair. The picture does not change.
 33. **A name fades in as you walk closer.** Inside about two tiles the name is solid. It fades across the next bit of distance and is gone by three tiles. Low effects and reduced motion keep the old hard edge.
 34. **The draw list is reused.** Each frame used to build a new list of everything on screen, and a new empty save when there was none. The same slots are cleared and filled again. The quest arrow finds its town with a short loop. The picture does not change.
+35. **The tile under the pointer lights up.** A soft hex fades in on that tile and fades out when the pointer leaves. It sits under people and buildings. Low effects and reduced motion show it at once, with no fade. A quiet map wakes for one frame so the light is not late.
 
 ## Checked
 
