@@ -72,6 +72,16 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - After a sheet check, five lights were moved onto the thing they light: the scroll, the split in the two curves, the trail flag, the top of the cairn, and a wider forge spark.
 - Checked in headless Edge on a sheet of the covers, badges, and plates. A real phone was not used.
 
+## Reward light
+
+- `origin/main` was already in this branch. The celebrate effect and the phone HUD stayed as they are. WebGL lights and the angled camera were left alone.
+- A cleared level, and the final challenge, show that region's plate with a gold rim in the course's warm colour. A missed level does not glow.
+- Badges earned on that screen sit in the panel, under the score, each with its medallion. They do not cover the picture or the buttons.
+- A chest opened on the map still uses a toast. The toast sits above the speech box. Its medal is the course seal: Python is blue and yellow, Foundations is purple and water blue, Evals is teal and amber, Safety is green and amber, and Portfolio is forest and brass. The shared seal is the fallback.
+- Every medal has a small shadow under its mark. The light still comes from the top left. An earned medal in the chest list has a soft gold glow.
+- On a narrow screen the lesson buttons stack, so "Back to the map" stays fully on screen.
+- Checked in headless Edge at 390×844 with a one-question harness for Python Basics and AI Safety. The sprout, the keep, the medals and both buttons were in view. A real phone was not used.
+
 ## Not done
 
 - Level-path emoji in `homeOld()` is unused by the world UI, so those icons were not redrawn.

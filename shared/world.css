@@ -76,6 +76,7 @@ body[data-world] .world-cover,body[data-world] .lesson-plate,body[data-world] .q
 #ov{background-image:linear-gradient(#060a0ee8,#060a0ee8),var(--world-bg,none);background-size:auto,160px 160px;background-color:#060a0e}
 .kbd{display:inline-block;min-width:22px;padding:0 6px;border:1px solid var(--brass-mid);border-bottom-width:2px;border-radius:5px;background:#070b10;font:800 12px/20px var(--font);text-align:center;color:var(--gold-hi)}
 .toast{z-index:40}
+body.indlg .toast{bottom:calc(max(12px,env(safe-area-inset-bottom)) + var(--lq-dlg-h,150px) + 10px)}
 .mapfull{width:100%;border:1px solid var(--brass);border-radius:10px;background:#0a0f15;display:block;margin-bottom:10px}
 .qrow{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #2b3643}
 .qrow .plate{width:56px;height:36px;object-fit:cover;object-position:center;border-radius:6px;border:1px solid var(--brass-mid);background:#0a0f15;flex:none}
