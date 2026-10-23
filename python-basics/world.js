@@ -37,3 +37,34 @@ castle:{name:'Citadel of Working Code',biome:'crown',accent:'#c9a24f',
  chest:'Debugger\'s Lens',hall:'Great Hall'}
 };
 })();
+/* ---- Course scene art (graphics pass): colour identity + themed landmark and map props for python-basics.
+   Uses only window.Art (S, building, ell, mix) and window.LQFx.low from shared/. Full effects only; Low effects keeps the shared art. ---- */
+(function(){
+var W=window.WORLD;if(!W)return;
+var PAL=['#2f6ab0','#d0a020','#3a7ac0','#c08a1a','#2a5a9a','#b8961a','#4a80c8'];
+W.palette=PAL;W.regions.forEach(function(r,i){r.accent=PAL[i%PAL.length]});if(W.castle)W.castle.accent='#ffd34a';
+Object.assign(W.hero,{robe:'#2f6ab0',cape:'#d0a020',trim:'#ffd34a'});
+var PI=Math.PI;
+function E(g,x,y,rx,ry,c){g.fillStyle=c;g.beginPath();g.ellipse(x,y,Math.max(rx,.1),Math.max(ry,.1),0,0,PI*2);g.fill()}
+function R(g,x,y,w,h,c){g.fillStyle=c;g.fillRect(x,y,w,h)}
+function T(g,a,b,c,d,e,f,col){g.fillStyle=col;g.beginPath();g.moveTo(a,b);g.lineTo(c,d);g.lineTo(e,f);g.fill()}
+function L(g,pts,c,w){g.strokeStyle=c;g.lineWidth=w;g.lineCap='round';g.beginPath();g.moveTo(pts[0],pts[1]);for(var i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);g.stroke()}
+function glow(g,x,y,r,col,a){var gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,col.replace('A',a));gr.addColorStop(1,col.replace('A',0));g.fillStyle=gr;g.fillRect(x-r,y-r,2*r,2*r)}
+function plinth(g,u,w,col){E(g,0,0,w*1.2*u,w*.45*u,'rgba(0,0,0,.28)');R(g,-w*u,-5*u,2*w*u,5*u,col);R(g,-w*u,-5*u,2*w*u,1.4*u,'rgba(255,255,255,.22)');R(g,(w-3)*u,-5*u,3*u,5*u,'rgba(0,0,0,.18)')}
+/* Python Basics: a friendly coder's valley in blue and yellow. Landmark = a cheerful python curled around a code block; map prop = a ">_" prompt signpost. */
+function landmark(g,u,ac,t,b){plinth(g,u,13,'#cfd6e0');R(g,-9*u,-19*u,18*u,14*u,'#26334a');R(g,-9*u,-19*u,18*u,2.4*u,'#3a4a6a');
+ g.fillStyle='#ffd34a';g.font='bold '+(6*u)+'px monospace';g.textAlign='center';g.fillText('{ }',0,-9*u);
+ var bob=Math.sin(t*2)*1*u;g.lineCap='round';g.strokeStyle='#2f6ab0';g.lineWidth=5*u;g.beginPath();g.moveTo(-14*u,-3*u);g.quadraticCurveTo(-16*u,-22*u,-2*u,-23*u);g.quadraticCurveTo(12*u,-24*u,12*u,-30*u+bob);g.stroke();
+ g.strokeStyle='#ffd34a';g.lineWidth=1.6*u;g.setLineDash([2*u,3*u]);g.beginPath();g.moveTo(-14*u,-3*u);g.quadraticCurveTo(-16*u,-22*u,-2*u,-23*u);g.quadraticCurveTo(12*u,-24*u,12*u,-30*u+bob);g.stroke();g.setLineDash([]);
+ E(g,13*u,-33*u+bob,5*u,4*u,'#2f6ab0');E(g,11.6*u,-34.4*u+bob,1.3*u,1.3*u,'#fff');E(g,15*u,-34.4*u+bob,1.3*u,1.3*u,'#fff');E(g,11.8*u,-34.2*u+bob,.6*u,.6*u,'#111');E(g,15.2*u,-34.2*u+bob,.6*u,.6*u,'#111');
+ L(g,[11.6*u,-31.4*u+bob,13*u,-30.6*u+bob,14.6*u,-31.4*u+bob],'#ffd34a',.7*u);var s=.5+.5*Math.sin(t*3);glow(g,0,-12*u,12*u,'rgba(255,211,74,A)',.25*s)}
+function mapProp(g,u,ac,t,kind){E(g,0,0,7*u,2.4*u,'rgba(0,0,0,.25)');R(g,-.8*u,-12*u,1.6*u,12*u,'#6a4a22');R(g,-7*u,-20*u,14*u,9*u,'#26334a');R(g,-7*u,-20*u,14*u,1.6*u,'#2f6ab0');
+ g.fillStyle='#ffd34a';g.font='bold '+(5*u)+'px monospace';g.textAlign='left';g.fillText('>',-5.5*u,-13*u);if(Math.sin(t*5)>0)R(g,-1.5*u,-14.6*u,3.6*u,1.2*u,'#ffd34a')}
+
+function install(){var A=window.Art;if(!A||!A.building||A.__courseArt)return;var base=A.building;A.__courseArt=W.key;
+ A.building=function(g,kind,x,y,o){var low=!window.LQFx||window.LQFx.low;o=o||{};
+  if(!low&&kind==='tree'&&o.landmark){var u=A.S/34;g.save();g.translate(x,y+A.S*.5);g.scale(1.25,1.25);try{landmark(g,u,o.accent||PAL[0],o.t||0,o.landmark)}catch(e){}g.restore();return}
+  base.apply(this,arguments);
+  if(!low&&(kind==='town'||kind==='castle')){var u2=A.S/34;g.save();g.translate(x-(kind==='castle'?34:26)*u2,y+A.S*.5-2*u2);g.scale(1.7,1.7);try{mapProp(g,u2,o.accent||PAL[0],o.t||0,kind)}catch(e){}g.restore()}};}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else setTimeout(install,0);
+})();
