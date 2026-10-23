@@ -32,6 +32,7 @@ function mount(q,el,ctx){
  +'<div class="row cq-btns"><button class="btn btn-ghost" id="cq-run">Run</button><button class="btn btn-primary" id="cq-chk">Check</button></div><p class="small dim cq-chknote">Check runs '+vis+' example test'+(vis===1?'':'s')+(hid?' and '+hid+' hidden one'+(hid===1?'':'s'):'')+'.</p>'
  +'<div id="cq-out" class="cq-out" aria-live="polite"></div><div class="row cq-btns2">'+(q.walk?'<button class="btn btn-ghost btn-sm" id="cq-walk">Walk me through it</button>':'')+'<button class="btn btn-ghost btn-sm" id="cq-hint">Hint</button><button class="btn btn-ghost btn-sm" id="cq-reset">Reset code</button><button class="btn btn-ghost btn-sm" id="cq-giveup">'+(q.walk?'Walk me through it, then solution':'Show solution (counts as unsolved)')+'</button></div><div id="cq-hints"></div><div id="cq-end"></div></section>';
  el.innerHTML=h;
+ var qb=el.querySelector('.bar>i');if(qb&&!(window.LQFx&&(LQFx.low||(LQFx.rm&&LQFx.rm.matches)))){var bw=qb.style.width;if(bw&&bw!=='0%'){qb.style.width='0%';requestAnimationFrame(function(){qb.style.width=bw})}}
  if(window.PyPrimer)window.PyPrimer.wire(el,q,function(c){return call('code',c)});
  if(window.LQGuide)window.LQGuide.scan(el);
  var ed=el.querySelector('#cq-ed'),out=el.querySelector('#cq-out');ed.value=code;
