@@ -43,26 +43,27 @@
   <rect x="131" y="262" width="5" height="62" rx="2" fill="#8a6528"/>
   <rect x="496" y="258" width="16" height="74" rx="6" fill="#6b4a0e"/>
   <rect x="499" y="262" width="5" height="62" rx="2" fill="#8a6528"/>
-  <ellipse cx="300" cy="236" rx="48" ry="12" fill="#2a1d0a"/>
-  <ellipse cx="300" cy="230" rx="46" ry="11" fill="url(#ev-brass)"/>
-  <ellipse cx="300" cy="228" rx="28" ry="6" fill="#8a6528"/>
-  <rect x="294" y="156" width="12" height="72" rx="4" fill="url(#ev-brass)"/>
-  <line x1="210" y1="158" x2="210" y2="182" stroke="#c8a86a" stroke-width="2"/>
-  <line x1="390" y1="158" x2="390" y2="182" stroke="#c8a86a" stroke-width="2"/>
-  <rect x="182" y="186" width="56" height="52" rx="4" fill="url(#ev-paper)" stroke="#8a6528" stroke-width="1.2"/>
-  <path d="M218 186 L238 186 L238 204 Z" fill="#e8dcc4"/>
-  <path d="M218 186 L238 204" fill="none" stroke="#c8a86a" stroke-width="1"/>
-  <rect x="362" y="186" width="56" height="52" rx="4" fill="url(#ev-paper)" stroke="#8a6528" stroke-width="1.2"/>
-  <path d="M398 186 L418 186 L418 204 Z" fill="#e8dcc4"/>
-  <path d="M398 186 L418 204" fill="none" stroke="#c8a86a" stroke-width="1"/>
-  <rect x="198" y="180" width="24" height="8" rx="2" fill="url(#ev-brass)" stroke="#6b4a0e" stroke-width="1"/>
-  <rect x="378" y="180" width="24" height="8" rx="2" fill="url(#ev-brass)" stroke="#6b4a0e" stroke-width="1"/>
-  <path d="M178 222 Q210 250 242 222 Q210 236 178 222 Z" fill="url(#ev-brass)" stroke="#6b4a0e" stroke-width="1"/>
-  <path d="M358 222 Q390 250 422 222 Q390 236 358 222 Z" fill="url(#ev-brass)" stroke="#6b4a0e" stroke-width="1"/>
-  <rect x="188" y="148" width="224" height="10" rx="5" fill="url(#ev-brass)"/>
-  <circle cx="210" cy="153" r="3.5" fill="#6b4a0e"/>
-  <circle cx="390" cy="153" r="3.5" fill="#6b4a0e"/>
-  <circle cx="300" cy="153" r="8" fill="#f3e2b0" stroke="#6b4a0e" stroke-width="1.5"/>
+  <ellipse cx="300" cy="230" rx="40" ry="10" fill="#2a1d0a"/>
+  <ellipse cx="300" cy="224" rx="38" ry="9" fill="url(#ev-brass)"/>
+  <rect x="294" y="146" width="12" height="76" rx="4" fill="url(#ev-brass)"/>
+  <line x1="174" y1="146" x2="174" y2="198" stroke="#c8a86a" stroke-width="2"/>
+  <line x1="226" y1="146" x2="226" y2="198" stroke="#c8a86a" stroke-width="2"/>
+  <line x1="374" y1="146" x2="374" y2="198" stroke="#c8a86a" stroke-width="2"/>
+  <line x1="426" y1="146" x2="426" y2="198" stroke="#c8a86a" stroke-width="2"/>
+  <rect x="180" y="154" width="40" height="50" rx="3" fill="url(#ev-paper)" stroke="#8a6528" stroke-width="1.2"/>
+  <path d="M204 154 H220 V168 Z" fill="#e8dcc4"/>
+  <path d="M204 154 L220 168" fill="none" stroke="#c8a86a" stroke-width="1"/>
+  <rect x="380" y="154" width="40" height="50" rx="3" fill="url(#ev-paper)" stroke="#8a6528" stroke-width="1.2"/>
+  <path d="M404 154 H420 V168 Z" fill="#e8dcc4"/>
+  <path d="M404 154 L420 168" fill="none" stroke="#c8a86a" stroke-width="1"/>
+  <path d="M166 198 Q200 234 234 198 Q200 220 166 198 Z" fill="url(#ev-brass)" stroke="#6b4a0e" stroke-width="1.2"/>
+  <path d="M366 198 Q400 234 434 198 Q400 220 366 198 Z" fill="url(#ev-brass)" stroke="#6b4a0e" stroke-width="1.2"/>
+  <ellipse cx="200" cy="198" rx="34" ry="8" fill="#d7b56a" stroke="#6b4a0e" stroke-width="1.2"/>
+  <ellipse cx="200" cy="198" rx="24" ry="5" fill="#6b4a0e"/>
+  <ellipse cx="400" cy="198" rx="34" ry="8" fill="#d7b56a" stroke="#6b4a0e" stroke-width="1.2"/>
+  <ellipse cx="400" cy="198" rx="24" ry="5" fill="#6b4a0e"/>
+  <rect x="160" y="136" width="280" height="10" rx="5" fill="url(#ev-brass)"/>
+  <circle cx="300" cy="141" r="8" fill="#f3e2b0" stroke="#6b4a0e" stroke-width="1.5"/>
   <circle cx="508" cy="186" r="32" fill="#2a4e66" opacity="0.4"/>
   <circle cx="508" cy="186" r="32" fill="none" stroke="#6b4a0e" stroke-width="8"/>
   <circle cx="508" cy="186" r="32" fill="none" stroke="#d7b56a" stroke-width="3"/>
