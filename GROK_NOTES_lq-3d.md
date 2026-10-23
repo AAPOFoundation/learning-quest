@@ -36,3 +36,8 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 ## Check, pass 2
 
 `node shared/lq3d-geom.js` prints `"ok": true`. Hero heading dot is 1, height about 1.90, and the meadow picture has skin, tent, fire, ground and sky. Headless Edge rendered meadow, forest, desert, marsh and tundra with full effects. The hood has a point, the friend has a cap and a book, the fire has a pot, and the marsh pool has a pale rim and a lily. Desert fog is warm. Tundra pines and ice read as snow. Not tried on a phone.
+
+## Pass 3 (same day)
+
+- The first cape sat inside the robe outline. A meadow frame showed only blue cloth. The cape now flares past the hem (robe is x ±0.36, cloth reaches about ±0.66) and is drawn on both sides. The right panel stays behind the walking stick. A small brass clasp sits at the throat. The software picture counts about 50 cape-coloured pixels. A later meadow frame shows dark red cloth on both sides of the robe, with the face and the stick still clear.
+- Open: the pennant cloth is nearly edge-on from the camp camera, so it can read as a thin stick by the tent. Next pass turns the cloth toward the camera and moves it off the tent guys.

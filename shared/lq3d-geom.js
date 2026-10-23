@@ -173,7 +173,13 @@ function person(o){
  }
  if(o.cape){
   var cape=hex(o.cape);
-  b.polyOut([[-0.22,1.06,0.14],[0.22,1.06,0.14],[0.32,0.40,0.30],[-0.32,0.40,0.30]],[0,0.75,-0.4],cape,0);
+  /* Flare past the robe (hem is x ±0.36) so a camera on -Z sees the cloth. Right side stays behind the stick. */
+  card(b, [[-0.22,1.14,0.08],[-0.40,1.10,-0.04],[-0.58,0.34,-0.08],[-0.28,0.36,0.12]], cape);
+  card(b, [[-0.36,1.08,-0.02],[-0.48,1.04,-0.12],[-0.66,0.32,-0.10],[-0.52,0.34,-0.02]], cape);
+  card(b, [[0.22,1.14,0.10],[0.28,0.36,0.14],[0.52,0.34,0.02],[0.38,1.08,0.04]], cape);
+  card(b, [[0.34,1.06,0.08],[0.48,0.34,0.04],[0.62,0.32,0.00],[0.46,1.02,0.02]], cape);
+  card(b, [[-0.26,1.12,0.16],[0.26,1.12,0.16],[0.32,0.40,0.32],[-0.32,0.40,0.32]], cape);
+  b.box(0, 1.15, -0.20, 0.07, 0.045, 0.03, trim, 0.55);
  }
  b.box(-0.11, 0.06, -0.03, 0.15, 0.12, 0.26, boot, 0);
  b.box(0.12, 0.06, -0.03, 0.15, 0.12, 0.26, boot, 0);
@@ -744,11 +750,13 @@ function selfCheck(){
  var skin=hex('#e2b48c'), tent=hex('#f4ead4'), grass=hex('#5c8a3e'), grass2=hex('#3e6b32'), dirt=hex('#8a6840');
  var nSkin=countNear(img,function(c){return dist2(c,skin)<0.22*0.22}), nTent=countNear(img,function(c){return dist2(c,tent)<0.26*0.26||dist2(c,hex('#e4d2ae'))<0.26*0.26});
  var nFire=countNear(img,function(c){return c[0]>0.82&&c[1]>0.32&&c[2]<0.45});
+ var nCape=countNear(img,function(c){return dist2(c,hex('#7a2e2a'))<0.06*0.06});
  var nGround=countNear(img,function(c){return dist2(c,grass)<0.34*0.34||dist2(c,grass2)<0.34*0.34||dist2(c,dirt)<0.3*0.3});
  var sky=0, top=10*img.w, pi;
  for(pi=0;pi<top;pi++)if(dist2([img.color[pi*3],img.color[pi*3+1],img.color[pi*3+2]],img.bg)<1e-6)sky++;
- stats.skin=nSkin; stats.tent=nTent; stats.fire=nFire; stats.ground=nGround; stats.skyTop=sky/top;
+ stats.skin=nSkin; stats.tent=nTent; stats.fire=nFire; stats.cape=nCape; stats.ground=nGround; stats.skyTop=sky/top;
  if(nSkin<20)errors.push('skin pixels '+nSkin);
+ if(nCape<8)errors.push('cape pixels '+nCape);
  if(nTent<12)errors.push('tent pixels '+nTent);
  if(nFire<4)errors.push('fire pixels '+nFire);
  if(nGround<img.w*img.h*0.12)errors.push('ground pixels '+nGround);
