@@ -50,10 +50,7 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - Badges and the tab mark have a brass highlight from the top left and a shade at the lower right, drawn behind the symbol.
 - Watermark tiles stay at 0.26 opacity so the words stay clear.
 - Checked in headless Edge: a sheet of the covers, badges and plates, and the home at 390×1600 and 1100×1200. The mill, the cabin and the scales all read in the card crop. A real phone was not used.
-
-## Open
-
-- At 390×844 the world HUD still overlaps. `#area` sits 250px above the bottom, over the hero, and a tall guide panel can cover the XP and objective row. That lives in `shared/world.css`. It was left alone so this branch does not fight the UI session.
+- On a phone, the region name sat over the hero. At 390×844 it now sits in the top band, and the XP row starts below it. The guide speech stays at the bottom. Measured in headless Edge: the banner is y 8–58, the objective row ends at y 244, and the speech starts at y 639. A real phone was not used.
 
 ## Not done
 
