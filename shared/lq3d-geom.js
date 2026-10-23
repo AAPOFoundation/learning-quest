@@ -351,11 +351,13 @@ function rockMesh(col){
  return pack(b);
 }
 function palmMesh(){
- var b=new Builder(), col=hex('#8a5a32'), leaf=hex('#2f7a34'), i, y=0, k, a, dir, fr;
- for(i=0;i<5;i++){cyl(b, Math.sin(i*0.8)*0.06, y+0.16, 0, 0.055, 0.3, 6, col, 0); y+=0.26}
+ var b=new Builder(), col=hex('#8a5a32'), leaf=hex('#2f7a34'), k, a, dir, fr, i;
+ var pts=[[0,0.02,0],[0.1,0.34,0.02],[0.22,0.66,-0.04],[0.12,0.98,0.04],[-0.04,1.24,0]];
+ for(i=0;i<pts.length-1;i++)shaft(b, pts[i], pts[i+1], 0.058-i*0.008, i%2?hex('#6b4428'):col, 0);
+ var top=pts[pts.length-1];
  for(k=0;k<6;k++){
-  a=k/6*TAU; dir=[Math.cos(a)*0.85, -0.28, Math.sin(a)*0.85]; fr=frameY(dir);
-  b.axesBox([Math.cos(a)*0.38, y+0.05, Math.sin(a)*0.38], fr.x, fr.y, fr.z, 0.1, 0.62, 0.18, k%2?leaf:hex('#3e8a42'), 0);
+  a=k/6*TAU; dir=[Math.cos(a)*0.95, -0.55, Math.sin(a)*0.95]; fr=frameY(dir);
+  b.axesBox([top[0]+dir[0]*0.32, top[1]+dir[1]*0.32, top[2]+dir[2]*0.32], fr.x, fr.y, fr.z, 0.1, 0.72, 0.16, k%2?leaf:hex('#3e8a42'), 0);
  }
  return pack(b);
 }
