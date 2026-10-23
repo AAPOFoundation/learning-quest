@@ -83,7 +83,8 @@ var CFS=[
 'precision highp float;',
 'varying vec3 vCol;varying vec3 vN;varying vec3 vW;varying vec4 vS;varying float vE;',
 'uniform vec3 uEye;uniform vec3 uLDir;uniform vec3 uLCol;uniform vec3 uSky;uniform vec3 uGnd;uniform vec3 uFog;',
-'uniform float uFogN;uniform float uFogF;uniform float uShOn;uniform sampler2D uSh;',
+'uniform vec3 uFire;uniform vec3 uFireCol;',
+'uniform float uFogN;uniform float uFogF;uniform float uShOn;uniform float uGlow;uniform float uFireR;uniform float uFireK;uniform sampler2D uSh;',
 'float unpack(vec4 c){return dot(c,vec4(1.0,0.0039215686,0.0000153787,0.00000006035));}',
 'float pcf(vec2 uv,float ref){',
 ' vec2 t=vec2(0.0009765625);float s=0.0;',
@@ -100,18 +101,37 @@ var CFS=[
 '}',
 'void main(){',
 ' vec3 N=normalize(vN);vec3 L=normalize(uLDir);vec3 col;',
-' if(vE>0.5){col=vCol*1.35;}',
+' if(vE>0.95){col=vCol*uGlow;}',
+' else if(vE>0.80){col=vCol*1.25;}',
 ' else{',
 '  float wrap=dot(N,L)*0.5+0.5;wrap=wrap*wrap;float shade=1.0;',
 '  if(uShOn>0.5){',
 '   vec3 sp=vS.xyz/vS.w;vec2 uv=sp.xy*0.5+0.5;',
-'   if(uv.x>0.0&&uv.x<1.0&&uv.y>0.0&&uv.y<1.0){float ref=sp.z*0.5+0.5-0.002;shade=mix(pcf(uv,ref),1.0,0.5);}',
+'   if(uv.x>0.0&&uv.x<1.0&&uv.y>0.0&&uv.y<1.0){',
+'    float bias=0.0012+0.0016*(1.0-max(dot(N,L),0.0));',
+'    float ref=sp.z*0.5+0.5-bias;',
+'    shade=mix(pcf(uv,ref),1.0,0.5);',
+'   }',
 '  }',
 '  vec3 hemi=mix(uGnd,uSky,N.y*0.5+0.5);',
 '  vec3 V=normalize(uEye-vW);vec3 H=normalize(L+V);',
-'  float spec=pow(max(dot(N,H),0.0),28.0)*0.12*shade;',
+'  float spow=28.0;float sstr=0.10;',
+'  if(vE>0.45){spow=16.0;sstr=0.55;}',
+'  else if(vE>0.20){spow=48.0;sstr=0.38;}',
+'  float spec=pow(max(dot(N,H),0.0),spow)*sstr*shade;',
 '  col=vCol*(hemi+uLCol*wrap*shade)+uLCol*spec;',
+'  if(vE>0.20&&vE<=0.45)col+=uSky*0.08;',
+'  vec3 fillL=normalize(vec3(-0.35,0.42,-0.62));',
+'  col+=vCol*vec3(0.40,0.52,0.68)*max(dot(N,fillL),0.0)*0.22;',
+'  vec3 toF=uFire-vW;',
+'  float fd=length(toF);',
+'  float att=clamp(1.0-fd/uFireR,0.0,1.0);att=att*att;',
+'  float fl=max(dot(N,toF/max(fd,0.001)),0.0);',
+'  col+=vCol*uFireCol*att*(0.28+0.72*fl)*uFireK;',
+'  float rim=pow(1.0-max(dot(N,V),0.0),2.2);',
+'  col+=uSky*rim*0.16;',
 ' }',
+' col=min(col,vec3(1.35));',
 ' float dist=length(vW-uEye);',
 ' float fog=clamp((dist-uFogN)/(uFogF-uFogN),0.0,1.0);',
 ' fog=fog*fog*(3.0-2.0*fog);',
@@ -150,6 +170,8 @@ function mount(figureEl,opts){
   col.uEye=loc(col,'uEye');col.uLDir=loc(col,'uLDir');col.uLCol=loc(col,'uLCol');
   col.uSky=loc(col,'uSky');col.uGnd=loc(col,'uGnd');col.uFog=loc(col,'uFog');
   col.uFogN=loc(col,'uFogN');col.uFogF=loc(col,'uFogF');col.uShOn=loc(col,'uShOn');col.uSh=loc(col,'uSh');
+  col.uGlow=loc(col,'uGlow');col.uFire=loc(col,'uFire');col.uFireCol=loc(col,'uFireCol');
+  col.uFireR=loc(col,'uFireR');col.uFireK=loc(col,'uFireK');
   dep.uMVP=loc(dep,'uMVP');
   var gpu=[],i,src,m;
   function buf(type,data){var b=gl.createBuffer();gl.bindBuffer(type,b);gl.bufferData(type,data,gl.STATIC_DRAW);return b}
@@ -204,6 +226,9 @@ function mount(figureEl,opts){
   var fog=tri(scene.fog),fogN=scene.fogNear!=null?scene.fogNear:9,fogF=scene.fogFar!=null?scene.fogFar:20;
   if(fogF<fogN+0.5)fogF=fogN+0.5;
   var ld=tri(scene.lightDir),lc=tri(scene.lightColor),sky=tri(scene.skyAmb),gnd=tri(scene.groundAmb);
+  var fire=scene.firePos&&scene.firePos.length>=3?scene.firePos:[0.12,0.55,-1.5];
+  var fireC=scene.fireColor&&scene.fireColor.length>=3?scene.fireColor:[1,0.48,0.16];
+  var fireR=scene.fireRadius!=null?scene.fireRadius:3.6;
   var proj=new Float32Array(16),view=new Float32Array(16),vp=new Float32Array(16);
   var model=new Float32Array(16),mvp=new Float32Array(16);
   var lproj=new Float32Array(16),lview=new Float32Array(16),lvp=new Float32Array(16);
@@ -221,12 +246,14 @@ function mount(figureEl,opts){
    return true;
   }
   function pose(mesh,st){
-   var bob=0,sy=1;
+   var bob=0,sy=1,ry=mesh.ry;
    if(!st){
-    if(mesh.name==='hero'||mesh.name==='friend')bob=Math.sin(t*2+(mesh.name==='friend'?1:0))*0.025;
-    else if(mesh.name.indexOf('flame')===0)sy=0.82+0.22*Math.sin(t*8+mesh.seed);
+    if(mesh.name==='hero'||mesh.name==='friend'){
+     bob=Math.sin(t*2+(mesh.name==='friend'?1:0))*0.025;
+     ry=mesh.ry+Math.sin(t*1.3+mesh.seed)*0.035;
+    }else if(mesh.name.indexOf('flame')===0)sy=0.82+0.22*Math.sin(t*8+mesh.seed);
    }
-   setModel(model,mesh.x,mesh.y+bob,mesh.z,mesh.ry,mesh.s,sy);
+   setModel(model,mesh.x,mesh.y+bob,mesh.z,ry,mesh.s,sy);
   }
   function bindPos(mesh){
    gl.bindBuffer(gl.ARRAY_BUFFER,mesh.bPos);
@@ -253,7 +280,7 @@ function mount(figureEl,opts){
    mul(proj,view,vp);
    if(!st&&shOk){
     lookAt(lview,ld[0]*16,ld[1]*16,ld[2]*16,0,0.6,0);
-    ortho(lproj,-6,6,-6,6,0.5,40);
+    ortho(lproj,-8,8,-8,8,0.5,40);
     mul(lproj,lview,lvp);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,null);
@@ -281,6 +308,11 @@ function mount(figureEl,opts){
    gl.uniformMatrix4fv(col.uLVP,false,lvp);
    gl.uniform3f(col.uEye,ex,ey,ez);
    gl.uniform1f(col.uShOn,(!st&&shOk)?1:0);
+   gl.uniform3f(col.uFire,fire[0],fire[1],fire[2]);
+   gl.uniform3f(col.uFireCol,fireC[0],fireC[1],fireC[2]);
+   gl.uniform1f(col.uFireR,fireR);
+   gl.uniform1f(col.uGlow,st?1.25:(1.15+0.22*Math.sin(t*6.0)));
+   gl.uniform1f(col.uFireK,st?0.85:(0.72+0.28*Math.sin(t*7.0)));
    for(k=0;k<gpu.length;k++){
     pose(gpu[k],st);
     mul(vp,model,mvp);
