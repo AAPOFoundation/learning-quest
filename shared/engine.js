@@ -128,7 +128,7 @@ function boss(){
    shell('<section class="panel cheer"><p class="kicker">Final challenge complete</p><h2>'+Math.round(p*100)+'% design score</h2>'+stars(starsFor(p))+'<p class="dim" style="margin-top:10px">+'+gain+' XP.</p>'+picks.map(function(x){return '<p class="small"><b>'+esc(x.t)+':</b> '+x.why+'</p>'}).join('')+'<div class="row"><button class="btn btn-ghost" id="rp">Replay</button><button class="btn btn-primary" id="hm">Back to the map</button></div></section>');
    $('#rp').onclick=function(){boss()};$('#hm').onclick=home;return}
   var s=B.steps[i],h='<section class="panel"><p class="kicker">'+esc(B.title)+' · step '+(i+1)+' of '+B.steps.length+'</p>'+(i===0?'<p class="dim">'+B.intro+'</p>':'')+'<h3 style="color:var(--ink);font-family:var(--font);font-size:18px">'+s.q+'</h3>';
-  shuf(s.opts.map(function(_,k){return k})).forEach(function(k){var o=s.opts[k];h+='<button class="opt" data-k="'+k+'">'+o.t+'</button>'});
+  shuf(s.opts.map(function(_,k){return k})).forEach(function(k,n){var o=s.opts[k];h+='<button class="opt" data-k="'+k+'" style="animation:pop .22s ease both;animation-delay:'+(n*40)+'ms">'+o.t+'</button>'});
   shell(h+'</section>');
   root.onclick=function(e){var b=e.target.closest('[data-k]');if(b){var o=s.opts[+b.dataset.k];pts+=o.pts;picks.push({t:'Step '+(i+1),why:o.why});
    shell('<section class="panel"><p class="kicker">Step '+(i+1)+' result</p><div class="fb '+(o.pts===2?'ok':'no')+'"><b>'+(o.pts===2?'Strong choice. ':o.pts===1?'Workable, with a gap. ':'Weak choice. ')+'</b>'+o.why+'</div><button class="btn btn-primary" id="nb">Continue</button></section>');

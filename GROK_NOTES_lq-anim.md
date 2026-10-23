@@ -53,6 +53,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 43. **A walk-through arrives step by step.** The plain-English plan lists its steps one after another. The heading stays still. The delay stops growing after the tenth step. Reduced motion removes it. Opening the plan again plays it once more.
 44. **Dialogue appears at once when motion is off.** Low effects and reduced motion no longer reveal a line one letter at a time, and they skip the little ticks. The full line, the choices and the advance mark show on the first paint.
 45. **A locked chest nudges its lid.** Trying a sealed chest lifts the lid a little, then it shuts, over about a quarter of a second. An open chest and a quiet setting do not nudge. The half-open lid stays live, so it is not baked into the building picture.
+46. **Final-challenge choices arrive in turn.** Each choice rises a little after the one above, the same way a quiz choice does. The result screen is unchanged. Reduced motion removes the rise.
 
 ## Checked
 
