@@ -318,7 +318,7 @@ function drawRoute(g,rings){if(st.mode!=='play')return;if(!rings){var pth=st.pat
  g.restore();return}
  if(st.path&&st.path.length){var last=st.path[st.path.length-1],pulse=motionOn()?.5+.5*Math.sin(st.time*5):.55;g.save();g.globalAlpha=.4+.25*pulse;g.strokeStyle='#f3e2b0';g.lineWidth=2;Art.hexPath(g,hx(last[0],last[1]),hy(last[1]),S*(.58+.12*pulse));g.stroke();g.restore()}
  if(st.rip&&motionOn()){var a=1-st.rip.t/.42;g.save();g.globalAlpha=Math.max(0,a)*.65;g.strokeStyle='#f3e2b0';g.lineWidth=2;Art.hexPath(g,hx(st.rip.c,st.rip.r),hy(st.rip.r),S*(.3+st.rip.t*1.6));g.stroke();g.restore()}}
-var drawList=[],emptyW={chests:{},caches:{}};function byY(a,b){return a.y-b.y}
+var drawList=[],drawOp={},emptyW={chests:{},caches:{}};function byY(a,b){return a.y-b.y}
 function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=st.hero,g=ctx;g.setTransform(1,0,0,1,0,0);g.fillStyle='#0a0f15';g.fillRect(0,0,cv.width,cv.height);
  var tx=h.x-vw/2,ty=h.y-vh/2;if(st.mode==='title'&&sc.id==='w'){tx=hx(NODES[0][0],NODES[0][1])-vw/2+(motionOn()?Math.sin(st.time*.2)*40:0);ty=hy(NODES[0][1])-vh/2}
  var mx=sc.W-vw,my=sc.H-vh;tx=mx<0?mx/2:Math.max(0,Math.min(mx,tx));ty=my<0?my/2:Math.max(0,Math.min(my,ty));
@@ -336,7 +336,7 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
   if(o.type==='npc'){var fc=h.x<x?-1:1,dx=Math.abs(h.x-x),dy=Math.abs(h.y-y),near=dx<S*2.2&&dy<S*2.2;Art.figure(g,x,y,o.sp.look,{t:T+o.c*.7,face:fc,wave:near&&motionOn()?.5+.5*Math.sin(T*3+o.c):0});
    var nd=Math.max(dx,dy)/S,al=motionOn()?(nd>=3?0:nd>2.2?(3-nd)/.8:1):(nd<3?1:0);
    if(al>0.04){g.font='700 13px "Cormorant Garamond",Georgia,serif';g.textAlign='center';g.lineWidth=4;g.strokeStyle='rgba(10,15,21,.9)';g.globalAlpha=al;g.strokeText(o.name,x,y-S*1.45);g.fillStyle='#f3e2b0';g.fillText(o.name,x,y-S*1.45);g.globalAlpha=1}}
-  else{var op={accent:o.accent,t:T,pine:o.pine,snow:o.snow,v:o.v,landmark:o.landmark,biome:o.type==='node'?bio(o.i):null};
+  else{var op=drawOp;op.accent=o.accent;op.t=T;op.pine=o.pine;op.snow=o.snow;op.v=o.v;op.landmark=o.landmark;op.biome=o.type==='node'?bio(o.i):null;op.open=op.glow=op.locked=op.lid=op.lit=op.lift=void 0;
    if(o.type==='chest'){op.open=!!w.chests[o.i];op.glow=!op.open&&(o.i>=NR?bossDone():levelDone(o.i));op.locked=!op.open&&!(o.i>=NR?bossDone():levelDone(o.i));if(!motionOn())op.lid=op.open?1:0;else{if(op.open&&o._wasOpen===false)o._lid=0;if(o._lid!=null&&o._lid<1){o._lid=Math.min(1,o._lid+(st.dtRaw||0)/.38);op.lid=o._lid}else if(op.open)op.lid=1}o._wasOpen=op.open}
    if(o.role==='hall')op.lit=o.kind==='great'?bossDone():levelDone(region());
    if(o.type==='cache'&&w.caches[o.i])return;

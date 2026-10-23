@@ -45,6 +45,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 35. **The tile under the pointer lights up.** A soft hex fades in on that tile and fades out when the pointer leaves. It sits under people and buildings. Low effects and reduced motion show it at once, with no fade. A quiet map wakes for one frame so the light is not late.
 36. **A still beard, plume and scholar board stir.** The beard tip swings about a pixel. The helm plume bobs. The flat scholar board tips a few degrees. Walking holds each one still. Low effects draws them with the quiet idle.
 37. **The streak flame flickers.** The small fire by the day count rises and grows a little, on a loop. The number stays still. Reduced motion removes the flicker.
+38. **One options bag for buildings.** Each building on screen used to get a new options object every frame. One bag is cleared and filled again. A lid, a light or a gate lift cannot leak onto the next building, because those fields are wiped first. The picture does not change.
 
 ## Checked
 
