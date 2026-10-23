@@ -365,7 +365,7 @@ function drawMM(rebake){if(!mm||!st.scene)return;var sc=st.scene,g=mmg,W=mm.widt
   mmBg._sid=sc.id}
  g.setTransform(1,0,0,1,0,0);g.drawImage(mmBg,0,0);
  var tgt=st.obj&&st.obj.target;if(tgt&&tgt.sid===sc.id){g.strokeStyle='#ffd25a';g.lineWidth=3;g.beginPath();g.arc(ox+hx(tgt.c,tgt.r)*k,oy+hy(tgt.r)*k,9+(motionOn()?Math.sin(st.time*5)*2:0),0,7);g.stroke()}
- g.fillStyle='#fff';g.strokeStyle='#c0392b';g.lineWidth=3;g.beginPath();g.arc(ox+st.hero.x*k,oy+st.hero.y*k,6,0,7);g.fill();g.stroke()}
+ g.fillStyle='#fff';g.strokeStyle='#c0392b';g.lineWidth=3;g.beginPath();g.arc(ox+st.hero.x*k,oy+st.hero.y*k,motionOn()?6+Math.sin(st.time*4):6,0,7);g.fill();g.stroke()}
 function nameW(g,font,text){var k=font+'\0'+text,w=st.lw[k];if(w==null){g.font=font;w=st.lw[k]=g.measureText(text).width}else g.font=font;return w}
 var plates={};function namePlate(g,text){var c=plates[text];if(c)return c;var font='700 13px "Cormorant Garamond",Georgia,serif';g.font=font;var w=Math.ceil(g.measureText(text).width)+8,h=22;c=document.createElement('canvas');c.width=w*2;c.height=h*2;var sg=c.getContext('2d');sg.scale(2,2);sg.font=font;sg.textAlign='center';sg.lineWidth=4;sg.lineJoin='round';sg.strokeStyle='rgba(10,15,21,.9)';sg.strokeText(text,w/2,16);sg.fillStyle='#f3e2b0';sg.fillText(text,w/2,16);c._w=w;c._h=h;plates[text]=c;return c}
 var last=0;function frame(ts){requestAnimationFrame(frame);if(document.hidden){last=ts;return}var dt=Math.min(.05,(ts-last)/1000||0);last=ts;st.dtRaw=dt;
