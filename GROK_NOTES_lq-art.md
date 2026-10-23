@@ -36,6 +36,7 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - The AI Evals plates were checked as one set. The balance shows two pans. The shield is a night circle with a brass rim and a gold tick. The snake has a smile and a brass hat. The pennant is a plain round flag. The padlock, ruler, bars, scroll, stamp, stacked blocks, and keep stay in the same frame.
 - The tab icon is `assets/art/mark.svg`: a night circle, a brass ring, short ticks inside the ring, and a diamond needle. Home and each world point at it.
 - The Portfolio watermark compass sits higher in the tile, beside the jar, so both motifs show in the repeat.
+- A later pass nudged three plates. The Foundations anchor is a little larger. The Portfolio keep's door and ledger sit a little lower. The anvil keeps a hammer handle on its head. The hourglass bulbs are a smoother shape.
 
 ## Not done
 
