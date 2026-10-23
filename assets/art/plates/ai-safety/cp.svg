@@ -23,7 +23,7 @@
   <path d="M0 58 C36 48 70 66 108 54 C132 46 148 56 160 50 V100 H0 Z" fill="#243044"/>
   <path d="M0 72 C40 64 80 80 120 70 C140 66 152 74 160 70 V100 H0 Z" fill="#1c2733"/>
   <path d="M0 86 C50 80 100 92 160 84 V100 H0 Z" fill="#1c2733"/>
-  <ellipse id="lq-shadow" cx="80" cy="91" rx="46" ry="4" fill="#0a0f15" opacity="0.34"/>
+  <ellipse id="lq-shadow" cx="84" cy="84" rx="24" ry="3.6" fill="#0a0f15" opacity="0.34"/>
   <!-- SUBJECT -->
   <path d="M0 78 C46 70 96 88 160 74 V100 H0 Z" fill="#e8dcc4"/>
   <path d="M16 88 C56 84 110 92 144 86 V94 H16 Z" fill="#f6efe0"/>
@@ -44,6 +44,7 @@
     <rect width="160" height="100" fill="url(#lq-key)"/>
     <rect width="160" height="100" fill="url(#lq-tint)"/>
     <circle cx="128" cy="18" r="28" fill="url(#lq-gold)"/>
+    <circle id="lq-lamp" cx="88" cy="58" r="16" fill="url(#lq-gold)"/>
   </g>
 
   <rect x="4" y="4" width="152" height="92" rx="8" fill="none" stroke="#d7b56a" stroke-opacity="0.4" stroke-width="1.25"/>

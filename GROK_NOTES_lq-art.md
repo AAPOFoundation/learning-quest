@@ -63,6 +63,15 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - Plate ground shadows are a little darker (0.34) so they read at thumbnail size. The brass point light on each plate stays.
 - Checked in headless Edge: a sheet of the five covers and five plates, the home at 390×1700 and 1100×1500, and the Python Basics title at 390×844. The mill, the cabin and the scales stay in frame. Words on the cards stay readable. Begin your journey stays on screen. A real phone was not used.
 
+## Landmark lights
+
+- `origin/main` was already in this branch. Nothing new to merge.
+- Each region plate now has a gold point light on its landmark. The ground shadow sits under that object, a little down and to the right, because the light comes from the top left. The moon glow stays. The forge spark, the watchtower lantern, and the signal lamp already had a second light, so they kept it.
+- Covers gained a light on the snake's hat, the open book, the scale beam, the shield, and the compass. The Python snake has a contact shadow under it.
+- The first-step, coder, pythonista, and boss medallions have a small shadow under the mark.
+- After a sheet check, five lights were moved onto the thing they light: the scroll, the split in the two curves, the trail flag, the top of the cairn, and a wider forge spark.
+- Checked in headless Edge on a sheet of the covers, badges, and plates. A real phone was not used.
+
 ## Not done
 
 - Level-path emoji in `homeOld()` is unused by the world UI, so those icons were not redrawn.

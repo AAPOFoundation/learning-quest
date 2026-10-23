@@ -117,6 +117,7 @@
     <rect width="640" height="360" fill="url(#lq-tint)"/>
     <circle cx="278" cy="208" r="44" fill="url(#lq-gold)"/>
     <circle cx="392" cy="192" r="36" fill="url(#lq-gold)"/>
+    <circle id="lq-lamp" cx="318" cy="270" r="32" fill="url(#lq-gold)"/>
   </g>
 
   <rect x="8" y="8" width="624" height="344" rx="8" fill="none" stroke="#d7b56a" stroke-opacity="0.35" stroke-width="1"/>

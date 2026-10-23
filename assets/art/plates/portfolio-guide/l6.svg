@@ -22,7 +22,7 @@
   <path d="M0 58 C36 48 70 66 108 54 C132 46 148 56 160 50 V100 H0 Z" fill="#243044"/>
   <path d="M0 72 C40 64 80 80 120 70 C140 66 152 74 160 70 V100 H0 Z" fill="#2f4a28"/>
   <path d="M0 80 C44 72 78 88 118 76 C138 72 150 82 160 78 V100 H0 Z" fill="#2a4e66"/>
-  <ellipse id="lq-shadow" cx="80" cy="91" rx="46" ry="4" fill="#0a0f15" opacity="0.34"/>
+  <ellipse id="lq-shadow" cx="86" cy="84" rx="20" ry="3.6" fill="#0a0f15" opacity="0.34"/>
   <!-- SUBJECT -->
   <ellipse cx="80" cy="82" rx="44" ry="5" fill="#2a4e66"/>
   <path d="M26 82 Q28 72 30 82 M36 84 Q38 74 40 84" fill="none" stroke="#4f7a3a" stroke-width="1.7" stroke-linecap="round"/>
