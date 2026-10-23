@@ -103,16 +103,20 @@ function paintRelief(sc){
  var tiles=[];for(r=0;r<sc.rows;r++)for(c=0;c<sc.cols;c++)tiles.push([hy(r),c,r]);
  tiles.sort(function(a,b){return a[0]-b[0]||a[1]-b[1]});
  var groups={},heights=[];
- for(var i=0;i<tiles.length;i++){c=tiles[i][1];r=tiles[i][2];x=hx(c,r);y=hy(r);h=groundH(sc.t[c][r]);var base=COL[sc.t[c][r]==='pine'?'forest':sc.t[c][r]]||COL.grass;
+ for(var i=0;i<tiles.length;i++){c=tiles[i][1];r=tiles[i][2];x=hx(c,r);y=hy(r);h=groundH(sc.t[c][r]);
   for(var e=0;e<6;e++){var n=neigh(c,r,e),inside=n[0]>=0&&n[1]>=0&&n[0]<sc.cols&&n[1]<sc.rows,nh=inside?groundH(sc.t[n[0]][n[1]]):0;if(nh>=h-0.5)continue;
    var ed=EDGE[e],A=corner(x,y,ed[0]),B=corner(x,y,ed[1]);
    var tA=project(A[0],A[1],h),tB=project(B[0],B[1],h),bA=project(A[0],A[1],nh),bB=project(B[0],B[1],nh);
    var nx=hx(n[0],n[1])-x,ny=hy(n[1])-y,ln=Math.hypot(nx,ny)||1;nx/=ln;ny/=ln;
-   var lam=nx*-0.55+ny*-0.84,sh=0.38+0.5*(lam*0.5+0.5);
+   /* A darkened cap went near-black (mountain rgb ~29). Faces are stone, earth or a sand bank. Shade stays above ~0.55. */
+   var drop=h-nh,stone=drop>=16?[152,144,132]:drop>=8?[146,112,74]:[186,158,108];
+   var lam=nx*-0.55+ny*-0.84,sh=0.70+0.30*(lam*0.5+0.5);
    var A1=[ox+tA.x,oy+tA.y],B1=[ox+tB.x,oy+tB.y],A0=[ox+bA.x,oy+bA.y],B0=[ox+bB.x,oy+bB.y];
-   g.fillStyle=rgb(base,sh*0.74);g.beginPath();g.moveTo(A1[0],A1[1]);g.lineTo(B1[0],B1[1]);g.lineTo(A0[0],A0[1]);g.closePath();g.fill();
-   g.fillStyle=rgb(base,sh*0.56);g.beginPath();g.moveTo(B1[0],B1[1]);g.lineTo(B0[0],B0[1]);g.lineTo(A0[0],A0[1]);g.closePath();g.fill();
-   g.strokeStyle='rgba(255,244,210,.32)';g.lineWidth=1.3;g.beginPath();g.moveTo(A1[0],A1[1]);g.lineTo(B1[0],B1[1]);g.stroke()}
+   g.fillStyle=rgb(stone,Math.min(1.08,sh*1.02));g.beginPath();g.moveTo(A1[0],A1[1]);g.lineTo(B1[0],B1[1]);g.lineTo(A0[0],A0[1]);g.closePath();g.fill();
+   g.fillStyle=rgb(stone,sh*0.78);g.beginPath();g.moveTo(B1[0],B1[1]);g.lineTo(B0[0],B0[1]);g.lineTo(A0[0],A0[1]);g.closePath();g.fill();
+   if(drop>=12){g.strokeStyle='rgba(48,36,24,.35)';g.lineWidth=1;var steps=drop>=28?3:2,si,tt;
+    for(si=1;si<=steps;si++){tt=si/(steps+1);g.beginPath();g.moveTo(A1[0]+(A0[0]-A1[0])*tt,A1[1]+(A0[1]-A1[1])*tt);g.lineTo(B1[0]+(B0[0]-B1[0])*tt,B1[1]+(B0[1]-B1[1])*tt);g.stroke()}}
+   g.strokeStyle='rgba(255,244,210,.45)';g.lineWidth=1.4;g.beginPath();g.moveTo(A1[0],A1[1]);g.lineTo(B1[0],B1[1]);g.stroke()}
   if(!groups[h]){groups[h]=[];heights.push(h)}groups[h].push([c,r])}
  heights.sort(function(a,b){return a-b});
  heights.forEach(function(hv){g.save();g.beginPath();groups[hv].forEach(function(cr){var xx=hx(cr[0],cr[1]),yy=hy(cr[1]);
@@ -120,8 +124,9 @@ function paintRelief(sc){
   g.clip();g.setTransform(1,0,CAM.shear,CAM.v,ox,oy-hv);g.drawImage(sc.cv,0,0);g.restore()});
  sc.view=cv;sc.viewOx=ox;sc.viewOy=oy}
 /* Low-poly plinth under a building or landmark. (0,0) is the ground contact in upright sprite space.
-   The footprint uses the same shear and v as the ground, then extrudes straight up. West face is lit. */
-function podium(g,kind){var spec={hall:[26,14,8],guild:[24,13,7],smithy:[24,13,7],vault:[22,12,6],tower:[14,12,8],great:[36,16,9],town:[30,16,7],castle:[36,18,10],gate:[24,10,5],fountain:[16,10,4],landmark:[16,12,6]}[kind];if(!spec)return;
+   The footprint uses the same shear and v as the ground, then extrudes straight up. West face is lit.
+   The sprite shadow reaches about 8px below the feet, so the south face is tall enough to show beneath it. */
+function podium(g,kind){var spec={hall:[34,18,14],guild:[32,18,13],smithy:[32,18,13],vault:[30,16,12],tower:[20,14,12],great:[44,20,15],town:[36,18,13],castle:[42,20,15],gate:[30,14,10],fountain:[24,14,11],landmark:[22,14,10]}[kind];if(!spec)return;
  var u=S/34,hw=spec[0]*u,hd=spec[1]*u,ht=spec[2]*u,sh=CAM.shear,v=CAM.v;
  function gp(gx,gy,up){return [gx+sh*gy,gy*v-up]}
  /* Top is the foot line (up 0). The block hangs down-screen so the sprite stands on it. */
