@@ -38,6 +38,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 28. **The talk button glows when it will do something.** On a touch pad, A pulses while a person, a hall, or a chest is on a neighbouring tile. It checks again only when the tile, the place, or the motion setting changes. Low effects and reduced motion leave it still.
 29. **A still cape stirs.** While a figure stands, the cape hem shifts by about two pixels. Walking still uses the step drag, and the idle shift is off then. Low effects draws this with the rest of the quiet idle, at about 8 frames a second.
 30. **A still staff stone pulses.** The pale stone on a staff grows and shrinks a little while the figure stands. It holds one size while the figure walks.
+31. **Hair stirs while a figure stands.** The hairline shifts by about a pixel, on a different beat from the cape. Walking holds it still. Hoods and helms have no loose hair, so they stay put. Low effects draws this with the quiet idle, at about 8 frames a second.
 
 ## Checked
 

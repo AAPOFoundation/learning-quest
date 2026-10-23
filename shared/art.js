@@ -125,7 +125,7 @@ function figure(g,x,y,look,o){look=look||{};o=o||{};var u=S/34,t=o.t||0,mv=!!o.m
  g.strokeStyle=look.trim;g.lineWidth=1.6*u;g.beginPath();g.moveTo(-10*u,-4.5*u);g.lineTo(10*u,-4.5*u);g.stroke();g.beginPath();g.moveTo(-6*u,-15*u);g.lineTo(6*u,-15*u);g.stroke();
  if(look.hat==='hood'){ell(g,0,-31*u,8.8*u,9*u,look.robe)}
  var hg=g.createRadialGradient(-2*u,-33*u,1,0,-31*u,8*u);hg.addColorStop(0,mix(look.skin,'#fff',.2));hg.addColorStop(1,look.skin);g.fillStyle=hg;g.beginPath();g.arc(0,-30*u,7*u,0,PI*2);g.fill();
- if(look.hair&&look.hat!=='helm'&&look.hat!=='hood'){g.fillStyle=look.hair;g.beginPath();g.arc(0,-31*u,7.3*u,PI*1.02,PI*1.98);g.fill()}
+ if(look.hair&&look.hat!=='helm'&&look.hat!=='hood'){var hs=mv?0:Math.sin(t*1.7+(x||0))*1.1*u;g.fillStyle=look.hair;g.beginPath();g.arc(hs,-31*u,7.3*u,PI*1.02,PI*1.98);g.fill()}
  if(look.hat==='helm'){g.fillStyle='#8a929c';g.beginPath();g.arc(0,-31*u,7.6*u,PI,0);g.fill();g.fillStyle=look.trim;g.fillRect(-7.6*u,-31*u,15.2*u,1.6*u);ell(g,0,-40*u,1.6*u,3*u,'#a32a2a')}
  if(look.hat==='cap'){g.fillStyle=look.robe;g.beginPath();g.ellipse(0,-34*u,8*u,3.6*u,0,PI,0);g.fill()}
  if(look.hat==='scholar'){g.fillStyle='#1a1208';g.fillRect(-7*u,-38*u,14*u,2.4*u)}
