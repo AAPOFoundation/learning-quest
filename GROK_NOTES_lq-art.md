@@ -41,4 +41,5 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 ## Not done
 
 - Level-path emoji in `homeOld()` is unused by the world UI, so those icons were not redrawn.
-- Checked in headless Edge: home cards, the Python Basics title (cover and watermark), and a grid of region plates. The pause-menu badge chest was not clicked. Quest-log layout was not clicked through in the game.
+- A lesson plate at full panel width and 112px tall cropped the scene down to a thin band. It now shows the whole plate, up to 400px wide, and keeps its own shape. Skill-map and quest-log plates stay small thumbnails.
+- Checked in headless Edge: the Python Basics lesson, quest log, world map, skills map, and badge chest; the Portfolio Guide quest log and a lesson on a 390px-wide screen; the home cards on that same width. The lesson plate shows the whole scene, and the small plates load. A real phone was not used.
