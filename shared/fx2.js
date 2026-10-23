@@ -37,13 +37,15 @@ function vfxLayer(kind,x,y,html,ms){if(!document.getElementById('lq-vfx-css')){v
  st.setProperty('--k',(Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y))/20*1.05).toFixed(1));d.innerHTML=html;document.body.appendChild(d);setTimeout(function(){d.remove()},ms||2400);return d}
 function beam(x,y){return vfxLayer('beam',x,y,'<div class="rays"></div><div class="shaft"></div><div class="core"></div><div class="glow"></div>',2500)}
 function shockwave(x,y){return vfxLayer('shock',x,y,'<div class="wash"></div><div class="glow"></div><div class="ring"></div><div class="ring r2"></div>',2400)}
-window.LQVfx={beam:beam,shockwave:shockwave};
-function celebrate(msg,opts){opts=opts||{};if(opts.vfx==='beam')beam(opts.x,opts.y);else if(opts.vfx==='shockwave')shockwave(opts.x,opts.y);if(opts.confetti!==false)confetti(opts.count);cheer(msg)}
+/* gate(x,y): a soft warm glow that blooms and fades where a gate opens (no ring). Calm mode shows it still. */
+function gate(x,y){return vfxLayer('gate',x,y,'<div class="wash"></div><div class="glow"></div>',2200)}
+window.LQVfx={beam:beam,shockwave:shockwave,gate:gate};
+function celebrate(msg,opts){opts=opts||{};if(opts.vfx==='beam')beam(opts.x,opts.y);else if(opts.vfx==='shockwave')shockwave(opts.x,opts.y);else if(opts.vfx==='gate')gate(opts.x,opts.y);if(opts.confetti!==false)confetti(opts.count);cheer(msg)}
 /* small helper: replay a one-shot CSS animation class on an element */
 function pop(el,cls){if(!el||calm())return;cls=cls||'lq-pop';el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls)}
-window.LQCelebrate={celebrate:celebrate,beam:beam,shockwave:shockwave,confetti:confetti,cheer:cheer,pop:pop,calm:calm};
+window.LQCelebrate={celebrate:celebrate,beam:beam,shockwave:shockwave,gate:gate,confetti:confetti,cheer:cheer,pop:pop,calm:calm};
 /* any script can fire: document.dispatchEvent(new CustomEvent('lq:celebrate',{detail:{msg:'Level cleared!',vfx:'shockwave'}}))
-   detail: msg, vfx ('beam'|'shockwave'), x/y (screen px; default centre), confetti (false to skip), count */
+   detail: msg, vfx ('beam'|'shockwave'|'gate'), x/y (screen px; default centre), confetti (false to skip), count */
 document.addEventListener('lq:celebrate',function(e){var d=e.detail||{};celebrate(d.msg,d)});
 })();
 (function(){
@@ -52,11 +54,18 @@ var Art=window.Art,FX=window.LQFx;if(!Art||!FX)return;
 var S=Art.S,hx=Art.hx,hy=Art.hy,hash=Art.hash;
 function waterList(sc){if(sc._wl)return sc._wl;var l=[];for(var c=0;c<sc.cols;c++)for(var r=0;r<sc.rows;r++)if(sc.t[c][r]==='water')l.push([hx(c,r),hy(r),hash(c,r,99)]);sc._wl=l;return l}
 /* water: two drifting highlight strokes and an occasional glint per visible water tile */
-function water(g,sc,T,cx,cy,vw,vh){if(FX.low||(FX.rm&&FX.rm.matches))return;var l=waterList(sc);if(!l.length)return;g.save();g.lineCap='round';g.lineWidth=1.3;
- for(var i=0;i<l.length;i++){var w=l[i],x=w[0],y=w[1];if(x<cx-S||x>cx+vw+S||y<cy-S||y>cy+vh+S)continue;var ph=w[2]*6.28;
-  for(var k=0;k<2;k++){var a=.07+.09*(.5+.5*Math.sin(T*1.3+ph+k*2.1)),dx=Math.sin(T*.45+ph+k)*S*.22,yy=y-S*.22+k*S*.42+Math.sin(T*.8+ph)*1.5,xx=x-S*.18+k*S*.3+dx;
-   g.strokeStyle='rgba(225,244,255,'+a.toFixed(3)+')';g.beginPath();g.moveTo(xx-7,yy);g.quadraticCurveTo(xx,yy-2.6,xx+7,yy);g.stroke()}
-  var gl=Math.sin(T*2.2+ph*3);if(gl>.92){g.fillStyle='rgba(255,252,235,'+((gl-.92)*8).toFixed(3)+')';g.beginPath();g.arc(x+(w[2]-.5)*S*.8,y+(w[2]*7%1-.5)*S*.6,1.6,0,6.3);g.fill()}}
+/* round 2b: the shimmer is batched. Each stroke's alpha is snapped to one of 5 levels and all strokes of a level go into one path,
+   so a frame costs about 5 stroke calls instead of 2 per water tile (and no per-stroke colour strings). Glints share one path too.
+   (An offscreen 12 Hz cache was measured first and was slower here: the full-view blit cost more than it saved.) */
+var NB=5,BK=[],BCOL=[];for(var bi=0;bi<NB;bi++){BK.push([]);BCOL.push('rgba(225,244,255,'+(.07+.09*(bi+.5)/NB).toFixed(3)+')')}
+function water(g,sc,T,cx,cy,vw,vh){if(FX.low||(FX.rm&&FX.rm.matches))return;var l=waterList(sc);if(!l.length)return;
+ var i,k,b,gls=[],x0=cx-S,x1=cx+vw+S,y0=cy-S,y1=cy+vh+S;for(b=0;b<NB;b++)BK[b].length=0;
+ for(i=0;i<l.length;i++){var w=l[i],x=w[0],y=w[1];if(x<x0||x>x1||y<y0||y>y1)continue;var ph=w[2]*6.28,sy=Math.sin(T*.8+ph)*1.5;
+  for(k=0;k<2;k++){var q=.5+.5*Math.sin(T*1.3+ph+k*2.1);b=q*NB|0;if(b>=NB)b=NB-1;BK[b].push(x-S*.18+k*S*.3+Math.sin(T*.45+ph+k)*S*.22,y-S*.22+k*S*.42+sy)}
+  var gl=Math.sin(T*2.2+ph*3);if(gl>.92)gls.push(x+(w[2]-.5)*S*.8,y+(w[2]*7%1-.5)*S*.6,(gl-.92)*8)}
+ g.save();g.lineCap='round';g.lineWidth=1.3;
+ for(b=0;b<NB;b++){var L=BK[b];if(!L.length)continue;g.strokeStyle=BCOL[b];g.beginPath();for(i=0;i<L.length;i+=2){var xx=L[i],yy=L[i+1];g.moveTo(xx-7,yy);g.quadraticCurveTo(xx,yy-2.6,xx+7,yy)}g.stroke()}
+ if(gls.length){g.fillStyle='rgb(255,252,235)';for(i=0;i<gls.length;i+=3){g.globalAlpha=gls[i+2];g.beginPath();g.arc(gls[i],gls[i+1],1.6,0,6.3);g.fill()}}
  g.restore()}
 /* ambient particles */
 var KIND={meadow:{n:22,col:'243,226,176',sz:1.9,vy:-6,vx:5,glow:false},forest:{n:24,col:'214,240,140',sz:2.0,vy:-3,vx:4,glow:true},hills:{n:20,col:'243,226,176',sz:1.8,vy:-5,vx:7,glow:false},desert:{n:26,col:'226,196,140',sz:1.6,vy:-1,vx:22,glow:false},
@@ -76,5 +85,21 @@ function particles(g,k,dtRaw,cx,cy,vw,vh,T){if(FX.low||(FX.rm&&FX.rm.matches)){p
   g.globalAlpha=a*.8;g.fillStyle='#fff';for(m=0;m<ps.length;m++)g.fillRect(ps[m].x-.5,ps[m].y-.5,1,1)}
  g.restore()}
 function burst(x,y){if(FX.low||(FX.rm&&FX.rm.matches))return;var ps=[];for(var i=0;i<26;i++){var a=Math.random()*6.28,v=40+Math.random()*90;ps.push({x:x,y:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-70,r:1.2+Math.random()*1.8})}bursts.push({t:0,ps:ps});if(bursts.length>4)bursts.shift()}
-window.LQAnim={water:water,particles:particles,burst:burst};
+/* round 2b ambient light (full effects only; off for Low effects and reduced motion):
+   pools(): warm lamplight pools on the ground around houses, halls and towns, breathing gently, added with 'lighter' so they light the paint.
+   fireflies(): a few soft glowing motes drifting on fixed sine paths near the edges of the view (stateless, cheap). */
+var POOL=null;function poolSprite(){if(POOL)return POOL;var c=document.createElement('canvas'),R=64;c.width=c.height=R*2;var x=c.getContext('2d'),gr=x.createRadialGradient(R,R,0,R,R,R);
+ gr.addColorStop(0,'rgba(255,190,100,.85)');gr.addColorStop(.4,'rgba(255,165,75,.35)');gr.addColorStop(1,'rgba(255,150,60,0)');x.fillStyle=gr;x.fillRect(0,0,R*2,R*2);POOL=c;return c}
+var LIT={building:1,node:1};
+function pools(g,sc,T,cx,cy,vw,vh){if(FX.low||(FX.rm&&FX.rm.matches)||!sc||!sc.objs)return;var sp=poolSprite();g.save();g.globalCompositeOperation='lighter';
+ for(var i=0;i<sc.objs.length;i++){var o=sc.objs[i];if(!LIT[o.type]&&o.role!=='hall')continue;var x=hx(o.c,o.r),y=hy(o.r);if(x<cx-S*2||x>cx+vw+S*2||y<cy-S*2||y>cy+vh+S*2)continue;
+  var big=o.role==='hall'||o.kind==='castle',r=S*(big?1.9:1.45)*(1+.04*Math.sin(T*1.6+o.c*1.3+o.r)),a=.55+.12*Math.sin(T*2.3+o.c*2.1)+.06*Math.sin(T*7.1+o.r);
+  g.globalAlpha=Math.max(0,Math.min(1,a));g.drawImage(sp,x-r,y+S*.15-r*.62,r*2,r*1.24)}
+ g.restore()}
+function fireflies(g,sc,T,cx,cy,vw,vh){if(FX.low||(FX.rm&&FX.rm.matches))return;var n=small?8:14;g.save();g.globalCompositeOperation='lighter';
+ for(var i=0;i<n;i++){var h1=hash(i,7,3),h2=hash(i,9,5),u=(h1+T*.012*(h2+.4))%1,v=(h2+.5*Math.sin(T*.21+i)+.5)%1;
+  var x=cx+u*vw+Math.sin(T*.9+i*2.3)*14,y=cy+(.2+.75*v)*vh+Math.cos(T*1.1+i)*10,on=Math.max(0,Math.sin(T*(1.1+h1)+i*1.7));if(on<.15)continue;
+  g.globalAlpha=.16*on;g.fillStyle='#ffe58a';g.beginPath();g.arc(x,y,6,0,6.3);g.fill();g.globalAlpha=.9*on;g.fillStyle='#fff6c0';g.beginPath();g.arc(x,y,1.5,0,6.3);g.fill()}
+ g.restore()}
+window.LQAnim={water:water,particles:particles,burst:burst,pools:pools,fireflies:fireflies};
 })();
