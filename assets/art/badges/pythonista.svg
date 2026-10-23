@@ -13,7 +13,8 @@
     <path d="M36 33H43"/>
     <path d="M37 37H43"/>
   </g>
-  <circle cx="32" cy="19.2" r="4.8" fill="#d7b56a"/>
-  <circle cx="33.7" cy="18" r="0.95" fill="#121a24"/>
-  <path d="M29.6 20.6Q32 22.5 34.8 20.4" fill="none" stroke="#121a24" stroke-width="1.15" stroke-linecap="round"/>
+  <path d="M25 31C28.5 27 30.5 28.5 32 24.5" fill="none" stroke="#d7b56a" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="32" cy="22.6" r="5" fill="#d7b56a"/>
+  <circle cx="33.8" cy="21.2" r="1" fill="#121a24"/>
+  <path d="M29.6 23.8Q32 25.8 34.8 23.6" fill="none" stroke="#121a24" stroke-width="1.15" stroke-linecap="round"/>
 </svg>
