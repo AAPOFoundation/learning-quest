@@ -389,7 +389,18 @@ function stumpMesh(col){
  cyl(b,0,0.29,0,0.1,0.02,6,ring,0);
  return pack(b);
 }
-function iceMesh(){var b=new Builder(); b.box(0,0.22,0,0.18,0.44,0.14,hex('#d7eef6'),0); b.box(0.1,0.36,0.04,0.1,0.32,0.1,hex('#f4fbff'),0); return pack(b)}
+function iceMesh(){
+ var b=new Builder(), ice=hex('#d7eef6'), pale=hex('#f4fbff'), i, d, fr, bits=[
+  [0,0.24,0, 0.4,1,0.15, 0.14,0.5,0.11, ice],
+  [0.12,0.36,0.04, -0.25,1,0.5, 0.09,0.38,0.09, pale],
+  [-0.08,0.16,-0.02, 0.55,1,-0.25, 0.1,0.24,0.08, mix(ice,[1,1,1],0.25)]
+ ];
+ for(i=0;i<bits.length;i++){
+  d=bits[i]; fr=frameY([d[3],d[4],d[5]]);
+  b.axesBox([d[0],d[1],d[2]], fr.x, fr.y, fr.z, d[6], d[7], d[8], d[9], 0);
+ }
+ return pack(b);
+}
 function cairnMesh(col){
  var b=new Builder(), i, d, fr, stone=mix(col,[0.25,0.22,0.2],0.35), lumps=[
   [0,0.09,0, 0.7,1,0.25, 0.42,0.14,0.28, stone],
