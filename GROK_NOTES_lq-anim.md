@@ -50,6 +50,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 40. **Party and satchel cards arrive in order.** The heading stays still. Each companion card, and each saved function, rises a little after the one above. The delay stops growing after the tenth card. An empty satchel rises once. Reduced motion removes it. The lists are built when the page opens, not on each keystroke.
 41. **A nearby name is painted once.** Standing next to someone used to stroke the name every frame. The first time, it is drawn onto a small picture and then blitted, including while it fades. The words do not change.
 42. **A new hint rises.** Only the hint that just opened rises. The ones already on screen stay put, because the list is rebuilt. Reduced motion removes the rise.
+43. **A walk-through arrives step by step.** The plain-English plan lists its steps one after another. The heading stays still. The delay stops growing after the tenth step. Reduced motion removes it. Opening the plan again plays it once more.
 
 ## Checked
 
