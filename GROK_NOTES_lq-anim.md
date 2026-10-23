@@ -51,6 +51,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 41. **A nearby name is painted once.** Standing next to someone used to stroke the name every frame. The first time, it is drawn onto a small picture and then blitted, including while it fades. The words do not change.
 42. **A new hint rises.** Only the hint that just opened rises. The ones already on screen stay put, because the list is rebuilt. Reduced motion removes the rise.
 43. **A walk-through arrives step by step.** The plain-English plan lists its steps one after another. The heading stays still. The delay stops growing after the tenth step. Reduced motion removes it. Opening the plan again plays it once more.
+44. **Dialogue appears at once when motion is off.** Low effects and reduced motion no longer reveal a line one letter at a time, and they skip the little ticks. The full line, the choices and the advance mark show on the first paint.
 
 ## Checked
 
