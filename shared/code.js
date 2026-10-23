@@ -74,9 +74,9 @@ function mount(q,el,ctx){
  el.querySelector('#cq-chk').onclick=function(){if(solved)return;if(blanks())return;tries++;hintBtn();busy(loadMsg());call('tests',ed.value,JSON.stringify(q.tests.map(function(t){return {code:t.code}})),q.prelude).then(function(r){
   if(r.unavailable)return unavailable(r);if(r.error){out.className='cq-out bad';out.textContent=r.error;return}
   var d=r.data;if(d.err){out.className='cq-out bad';out.innerHTML='<b>Your code has an error:</b> '+esc(d.err);return}
-  var pass=0,rows='',hn=0,hfail=0;d.res.forEach(function(x,i){var t=q.tests[i];if(x.ok)pass++;if(t.hidden){hn++;if(!x.ok)hfail++}else rows+='<div class="cq-t '+(x.ok?'ok':'no')+'">'+(x.ok?'✔ ':'✘ ')+esc(t.n)+(x.ok?'':'<div class="small">'+esc(x.msg||'failed')+'</div>')+'</div>'});
+  var pass=0,rows='',hn=0,hfail=0;d.res.forEach(function(x,i){var t=q.tests[i];if(x.ok)pass++;if(t.hidden){hn++;if(!x.ok)hfail++}else rows+='<div class="cq-t '+(x.ok?'ok':'no')+'" style="animation-delay:'+(i*40)+'ms">'+(x.ok?'✔ ':'✘ ')+esc(t.n)+(x.ok?'':'<div class="small">'+esc(x.msg||'failed')+'</div>')+'</div>'});
   var hmsgs=[];d.res.forEach(function(x,i){if(q.tests[i].hidden&&!x.ok)hmsgs.push(x.msg||'failed')});
-  rows+='<div class="cq-t '+(hfail?'no':'ok')+'">'+(hfail?'✘ ':'✔ ')+'Hidden tests: '+(hn-hfail)+' of '+hn+' passed'+(hmsgs.length?hmsgs.map(function(m){return '<div class="small">Failed: '+esc(m)+'</div>'}).join(''):'')+'</div>';
+  rows+='<div class="cq-t '+(hfail?'no':'ok')+'" style="animation-delay:'+(d.res.length*40)+'ms">'+(hfail?'✘ ':'✔ ')+'Hidden tests: '+(hn-hfail)+' of '+hn+' passed'+(hmsgs.length?hmsgs.map(function(m){return '<div class="small">Failed: '+esc(m)+'</div>'}).join(''):'')+'</div>';
   if(pass===d.res.length){out.className='cq-out ok cheer';out.innerHTML='<b>All '+pass+' tests pass.</b>'+rows;finish(true)}
   else{out.className='cq-out bad';out.innerHTML='<b>'+pass+' of '+d.res.length+' tests pass.</b>'+rows}})};
  function finish(ok){lock();var E=window.Engine;if(ok&&!q.practice&&E&&E.codeSolved)E.codeSolved(q.id);if(ok&&!q.capstone&&!q.practice&&window.Satchel)window.Satchel.add(q,ed.value);var end=el.querySelector('#cq-end');end.innerHTML='<div class="fb ok"><b>Solved. </b>'+(q.why||'')+'</div><button class="btn btn-primary" id="cq-next">Next</button>';end.querySelector('#cq-next').onclick=function(){ctx.done(true)}}

@@ -16,10 +16,14 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 6. **Quiz and code wins get a CSS beat.** A passed level and the final challenge use `panel cheer`. A Python challenge that passes every test uses `cq-out cheer`. Stars pop in one after another. The toast animation keeps `translateX(-50%)` so it stays centred. `prefers-reduced-motion` still removes CSS animation.
 7. **Performance.** Static trees and rocks are stamped once and blitted (shared by shape: oak, pine, snow, bush, stone). Low effects, or reduced motion, and a hero who is standing still with no key, path, fog, or camera settle, redraw at about 8fps. A held key is never skipped. The tab being hidden skips the frame. Name plaques cache `measureText`. Particle and water drawing avoid `toFixed` in the inner loop.
 8. **Low effects still means the quiet map.** Hop, veil, shake, dust, floaters, NPC waves, and the quest bob are off when Low effects is on or the reduced-motion query matches. The idle redraw cap applies only in that quiet mode.
+9. **A tap shows the route.** Brass dots march from the hero to the chosen tile, with a ring on the last hex and a short ripple on the tap. Low effects keeps still dots and skips the march and the ripple. At most 48 dots.
+10. **A turn is a sideways squash.** Changing facing plays it for about 0.14s. The town gate's door slides up when the hero is within two tiles, and snaps shut or open when motion is off.
+11. **XP counts, then the bar follows.** The number eases to the new total over about half a second. The existing bar width transition is unchanged. Back on the world map, a region that just opened gets one burst and the word Open.
+12. **Small UI beats.** The place name rises as it fades in. A dialogue portrait breathes. The pad shows a press. The quest card pulses when the next objective changes. Test rows arrive one after another. Each home-page world fills a thin bar to its cleared fraction. The vignette is painted once per window size, and the scene fade no longer builds a colour string each frame.
 
 ## Checked
 
-A mock canvas ran the stride, the idle blink, the wave, shared tree stamps, the chest lid and the low-effects skip. Edge drew one frame: four steps, a wave, a pine, an opening chest, the word Cleared and a ring. The full game was not clicked through on a phone.
+A mock canvas ran the stride, the idle blink, the wave, shared tree stamps, the chest lid and the low-effects skip. The same mock checked that an open gate draws its door higher, and that a turn squashes the body. Headless Edge loaded Python Basics to the title screen: the canvas was sized, the portrait drew, and "Begin your journey" was on the page. The route was not clicked through on a phone.
 
 ## Not done
 
