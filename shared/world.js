@@ -337,7 +337,7 @@ var lights=[],shadows=[],ldx=0,ldy=0;
 function lshift(dx,dy){ldx=dx;ldy=dy}
 var MARK={
  'python-basics':{dy:0.06,r:68,c:[0.36,0.26,0.07]},
- 'ai-foundations':{dy:-0.16,r:78,c:[0.14,0.28,0.48]},
+ 'ai-foundations':{dy:-0.16,r:78,c:[0.4,0.3,0.1]},
  'ai-evals':{dy:-1.01,r:64,c:[0.38,0.28,0.08]},
  'ai-safety':{dy:-1.01,r:80,c:[0.38,0.28,0.1]},
  'portfolio-guide':{dy:-0.92,r:76,c:[0.38,0.28,0.08]}
@@ -362,7 +362,7 @@ function packLights(cx,cy,z){var sc=z*dpr,i,L,sx,sy,rr,out=[],sh=[];
  for(i=0;i<shadows.length;i++){L=shadows[i];sx=(L.x-cx)*sc;sy=(L.y-cy)*sc;rr=Math.max(8,L.r*sc);if(sx<-rr||sy<-rr||sx>cv.width+rr||sy>cv.height+rr)continue;
   sh.push({x:sx,y:sy,r:rr,k:L.keep?0:1,d:(sx-cv.width*.5)*(sx-cv.width*.5)+(sy-cv.height*.5)*(sy-cv.height*.5)})}
  sh.sort(function(a,b){return a.k-b.k||a.d-b.d});if(sh.length>8)sh.length=8;return {lights:out,shadows:sh}}
-function useView(){return !FX.low&&st.scene&&st.scene.view}
+function useView(){return !FX.low&&!(FX.rm&&FX.rm.matches)&&st.scene&&st.scene.view}/* reduced motion uses the flat map */
 function tileH(sc,c,r){return inb(sc,c,r)?Art.groundH(sc.t[c][r]):0}
 function heroH(){var sc=st.scene,h=st.hero,a=tileH(sc,h.c,h.r);if(!h.mv)return a;var k=Math.max(0,Math.min(1,h.mv.t));return a+(tileH(sc,h.mv.c,h.mv.r)-a)*k}
 /* Top-down pixel on terrain height h, then `up` upright pixels toward the top of the screen. */
@@ -398,7 +398,8 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
   if(st.mode==='title'&&sc.id==='w'){var nd0=NODES[0],tp=toView(hx(nd0[0],nd0[1]),hy(nd0[1]),tileH(sc,nd0[0],nd0[1]),0);tx=tp.x-vw/2+sway;ty=tp.y-vh/2}
   camW=sc.view.width;camH=sc.view.height}
  else{tx=h.x-vw/2;ty=h.y-vh/2;if(st.mode==='title'&&sc.id==='w'){tx=hx(NODES[0][0],NODES[0][1])-vw/2+sway;ty=hy(NODES[0][1])-vh/2}camW=sc.W;camH=sc.H}
- var mx=camW-vw,my=camH-vh,hp=window.LQHudPad,pt=hp&&hp.on?hp.t/z:0,pb=hp&&hp.on?hp.b/z:0;tx=mx<0?mx/2:Math.max(0,Math.min(mx,tx));ty=my<0?my/2:Math.max(-pt,Math.min(my+pb,ty));/* phone: camera may scroll past the map edge by the HUD height (guide.js) so the hero never sits under the HUD */
+ var mx=camW-vw,my=camH-vh,hp=window.LQHudPad,pt=hp&&hp.on?hp.t/z:0,pb=hp&&hp.on?hp.b/z:0;tx=mx<0?mx/2:Math.max(0,Math.min(mx,tx));var lim=my+pb;if(hp&&hp.on&&hp.bt){var fy=view?feet.y:h.y+S*.38;lim=Math.max(my,fy-(hp.bt-16)/z)}/* phone band: only as much night under the island as keeps the hero's feet 16px above the d-pad */
+ ty=my<0?my/2:Math.max(-pt,Math.min(lim,ty));/* phone: camera may scroll past the map edge by the HUD height (guide.js) so the hero never sits under the HUD */
  if(st.cam.snap){st.cam.x=tx;st.cam.y=ty;st.cam.snap=false}else{var ck=1-Math.pow(0.82,Math.min(3,(st.dtRaw||1/60)*60));st.cam.x+=(tx-st.cam.x)*ck;st.cam.y+=(ty-st.cam.y)*ck}
  st.cam.err=Math.abs(tx-st.cam.x)+Math.abs(ty-st.cam.y);
  var shx=0,shy=0;if(st.shake>0&&motionOn()){var a=st.shake/.16;shx=Math.sin(st.time*62)*5*a;shy=Math.cos(st.time*48)*2.5*a}

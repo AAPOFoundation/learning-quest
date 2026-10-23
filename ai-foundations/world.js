@@ -21,7 +21,7 @@ function R(g,x,y,w,h,c){g.fillStyle=c;g.fillRect(x,y,w,h)}
 function T(g,a,b,c,d,e,f,col){g.fillStyle=col;g.beginPath();g.moveTo(a,b);g.lineTo(c,d);g.lineTo(e,f);g.fill()}
 function L(g,pts,c,w){g.strokeStyle=c;g.lineWidth=w;g.lineCap='round';g.beginPath();g.moveTo(pts[0],pts[1]);for(var i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);g.stroke()}
 function glow(g,x,y,r,col,a){var gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,col.replace('A',a));gr.addColorStop(1,col.replace('A',0));g.fillStyle=gr;g.fillRect(x-r,y-r,2*r,2*r)}
-function plinth(g,u,w,col){if(window.Art&&Art.stoneBase)Art.stoneBase(g,false,w*1.2*u,w*.6*u,14*u,col);else E(g,0,0,w*1.2*u,w*.45*u,'rgba(0,0,0,.28)');R(g,-w*u,-5*u,2*w*u,5*u,col);R(g,-w*u,-5*u,2*w*u,1.4*u,'rgba(255,255,255,.22)');R(g,(w-3)*u,-5*u,3*u,5*u,'rgba(0,0,0,.18)')}
+function plinth(g,u,w,col){if(window.Art&&Art.stoneBase)Art.stoneBase(g,false,w*1.2*u,w*.6*u,14*u,col);else E(g,0,0,w*1.2*u,w*.45*u,'rgba(0,0,0,.28)');/* default r3: no flat slab; the camera podium is the step */}
 /* AI Foundations: a glowing workshop of learning machines. Landmark = a neural-network sculpture whose signals pulse layer to layer; map prop = a small three-node network. */
 function net(g,u,ac,t,sc){var Ls=[[-12,[-26,-16,-6]],[0,[-30,-21,-12,-3]],[12,[-21,-11]]],k,i,j;
  for(k=0;k<2;k++)Ls[k][1].forEach(function(y1){Ls[k+1][1].forEach(function(y2){L(g,[Ls[k][0]*u*sc,y1*u*sc,Ls[k+1][0]*u*sc,y2*u*sc],'rgba(140,200,255,.55)',.7*u)})});

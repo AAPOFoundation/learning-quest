@@ -18,7 +18,7 @@ function hy(r){return S*1.5*r+S}
    shear -0.36: a point 100px further south sits 36px to the left. v 0.62: north-south ground shrinks to 62%.
    Pinned: project(100, 200, 40) is (28, 84). unproject(28, 124) is (100, 200). */
 var CAM={shear:-0.36,v:0.62};
-function groundH(t){switch(t){case 'water':return 0;case 'sand':case 'marsh':return 3;case 'snow':return 6;case 'plaza':return 6;case 'forest':return 14;case 'pine':return 18;case 'hills':return 26;case 'mountain':return 42;default:return 5}}
+function groundH(t){switch(t){case 'water':return 0;case 'sand':case 'marsh':return 1;case 'snow':return 6;case 'plaza':return 6;case 'forest':return 14;case 'pine':return 18;case 'hills':return 30;case 'mountain':return 52;default:return 5}}
 function project(x,y,h){return {x:x+CAM.shear*y,y:y*CAM.v-(h||0)}}
 function unproject(vx,vy){var y=vy/CAM.v;return {x:vx-CAM.shear*y,y:y}}
 var DE=[[1,0],[-1,0],[0,-1],[-1,-1],[0,1],[-1,1]],DO=[[1,0],[-1,0],[1,-1],[0,-1],[1,1],[0,1]];
@@ -93,11 +93,11 @@ function paintScene(sc){
   hexPath(g,x,y,S*1.03);g.fillStyle=rgb(base,f);g.fill();
   if(!FX.low&&(n2>.56||n2<.4)){g.fillStyle=n2>.56?'rgba(255,226,150,'+((n2-.56)*.5).toFixed(3)+')':'rgba(50,90,150,'+((.4-n2)*.5).toFixed(3)+')';g.fill()}
   var tn=!FX.low?tileTint(sc,c,r):null;if(tn){var al=(t==='water'||t==='crown')?0.08:t==='road'?0.06:0.16,tc=t==='road'?'rgba(255,230,180,'+al+')':rgbaHex(tn,al);if(tc){hexPath(g,x,y,S*1.03);g.fillStyle=tc;g.fill()}}
-  if(t==='water'){g.drawImage(litWtr,x-litW/2,y-litW/2);
+  if(t==='water'){if(!FX.low)g.drawImage(litWtr,x-litW/2,y-litW/2);
    g.save();hexPath(g,x,y,S*.98);g.clip();g.fillStyle='rgba(6,22,46,.34)';g.beginPath();g.ellipse(x+S*.22,y+S*.16,S*.4,S*.2,-.35,0,PI*2);g.fill();
    g.strokeStyle='rgba(214,238,255,.28)';g.lineWidth=1.3;g.beginPath();g.moveTo(x-S*.38,y-S*.12);g.quadraticCurveTo(x-S*.05,y-S*.3,x+S*.22,y-S*.1);g.stroke();g.restore();
    g.strokeStyle='rgba(235,248,255,.16)';g.lineWidth=1.2;for(i=0;i<2;i++){var wx=x-S*.5+hash(c,r,i+3)*S,wy=y-S*.4+hash(c,r,i+9)*S*.8;g.beginPath();g.moveTo(wx-6,wy);g.quadraticCurveTo(wx,wy-3,wx+6,wy);g.stroke()}}
-  else{g.drawImage(litHex,x-litW/2,y-litW/2);
+  else{if(!FX.low)g.drawImage(litHex,x-litW/2,y-litW/2);
    g.save();hexPath(g,x,y,S);g.clip();for(i=0;i<5;i++){var a=hash(c,r,20+i),b=hash(c,r,40+i);g.fillStyle=(i%2?'rgba(255,240,190,.07)':'rgba(30,20,0,.07)');g.beginPath();g.ellipse(x-S*.7+a*S*1.4,y-S*.7+b*S*1.4,S*.35,S*.12,a*3,0,PI*2);g.fill()}
    if(t==='snow'){g.fillStyle='rgba(62,98,128,.18)';g.beginPath();g.ellipse(x+S*.18,y+S*.12,S*.4,S*.18,0,0,PI*2);g.fill()}
    else if(t==='sand'){g.fillStyle='rgba(110,62,18,.16)';g.beginPath();g.ellipse(x+S*.16,y+S*.1,S*.46,S*.16,-.25,0,PI*2);g.fill()}
