@@ -179,7 +179,7 @@ function chestOpen(o){var i=o.i,w=PW(),sp={name:'Treasure chest',icon:'🎁'};
  w.chests[i]=1;P().xp+=25;E.award('seal_'+A.levels[i].id);chime('+25 XP');chestFx(o,'Seal found!');E.save();hud();say(sp,['You found the Seal of '+R.name+'! +25 XP and a badge.'])}
 function bossTalk(){var B=C.castle.boss;
  if(!allDone())return say(B,['You are not ready. Clear all '+NR+' regions first.']);
- say(B,bossDone()?['You have faced us already, and did well. Care to try for a higher score?']:['So you have crossed the whole realm. I am '+B.name+'.',B.title+'. Make your five choices wisely.'],function(){ask(B,bossDone()?'Face the challenge again?':'Begin the final challenge?',[{t:'Begin',fn:function(){openOv(function(){E.boss()},function(){if(bossDone()){chime('Well done');say(B,['A fine piece of work. Open the chest by the wall, and take your crown.'])}})}},{t:'Not yet'}])})}
+ say(B,bossDone()?['You have faced us already, and did well. Care to try for a higher score?']:['So you have crossed the whole realm. I am '+B.name+'.',B.title+'. Make your five choices wisely.'],function(){var was=bossDone();ask(B,was?'Face the challenge again?':'Begin the final challenge?',[{t:'Begin',fn:function(){openOv(function(){E.boss()},function(){if(bossDone()){chime('Well done');if(!was){var hp=scr(st.hero.x,st.hero.y-S*.5);cele({msg:'Well done',vfx:'shockwave',x:hp[0],y:hp[1],confetti:false})}say(B,['A fine piece of work. Open the chest by the wall, and take your crown.'])}})}},{t:'Not yet'}])})}
 function interact(o){
  if(o.role==='teacher')teacherTalk(region());
  else if(o.role==='gate'||o.role==='hall'&&region()<NR)gateTalk(region());
@@ -343,13 +343,14 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
   if(o.type==='npc'){var fc=h.x<x?-1:1,dx=Math.abs(h.x-x),dy=Math.abs(h.y-y),near=dx<S*2.2&&dy<S*2.2,cheer=near&&motionOn()&&!h.mv&&st.celUntil>T;Art.figure(g,x,y,o.sp.look,{t:T+o.c*.7,face:fc,wave:!cheer&&near&&motionOn()?.5+.5*Math.sin(T*3+o.c):0,celebrate:cheer});
    var nd=Math.max(dx,dy)/S,al=motionOn()?(nd>=3?0:nd>2.2?(3-nd)/.8:1):(nd<3?1:0);
    if(al>0.04){var pl=namePlate(g,o.name);g.globalAlpha=al;g.drawImage(pl,x-pl._w/2,y-S*1.45-16,pl._w,pl._h);g.globalAlpha=1}}
-  else{var op=drawOp;op.accent=o.accent;op.t=T;op.pine=o.pine;op.snow=o.snow;op.v=o.v;op.landmark=o.landmark;op.biome=o.type==='node'?bio(o.i):null;op.open=op.glow=op.locked=op.lid=op.lit=op.lift=void 0;
+  else{var op=drawOp;op.accent=o.accent;op.t=T;op.pine=o.pine;op.snow=o.snow;op.v=o.v;op.landmark=o.landmark;op.biome=o.type==='node'?bio(o.i):null;op.open=op.glow=op.locked=op.lid=op.lit=op.lift=op.cheer=void 0;
    if(o.type==='chest'){op.open=!!w.chests[o.i];op.glow=!op.open&&(o.i>=NR?bossDone():levelDone(o.i));op.locked=!op.open&&!(o.i>=NR?bossDone():levelDone(o.i));if(!motionOn())op.lid=op.open?1:0;else{if(op.open&&o._wasOpen===false)o._lid=0;if(o._lid!=null&&o._lid<1){o._lid=Math.min(1,o._lid+(st.dtRaw||0)/.38);op.lid=o._lid;if(o._lid>=1)o._litAt=T}else if(op.open)op.lid=1;if(!op.open&&o._nudge>0){o._nudge=Math.max(0,o._nudge-(st.dtRaw||0));op.lid=Math.sin((.28-o._nudge)/.28*Math.PI)*.14}}o._wasOpen=op.open}
    if(o.role==='hall')op.lit=o.kind==='great'?bossDone():levelDone(region());
    if(o.type==='cache'&&w.caches[o.i])continue;
    if(o.type==='node'){var cl=o.i<NR?levelDone(o.i):bossDone();if(cl)op.accent='#c9a24f'}
    if(o.kind==='gate'){var gt=Art.hdist(h.c,h.r,o.c,o.r)<=2?1:0;if(o._lift==null)o._lift=0;if(!motionOn())o._lift=gt;else if(o._lift!==gt){var gd=gt-o._lift;o._lift+=Math.sign(gd)*Math.min(Math.abs(gd),(st.dtRaw||0)*2.6)}op.lift=o._lift}
    Art.building(g,o.kind,x,y,op);
+   if(motionOn()&&Art.groundLight){var dxh=x-h.x,dyh=y-h.y;op.kind=o.kind;op.seed=o.c*5+o.r*3;op.cheer=st.celUntil>T&&dxh*dxh+dyh*dyh<S*S*18?Math.max(0,(st.celUntil-T)/2.4):0;Art.groundLight(g,x,y,op)}
    if(o.type==='chest'&&o._litAt!=null&&motionOn()){var cage=T-o._litAt;if(cage<1.6)chestPool(g,x,y,cage<.2?1:Math.max(0,1-(cage-.2)/1.4))}
    if(o.type==='node'&&(zoneOpen(o.i)||st.fog[o.i]<.8)){var nm=o.i<NR?C.regions[o.i].name:C.castle.name,cl2=o.i<NR?levelDone(o.i):bossDone(),label=(cl2?'★ ':'')+nm,by=y-S*(o.kind==='castle'?2.7:2.15),pl2=placePlate(label,cl2);
     g.drawImage(pl2,x-pl2._w/2,by-13,pl2._w,pl2._h);g.lineWidth=1.3;g.beginPath();g.rect(x-pl2._w/2,by-13,pl2._w,21);if(cl2&&motionOn()){g.strokeStyle='#f3e2b0';g.globalAlpha=.55+.45*Math.abs(Math.sin(T*2));g.stroke();g.globalAlpha=1}else{g.strokeStyle='#c8a86a';g.stroke()}}}}

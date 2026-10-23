@@ -99,7 +99,7 @@ function portrait(look,size){var key=JSON.stringify(look)+size;if(pc[key])return
 
 /* animated figure, feet at (x, y+0.38S). Chunky, friendly proportions (big head, short body) with a soft ink outline so characters read at small sizes.
    o: {t, moving, face:1|-1, step, hop, foot, turn, wave, celebrate}.
-   When step is set, one stride matches one hex and hop lifts the body only. A turn squashes sideways. Idle stirs hair, hood, plume, cap, crown and beard.
+   When step is set, one stride matches one hex, the leading foot lifts, and hop lifts the body only. A turn squashes sideways. Idle stirs hair, hood, plume, cap, crown and beard.
    A celebrate pose leaves a gold pool on the ground. The pool stays put while the body hops. */
 var OUT='rgba(28,18,12,.88)';
 function oFill(g,fill,lw){g.fillStyle=fill;g.fill();g.strokeStyle=OUT;g.lineWidth=lw;g.lineJoin='round';g.lineCap='round';g.stroke()}
@@ -117,8 +117,9 @@ function figure(g,x,y,look,o){look=look||{};o=o||{};var u=S/34,t=o.t||0,mv=!!o.m
  g.translate(0,-lift);
  if(has&&o.step>.82)g.scale(1.05,.94);
  if(o.turn>0){var ts=.34+.66*(1-Math.min(1,o.turn));g.scale(ts,1)}
- var sw=phase*3.4*u;limb(g,-2.6*u,-9*u,-2.6*u+sw*.6,-1.6*u,3.4*u,robeD,lw);limb(g,2.6*u,-9*u,2.6*u-sw*.6,-1.6*u,3.4*u,robeD,lw);
- [[-2.6*u+sw*.6,-1],[2.6*u-sw*.6,1]].forEach(function(b){g.beginPath();g.ellipse(b[0]+f*.8*u,-1.2*u,2.8*u,1.9*u,0,0,PI*2);oFill(g,'#4a2f1c',lw*.8)});
+ var sw=phase*3.4*u,up=4.2*u,lUp=Math.max(0,phase)*up,rUp=Math.max(0,-phase)*up,lx=-2.6*u+sw*.6,ly=-1.6*u-lUp,rx=2.6*u-sw*.6,ry=-1.6*u-rUp;
+ limb(g,-2.6*u,-9*u,lx,ly,3.4*u,robeD,lw);limb(g,2.6*u,-9*u,rx,ry,3.4*u,robeD,lw);
+ [[lx,ly],[rx,ry]].forEach(function(b){g.beginPath();g.ellipse(b[0]+f*.8*u,b[1]+.4*u,2.8*u,1.9*u,0,0,PI*2);oFill(g,'#4a2f1c',lw*.8)});
  if(look.cape){var cs=(mv?phase*1.5:Math.sin(t*1.6+(x||0))*1.6)*u;g.beginPath();g.moveTo(-6*u,-24*u);g.quadraticCurveTo(-f*9*u,-14*u,-f*10*u+cs-f*2*u,-4*u);g.lineTo(f*3*u+cs,-4.5*u);g.lineTo(6*u,-24*u);g.closePath();oFill(g,mix(look.cape,'#000000',.15),lw)}
  var as=phase*4*u,armC=mix(robe,'#000000',.18),wave=o.wave||0,raise=!cel&&wave>.35;
  if(cel){limb(g,-5.5*u,-21*u,-10*u,-31*u-Math.sin(t*7)*1.5*u,3.2*u,armC,lw)}
@@ -255,5 +256,23 @@ function building(g,kind,x,y,o){o=o||{};if(kind==='rock'||(kind==='tree'&&!o.lan
  else if(kind==='cache'){var b=1+.12*Math.sin(t*3);g.fillStyle='#6a4a22';g.fillRect(-8*u,-10*u,16*u,10*u);g.fillStyle='#8a6528';g.fillRect(-8*u,-10*u,16*u,3*u);g.fillStyle='#d7b56a';g.fillRect(-1.5*u,-8*u,3*u,4*u);ell(g,0,-16*u*b,3*u,3*u,'rgba(243,226,176,.8)')}
  else if(kind==='chest'){var lid=typeof o.lid==='number'?Math.max(0,Math.min(1,o.lid)):(o.open?1:0);g.fillStyle='#6a4a22';g.fillRect(-12*u,-12*u,24*u,12*u);g.fillStyle='#8a6528';g.fillRect(-12*u,-12*u,24*u,3*u);g.fillStyle='#d7b56a';g.fillRect(-12*u,-6*u,24*u,2*u);if(lid>.04)ell(g,0,-13*u,9*u,3*u,'#f3e2b0');g.save();g.translate(0,-12*u);g.rotate(-lid*1.15);g.fillStyle='#7a5628';g.beginPath();g.moveTo(-12*u,0);g.quadraticCurveTo(0,-14*u,12*u,0);g.fill();if(lid<.45){g.fillStyle='#d7b56a';g.fillRect(-2*u,-2*u,4*u,5*u)}g.restore();if(o.glow&&lid<.2){var gl=.5+.5*Math.sin(t*4);var cg=g.createRadialGradient(0,-12*u,1,0,-12*u,26*u);cg.addColorStop(0,'rgba(255,230,140,'+(.45*gl)+')');cg.addColorStop(1,'rgba(255,230,140,0)');g.fillStyle=cg;g.fillRect(-28*u,-38*u,56*u,52*u)}if(lid>.16&&lid<.96){var oa=(.96-lid)/.8,og=g.createRadialGradient(0,-4*u,10*u,0,2*u,36*u);og.addColorStop(0,'rgba(255,236,170,'+(.9*oa)+')');og.addColorStop(1,'rgba(255,236,170,0)');g.fillStyle=og;g.beginPath();g.ellipse(0,2*u,30*u,11*u,0,0,PI*2);g.fill()}if(o.locked){g.fillStyle='#2a1d0a';g.fillRect(-3*u,-10*u,6*u,6*u)}}
  g.restore();if(slot){slot.ph=slot.want;host.drawImage(slot.cv,ax-70,ay+S*.5-140,140,160)}}
-window.Art={S:S,SQ3:SQ3,hash:hash,vnoise:vnoise,hx:hx,hy:hy,neigh:neigh,hdist:hdist,px2hex:px2hex,hline:hline,hexPath:hexPath,paintScene:paintScene,portrait:portrait,figure:figure,building:building,COL:COL,ell:ell,mix:mix};
+/* A soft pool of light on the ground, drawn live so each lamp flickers on its own beat.
+   The building picture can stay cached. Low effects draws nothing here. cheer (0 to 1) brightens a win. */
+function groundLight(g,x,y,o){if(FX.low)return;o=o||{};var kind=o.kind,lm=o.landmark,warm=0,col='255,220,140',lift=S*.45,rad=S*.85;
+ if(kind==='smithy'){warm=.5;col='255,160,60';lift=S*.35}
+ else if(kind==='tower'){warm=.4;lift=S*1.05;rad=S*1.05}
+ else if(kind==='chest'&&o.glow&&!(o.lid>.2)){warm=.48;lift=S*.32}
+ else if(kind==='tree'&&lm==='marsh'){warm=.58;col='255,196,90';lift=S*.7}
+ else if(kind==='tree'&&lm==='desert'){warm=.4;lift=S*1.15;rad=S*.7}
+ else if(kind==='tree'&&lm==='tundra'){warm=.36;col='210,235,255';lift=S*.95}
+ else if(kind==='town'&&o.biome==='highland'){warm=.34;lift=S*.85}
+ var cheer=o.cheer||0;
+ if(cheer>0&&(warm>0||kind==='fountain'||kind==='hall'||kind==='castle'||kind==='chest'||kind==='great'))warm=Math.max(warm,.22)+cheer*.5;
+ if(warm<.04)return;
+ var ph=(o.t||0)*(kind==='smithy'?8:lm==='marsh'?6:2.5)+(o.seed||0)*1.7,fl=.62+.38*Math.sin(ph),a=warm*fl;
+ if(cheer>0){rad*=1+cheer*.4;a=Math.min(1,a+cheer*.15)}
+ var gy=y+S*.5-lift,rg=g.createRadialGradient(x,gy,S*.06,x,y+S*.2,rad);
+ rg.addColorStop(0,'rgba('+col+','+(a*.62)+')');rg.addColorStop(1,'rgba('+col+',0)');
+ g.fillStyle=rg;g.beginPath();g.ellipse(x,y+S*.42,rad,rad*.36,0,0,PI*2);g.fill()}
+window.Art={S:S,SQ3:SQ3,hash:hash,vnoise:vnoise,hx:hx,hy:hy,neigh:neigh,hdist:hdist,px2hex:px2hex,hline:hline,hexPath:hexPath,paintScene:paintScene,portrait:portrait,figure:figure,building:building,groundLight:groundLight,COL:COL,ell:ell,mix:mix};
 })();
