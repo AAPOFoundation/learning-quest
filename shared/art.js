@@ -200,7 +200,7 @@ function selfTestCam(){var errs=[],near=function(a,b){return Math.abs(a-b)<1e-4}
 /* portraits: painted head-and-shoulders busts (r2). Rendered at the screen's pixel density (at least 2x, at most 3x) so they stay crisp on
    retina, with soft gradients, a warm key light from the upper left, a cool rim light on the right, brush-dab texture and catch-lit eyes.
    Same look object as the map figure (skin, hair, robe, trim, cape, hat, beard), so hero and NPCs stay consistent. Cached as data URLs. */
-var pc={},MOODS={neutral:1,happy:1,thinking:1,surprised:1};
+var pc={},MOODS={neutral:1,happy:1,thinking:1,surprised:1,encouraging:1};
 /* stable per-NPC variety: hair style, skin tone, eye colour and outfit colours picked from a hash of the NPC's id (its name), so each NPC
    looks different from the others but always the same. The hero is never passed through this. */
 var SKINS=['#f3d2b8','#efc4a0','#e2b48c','#d9a97c','#c99568','#b07c54','#8f5e3e','#6e4630'],EYES=['#5a3a22','#3f6a8a','#4a6a3a','#6a4a2a','#2f2a26','#5a5a7a'],
@@ -267,12 +267,13 @@ function paintBust(g,L,s,seed,mood){mood=mood||'neutral';var ST=L.style||'short'
   E(x,y,5*eo,5.6*eo,'#fbf6ee');g.save();g.beginPath();g.ellipse(x,y,5*eo,5.6*eo,0,0,P*2);g.clip();
   var ix=x+.6+gx,iy=y+.8+gy,ir=mood==='surprised'?.85:1;
   var ig=g.createRadialGradient(ix,iy+.4,.5,ix,iy,4.4*ir);ig.addColorStop(0,mix(iris,'#ffffff',.35));ig.addColorStop(.7,iris);ig.addColorStop(1,mix(iris,'#000',.5));E(ix,iy,4.2*ir,4.6*ir,ig);E(ix,iy+.1,2*ir,2.2*ir,'#140c08');
-  if(mood!=='surprised')E(x,y-4,6,2.4,'rgba(60,30,30,.25)');g.restore();E(ix-1.5,iy-2,1.4,1.4,'#ffffff');E(ix+1.4,iy+1.4,.6,.6,'rgba(255,255,255,.85)');
+  if(mood==='encouraging')E(x,y-4.4,6.4,3.4,skin);if(mood!=='surprised')E(x,y-4,6,2.4,'rgba(60,30,30,.25)');g.restore();E(ix-1.5,iy-2,1.4,1.4,'#ffffff');E(ix+1.4,iy+1.4,.6,.6,'rgba(255,255,255,.85)');
   g.strokeStyle='#2a1610';g.lineWidth=1.5;g.lineCap='round';g.beginPath();g.ellipse(x,y,5.2*eo,5.8*eo,0,P*1.08,P*1.92);g.stroke()});
  /* brows */
  g.strokeStyle=mix(hair,'#000',.2);g.lineWidth=1.8;g.lineCap='round';g.beginPath();
  if(mood==='surprised'){g.moveTo(35,33.5);g.quadraticCurveTo(41,30,46,33);g.moveTo(54,33);g.quadraticCurveTo(59,30,65,33.5)}
  else if(mood==='thinking'){g.moveTo(36,38);g.quadraticCurveTo(41,37,46,38);g.moveTo(54,35);g.quadraticCurveTo(59,31.5,64,34)}
+ else if(mood==='encouraging'){g.moveTo(36,37.6);g.quadraticCurveTo(41,36.4,46,34.6);g.moveTo(54,34.6);g.quadraticCurveTo(59,36.4,64,37.6)}
  else if(mood==='happy'){g.moveTo(36,36.5);g.quadraticCurveTo(41,33.5,46,36);g.moveTo(54,36);g.quadraticCurveTo(59,33.5,64,36.5)}
  else{g.moveTo(36,37.5);g.quadraticCurveTo(41,35,46,37);g.moveTo(54,37);g.quadraticCurveTo(59,35,64,37.5)}g.stroke();
  /* nose: shadow on the right, highlight on the bridge */
@@ -280,6 +281,7 @@ function paintBust(g,L,s,seed,mood){mood=mood||'neutral';var ST=L.style||'short'
  function mouth(dy){g.save();g.translate(0,dy);g.lineCap='round';
   if(mood==='happy'){g.fillStyle='#7a2a26';g.beginPath();g.moveTo(42,57);g.quadraticCurveTo(50,68,58,57);g.quadraticCurveTo(50,59.5,42,57);g.fill();g.strokeStyle='rgba(90,30,24,.85)';g.lineWidth=1;g.stroke();g.fillStyle='#fbf6ee';g.beginPath();g.moveTo(44,58);g.quadraticCurveTo(50,60.4,56,58);g.lineTo(55,60);g.quadraticCurveTo(50,61.4,45,60);g.closePath();g.fill();E(50,64.2,3.4,1.4,'rgba(255,150,140,.85)')}
   else if(mood==='surprised'){E(50,60,3.6,4.4,'#6a2420');E(50,62.2,2.2,1.6,'rgba(255,150,140,.7)');g.strokeStyle='rgba(90,30,24,.85)';g.lineWidth=1;g.beginPath();g.ellipse(50,60,3.6,4.4,0,0,P*2);g.stroke()}
+  else if(mood==='encouraging'){g.strokeStyle='rgba(110,40,34,.9)';g.lineWidth=1.7;g.beginPath();g.moveTo(43,58);g.quadraticCurveTo(50,63.4,57,58);g.stroke();g.lineWidth=1;g.beginPath();g.moveTo(42.2,57.2);g.lineTo(43.4,58.6);g.moveTo(57.8,57.2);g.lineTo(56.6,58.6);g.stroke()}
   else if(mood==='thinking'){g.strokeStyle='rgba(110,40,34,.9)';g.lineWidth=1.6;g.beginPath();g.moveTo(46,60);g.quadraticCurveTo(51,58.6,56,59.4);g.stroke()}
   else{g.fillStyle='#8a3a32';g.beginPath();g.moveTo(44,58);g.quadraticCurveTo(50,64.5,56,58);g.quadraticCurveTo(50,60,44,58);g.fill();g.strokeStyle='rgba(90,30,24,.8)';g.lineWidth=1;g.stroke();E(50,61,2.4,.8,'rgba(255,170,160,.6)')}
   g.restore()}
@@ -307,6 +309,7 @@ function paintBust(g,L,s,seed,mood){mood=mood||'neutral';var ST=L.style||'short'
  /* front style pieces */
  if(HV&&ST==='braids'){[[29,1],[71,-1]].forEach(function(b){for(var q=0;q<5;q++){var by=54+q*6,bx=b[0]+b[1]*q*.4;E(bx,by,4.2,3.6,q%2?hair:hairD);E(bx-1,by-1,1.6,1,'rgba(255,240,210,.35)')}E(b[0]+b[1]*2,86,2.6,2,trim)})}
  if(HV&&ST==='spiky'&&hat!=='scholar'&&hat!=='crown'){g.fillStyle=hair;g.strokeStyle=INK;g.lineWidth=1;[[34,24,30,12,42,20],[44,20,46,7,54,19],[54,19,62,8,64,24],[62,22,74,16,70,30]].forEach(function(t){g.beginPath();g.moveTo(t[0],t[1]);g.lineTo(t[2],t[3]);g.lineTo(t[4],t[5]);g.closePath();g.fill();g.stroke()})}
+ if(mood==='encouraging'){g.fillStyle='rgba(255,150,170,.9)';g.beginPath();g.moveTo(86,24);g.bezierCurveTo(78,18,80,11,86,15);g.bezierCurveTo(92,11,94,18,86,24);g.fill();E(83.6,15.6,1.2,.8,'rgba(255,255,255,.7)')}
  if(mood==='thinking'){E(82,22,3.2,3.2,'rgba(255,248,230,.85)');E(88,14,2.2,2.2,'rgba(255,248,230,.75)');E(92,8,1.4,1.4,'rgba(255,248,230,.65)')}
  if(mood==='surprised'){g.strokeStyle='rgba(255,240,170,.9)';g.lineWidth=1.8;g.lineCap='round';[[80,20,88,14],[84,28,93,27],[78,13,82,5]].forEach(function(l){g.beginPath();g.moveTo(l[0],l[1]);g.lineTo(l[2],l[3]);g.stroke()})}
  if(mood==='happy'&&!low){[[84,18],[16,22]].forEach(function(p,i){var r=i?2.2:3;g.fillStyle='rgba(255,236,160,.9)';g.beginPath();g.moveTo(p[0],p[1]-r*2);g.lineTo(p[0]+r*.6,p[1]);g.lineTo(p[0],p[1]+r*2);g.lineTo(p[0]-r*.6,p[1]);g.closePath();g.fill()})}
@@ -493,6 +496,32 @@ function landmark(g,b,u,ac,t){g.save();
  else if(b==='highland'){ell(g,0,0,10*u,4*u,'rgba(0,0,0,.25)');for(var i=0;i<4;i++){var w=(9-i*2)*u;g.fillStyle=i%2?'#8d877c':'#a9a294';g.fillRect(-w/2,-(i+1)*6*u,w,6*u)}flag(g,0,-24*u,12*u,ac,t,u)}
  g.restore()}
 
+var psil=null,PAINTED={castle:[-56,56,-124,14],great:[-48,48,-100,12],tower:[-24,24,-100,10],hall:[-34,34,-56,10]},LMBOX=[-26,26,-56,10],pcv=null,pol=null,ptex=null;
+function brushTex(){if(ptex)return ptex;var c=document.createElement('canvas');c.width=c.height=64;var x=c.getContext('2d');for(var i=0;i<140;i++){x.fillStyle=i%2?'rgba(255,240,210,.5)':'rgba(30,20,10,.5)';x.save();x.translate(hash(i,1,77)*64,hash(i,2,77)*64);x.rotate(hash(i,3,77)*PI);x.fillRect(-4,-.6,8,1.2);x.restore()}ptex=c;return c}
+/* painted(g, x, y, box, draw): draw(c) paints in map coordinates onto an offscreen canvas at the current screen scale; the result gets the
+   ink outline, light glaze and brush texture and is composited at the same place. box=[left,right,top,bottom] in tile units (u) relative to
+   (x, y+S/2). Returns false (draws nothing) when it cannot help: Low effects, rotated transforms, or a sprite that would be too big. */
+function painted(g,x,y,box,draw,opt){if(FX.low||!g.getTransform)return false;var m=g.getTransform();if(Math.abs(m.b)>1e-6||Math.abs(m.c)>1e-6)return false;
+ var u=S/34,sc=m.a,bx=x+box[0]*u,by=y+S*.5+box[2]*u,bw=(box[1]-box[0])*u,bh=(box[3]-box[2])*u,W=Math.ceil(bw*sc)+8,H=Math.ceil(bh*sc)+8;
+ if(W>2048||H>2048||W<8)return false;
+ if(!pcv){pcv=document.createElement('canvas');pol=document.createElement('canvas')}
+ if(pcv.width<W||pcv.height<H){pcv.width=pol.width=Math.max(W,pcv.width);pcv.height=pol.height=Math.max(H,pcv.height)}
+ var c=pcv.getContext('2d'),q=pol.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,W+2,H+2);q.setTransform(1,0,0,1,0,0);q.clearRect(0,0,W+2,H+2);
+ c.setTransform(sc,0,0,sc,(-bx)*sc+4,(-by)*sc+4);
+ /* opt.dropShadows: skip the drawing's own translucent black ground shadows (they would be outlined and darkened) and lay one soft shadow on the map instead */
+ if(opt&&opt.dropShadows){ell(g,x+1.5*S/34,y+S*.5+1*S/34,(opt.shadowW||16)*S/34,(opt.shadowW||16)*.38*S/34,'rgba(10,16,8,.26)');var f0=c.fill;c.fill=function(){var fs=c.fillStyle;if(typeof fs==='string'&&/^rgba\(0, 0, 0, 0?\.[0-3]\d*\)$/.test(fs))return;return f0.apply(c,arguments)};try{draw(c)}finally{delete c.fill}}
+ else draw(c);
+ c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';
+ var lg=c.createLinearGradient(0,0,W,0);lg.addColorStop(0,'rgba(255,226,170,.22)');lg.addColorStop(.45,'rgba(255,226,170,0)');lg.addColorStop(.62,'rgba(30,40,90,0)');lg.addColorStop(1,'rgba(30,40,90,.26)');c.fillStyle=lg;c.fillRect(0,0,W,H);
+ var tg=c.createLinearGradient(0,0,0,H);tg.addColorStop(0,'rgba(255,240,200,.12)');tg.addColorStop(.7,'rgba(0,0,0,0)');tg.addColorStop(1,'rgba(20,10,0,.18)');c.fillStyle=tg;c.fillRect(0,0,W,H);
+ c.globalAlpha=.07;c.fillStyle=c.createPattern(brushTex(),'repeat');c.fillRect(0,0,W,H);c.globalAlpha=1;c.globalCompositeOperation='source-over';
+ /* silhouette with alpha cubed, so soft see-through bits (ground shadows, glows) barely count and only solid shapes get the ink line */
+ if(!psil)psil=document.createElement('canvas');if(psil.width<pcv.width||psil.height<pcv.height){psil.width=pcv.width;psil.height=pcv.height}
+ var sl=psil.getContext('2d');sl.setTransform(1,0,0,1,0,0);sl.globalCompositeOperation='source-over';sl.clearRect(0,0,W+2,H+2);sl.drawImage(pcv,0,0);sl.globalCompositeOperation='destination-in';sl.drawImage(pcv,0,0);sl.drawImage(pcv,0,0);sl.globalCompositeOperation='source-over';
+ var d=Math.max(1,Math.round(sc*.55));[[d,0],[-d,0],[0,d],[0,-d],[d,d],[-d,d],[d,-d],[-d,-d]].forEach(function(v){q.drawImage(psil,0,0,W,H,v[0],v[1],W,H)});
+ q.globalCompositeOperation='destination-out';q.drawImage(pcv,0,0);q.globalCompositeOperation='source-over';
+ q.globalCompositeOperation='source-in';q.fillStyle='rgba(30,20,14,.78)';q.fillRect(0,0,W,H);q.globalCompositeOperation='source-over';
+ var dx=Math.round(m.a*bx+m.e-4),dy=Math.round(m.d*by+m.f-4);g.save();g.setTransform(1,0,0,1,0,0);g.drawImage(pol,0,0,W,H,dx,dy,W,H);g.drawImage(pcv,0,0,W,H,dx,dy,W,H);g.restore();return true}
 /* buildings and props. (x,y)=hex centre. Static trees and rocks are stamped once (2x) and blitted.
    Other buildings are painted into a shared 2x sprite and blitted. Sails, jets, smoke, cloth, windows and glints are drawn on top each frame, so that picture stays still. A forge flame and a glowing chest still redraw about 15 times a second. Low effects skips the cache and draws live. A chest lid mid-swing and the town gate stay live so those motions stay smooth. */
 var bslots={},bcount=0,bclock=0,BW=280,BH=320;
@@ -585,5 +614,5 @@ var GMAP={'🌱':'seed','⭐':'star','🔥':'flame','🗺️':'map','🗺':'map'
 function LQMark(icon,z){if(!icon)return '';z=z||28;var k=GLYPH[icon]?icon:(GMAP[icon]||'');if(!k||!GLYPH[k])return '';
  return '<svg class="mk" viewBox="0 0 24 24" width="'+z+'" height="'+z+'" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+GLYPH[k]+'</svg>'}
 window.LQMark=LQMark;
-window.Art={npcLook:npcLook,S:S,SQ3:SQ3,hash:hash,vnoise:vnoise,hx:hx,hy:hy,neigh:neigh,hdist:hdist,px2hex:px2hex,hline:hline,hexPath:hexPath,paintScene:paintScene,portrait:portrait,figure:figure,building:building,groundLight:groundLight,COL:COL,ell:ell,mix:mix,CAM:CAM,project:project,unproject:unproject,groundH:groundH,podium:podium,selfTestCam:selfTestCam,stoneBase:stoneBase,camSkew:camSkew};
+window.Art={npcLook:npcLook,painted:painted,S:S,SQ3:SQ3,hash:hash,vnoise:vnoise,hx:hx,hy:hy,neigh:neigh,hdist:hdist,px2hex:px2hex,hline:hline,hexPath:hexPath,paintScene:paintScene,portrait:portrait,figure:figure,building:building,groundLight:groundLight,COL:COL,ell:ell,mix:mix,CAM:CAM,project:project,unproject:unproject,groundH:groundH,podium:podium,selfTestCam:selfTestCam,stoneBase:stoneBase,camSkew:camSkew};
 })();

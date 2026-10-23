@@ -136,7 +136,7 @@ function nextLine(){D.full=D.lines.shift();D.choices=null;draw0()}
 function plate(icon){var mk=window.LQMark&&LQMark(icon||'scroll',40);return '<div class="plate">'+(mk||esc(icon||''))+'</div>'}
 /* NPC look with stable per-name variety, and a portrait mood read from the line being spoken (neutral when unsure) */
 function nl(sp){return sp&&sp.look&&Art.npcLook?Art.npcLook(sp.look,sp.name):(sp&&sp.look)}
-function moodOf(t,q){t=String(t||'');if(/(you found|well done|well studied|you have passed|correct|great work|nicely done|excellent|\+\d+ XP|welcome|well met|hello)/i.test(t))return 'happy';if(/(halt|sealed|locked|oh!|whoa|wow)/i.test(t))return 'surprised';if(q||/\?\s*$/.test(t))return 'thinking';return 'neutral'}
+function moodOf(t,q){t=String(t||'');if(/(you found|well done|well studied|you have passed|correct|great work|nicely done|excellent|\+\d+ XP|welcome|well met|hello)/i.test(t))return 'happy';if(/(not this time|not quite|try again|almost|nearly|no penalty|have another go|keep going|not ready)/i.test(t))return 'encouraging';if(/(halt|sealed|locked|oh!|whoa|wow)/i.test(t))return 'surprised';if(q||/\?\s*$/.test(t))return 'thinking';return 'neutral'}
 function draw0(){var el=$('#dlg'),sp=D.sp||{};el.hidden=false;D.i=0;D.typing=true;D.shown=0;document.body.classList.add('indlg');
  var mood=sp.look?moodOf(D.full,!!D.choices):'',who=(sp.name||'')+'|'+(sp.look?JSON.stringify(sp.look):(sp.mark||sp.icon||''))+'|'+mood;
  if(el.dataset.who===who&&el.querySelector('.body')){el.querySelector('.body').textContent='';var ch=el.querySelector('.ch');if(ch)ch.innerHTML='';var more=el.querySelector('.more');if(more)more.remove();if(!motionOn())finishType();return}
