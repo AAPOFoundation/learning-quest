@@ -55,6 +55,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 45. **A locked chest nudges its lid.** Trying a sealed chest lifts the lid a little, then it shuts, over about a quarter of a second. An open chest and a quiet setting do not nudge. The half-open lid stays live, so it is not baked into the building picture.
 46. **Final-challenge choices arrive in turn.** Each choice rises a little after the one above, the same way a quiz choice does. The result screen is unchanged. Reduced motion removes the rise.
 47. **A lesson page fades in.** Moving to the next page of a lesson fades the panel in. Only the opacity changes, so the page does not jump. Low effects and reduced motion show it at once. Other panels, including the word list, are left alone.
+48. **A wrong choice settles sideways.** A correct choice still pops in place. A wrong one shifts a few pixels right, then left, then rests. The page itself does not shake. Reduced motion removes it.
 
 ## Checked
 
