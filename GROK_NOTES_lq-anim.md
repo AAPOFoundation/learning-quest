@@ -86,6 +86,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 76. **Example buttons rise.** Run on a small example, the scratchpad Run, and the primer's Run, Check and Fill buttons rise. A second and third button in the same row wait a moment. The rise lets go, so a press can still sink. Reduced motion removes it.
 77. **A guide, a spoken line and a clip fade in.** The lesson guide fades when it is ready. The spoken line fades when it appears. A short clip fades in, and Skip picks up a lighter edge, then sinks a pixel while it is held. Reduced motion removes all of it. The spoken line stays centred.
 78. **The sound icon pops when it changes.** Turning sound on or off plays a short pop on the new icon. The first paint of the map does not play it. Low effects and reduced motion skip it.
+79. **Workshop actions rise, and the text box eases.** Build the chain rises. Write 5 sentences rises, then Same dials, new luck. The sample text picks up the same gold edge as a code box. Reduced motion removes all of it. The odds bars were already easing.
 
 ## Checked
 
@@ -93,4 +94,4 @@ Headless Edge still opened Python Basics after the later motion edits: the title
 
 ## Not done
 
-No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings still move, but in full effects they move from a shared sprite at about 15 frames a second rather than being redrawn every frame. Headless Edge loaded the two lesson charts: 16 step dots, 60 score dots, the bowl stayed put, and both the step dot and the threshold line moved when the dial changed. That run did not wait for the slide to finish. The review deck, the pause menu, the dialogue box, the hood sway and the later button rises were syntax-checked and not clicked. Nothing was tried on a phone.
+No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings still move, but in full effects they move from a shared sprite at about 15 frames a second rather than being redrawn every frame. Headless Edge loaded the two lesson charts: 16 step dots, 60 score dots, the bowl stayed put, and both the step dot and the threshold line moved when the dial changed. That run did not wait for the slide to finish. The review deck, the pause menu, the dialogue box, the hood sway, the crown tip and the later button rises were syntax-checked and not clicked. A later headless dump did not start. Nothing was tried on a phone.

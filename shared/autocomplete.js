@@ -22,13 +22,13 @@ function workshop(host){
  host.innerHTML='<section class="panel sim"><p class="kicker">Simulator</p><h3>Autocomplete Workshop</h3>'
  +'<p class="dim small">A language model is, at heart, a very large autocomplete: given the words so far it scores every possible next piece and picks one. Here is a tiny one. <b>Step 1</b>: it reads some text and counts which word follows which. <b>Step 2</b>: you choose how adventurous the pick is.</p>'
  +'<p class="small dim">1. Text to learn from (edit it, then Build)</p><textarea id="ac-t" rows="5" style="width:100%;background:#0a0f15;color:inherit;border:1px solid #6b4a0e;border-radius:8px;padding:8px" spellcheck="false">'+esc(SAMPLE)+'</textarea>'
- +'<p><button class="btn btn-ghost btn-sm" id="ac-b">Build the chain</button> <span class="small dim" id="ac-info"></span></p>'
+ +'<p><button class="btn btn-ghost btn-sm" id="ac-b" style="animation:pop .22s ease backwards">Build the chain</button> <span class="small dim" id="ac-info"></span></p>'
  +'<p class="small dim">2. Next-word odds</p><div class="sim-row"><label>Words so far end with <select id="ac-w"></select></label></div>'
  +'<div class="sim-row"><label>Temperature: <b id="ac-tv">1.0</b> <span class="dim small">(low = stick to the likeliest, high = flatter odds)</span><input type="range" id="ac-T" min="0.2" max="3" step="0.1" value="1"></label></div>'
  +'<div class="sim-row"><label>Top-k: <b id="ac-kv">all</b> <span class="dim small">(keep only the k likeliest words)</span><input type="range" id="ac-k" min="1" max="10" step="1" value="10"></label></div>'
  +'<div class="sim-row"><label>Top-p: <b id="ac-pv">1.00</b> <span class="dim small">(keep the smallest group whose odds add up to p)</span><input type="range" id="ac-p" min="0.1" max="1" step="0.05" value="1"></label></div>'
  +'<div id="ac-bars"></div>'
- +'<p class="small dim">3. Generate</p><p><button class="btn btn-primary btn-sm" id="ac-g">Write 5 sentences</button> <button class="btn btn-ghost btn-sm" id="ac-g2">Same dials, new luck</button></p><div id="ac-out" class="ex" style="white-space:pre-wrap"></div>'
+ +'<p class="small dim">3. Generate</p><p><button class="btn btn-primary btn-sm" id="ac-g" style="animation:pop .22s ease backwards">Write 5 sentences</button> <button class="btn btn-ghost btn-sm" id="ac-g2" style="animation:pop .22s ease backwards;animation-delay:.06s">Same dials, new luck</button></p><div id="ac-out" class="ex" style="white-space:pre-wrap"></div>'
  +'<p class="small dim" id="ac-note">Try this: set temperature to 0.2 and generate twice: the text barely changes. Then temperature 3 with top-k and top-p all the way up: odd word choices appear. Then keep the temperature high but set top-k to 2: the oddest choices are cut off. Real models do the same cutting on far bigger lists.</p></section>';
  var $=function(s){return host.querySelector(s)};
  function fillWords(){var ks=Object.keys(chain.m).sort(),sel=$('#ac-w'),keep=st.start;sel.innerHTML=ks.map(function(k){return '<option value="'+esc(k)+'">'+esc(k==='.'?'. (sentence end)':k)+'</option>'}).join('');if(ks.indexOf(keep)<0)keep=ks.indexOf('the')>=0?'the':ks[0];st.start=keep;sel.value=keep;
