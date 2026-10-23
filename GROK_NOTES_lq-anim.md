@@ -92,6 +92,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 82. **Retry and Skip rise.** When Python cannot run, Retry rises, then Skip this challenge. The rise lets go, so a press can still sink. Reduced motion removes it.
 83. **Copied gives a small pop.** After a copy, the button word changes to Copied and the button pops, then the old word comes back. Reduced motion removes the pop. The word change stays.
 84. **Figures share one limb.** Each figure used to build a new limb function every frame. One shared limb draws the same legs and arms.
+85. **The loop stepper and the two benches rise.** Step rises, then Reset. Each new log line rises once. Older lines stay still, and a reset does not play it again. Autocomplete Workshop rises, then Context Bench. Switching benches does not play the rise again. The rise lets go, so a press can still sink. Reduced motion removes it.
 
 ## Checked
 
@@ -99,4 +100,4 @@ Headless Edge still opened Python Basics after the later motion edits: the title
 
 ## Not done
 
-No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings still move, but in full effects they move from a shared sprite at about 15 frames a second rather than being redrawn every frame. Headless Edge loaded the two lesson charts: 16 step dots, 60 score dots, the bowl stayed put, and both the step dot and the threshold line moved when the dial changed. That run did not wait for the slide to finish. The review deck, the pause menu, the dialogue box, the hood sway, the crown tip, the later button rises and the shared limb were syntax-checked and not clicked. A later headless dump did not start. Nothing was tried on a phone.
+No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings still move, but in full effects they move from a shared sprite at about 15 frames a second rather than being redrawn every frame. Headless Edge loaded the two lesson charts: 16 step dots, 60 score dots, the bowl stayed put, and both the step dot and the threshold line moved when the dial changed. That run did not wait for the slide to finish. The review deck, the pause menu, the dialogue box, the hood sway, the crown tip, the later button rises, the shared limb and the stepper were syntax-checked and not clicked. A later headless dump did not start. Nothing was tried on a phone.
