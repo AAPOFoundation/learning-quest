@@ -483,10 +483,12 @@ function cupMesh(){
  return pack(b);
 }
 function crateMesh(){
- var b=new Builder(), wood=hex('#8a5a32'), dark=hex('#5c3a22');
+ var b=new Builder(), wood=hex('#8a5a32'), dark=hex('#5c3a22'), slat=hex('#6b4428');
  b.box(0,0.16,0,0.36,0.32,0.28,wood,0);
  b.box(0,0.33,0,0.38,0.045,0.3,dark,0);
- b.box(0,0.2,-0.145,0.22,0.035,0.02,dark,0);
+ b.box(0,0.18,-0.16,0.3,0.045,0.03,dark,0);
+ b.box(-0.11,0.16,-0.165,0.08,0.26,0.035,slat,0);
+ b.box(0.11,0.16,-0.165,0.08,0.26,0.035,slat,0);
  return pack(b);
 }
 function pennantMesh(){
@@ -608,7 +610,7 @@ function buildCamp(opts){
  put(shade,-1.6,0,1.2,0,1.45,'shadow');
  put(bedMesh(),-2.85,0,-0.85,0.35,1.3,'bed');
  put(chestMesh(),-2.25,0,-0.45,-0.55,1,'chest');
- put(crateMesh(),-3.05,0,0.55,0.4,1,'crate');
+ put(crateMesh(),-1.75,0,-1.65,0.15,1.15,'crate');
  put(fireMesh(),0.12,0,-1.5,0.4,1,'fire');
  put(potMesh(),0.12,0,-1.5,0.3,1,'pot');
  put(shade,0.12,0,-1.5,0,0.7,'shadow');

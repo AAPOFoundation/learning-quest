@@ -55,3 +55,4 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 - The tree helper returned a second pine and round-tree after those meshes were already framed and committed. Kept the framed version. The helper did not edit the file.
 - The bedroll sat behind the tent and rarely showed. It now lies at (-2.85, 0, -0.85), scale 1.3. A meadow frame calls it a red bedroll to the right of the tent.
 - A hills frame after the pine branch, cape, book, cup and woodpile still reads as a camp: pines, grey rocks, a cairn, and the same people. Not tried on a phone.
+- The crate was a plain box behind the tent. Two dark slats now sit on the front, and the crate stands at (-1.75, 0, -1.65), scale 1.15, so the camp camera sees the boards. A meadow frame calls it a wooden crate with planks beside the fire.
