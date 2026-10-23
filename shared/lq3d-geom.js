@@ -408,12 +408,21 @@ function fernMesh(){
  return pack(b);
 }
 function waterMesh(r){
- var b=new Builder(), col=hex('#2a6e78'), rim=hex('#8fd0cc'), seg=16, i, a0, a1, r0=r*0.78;
+ var b=new Builder(), col=hex('#2a6e78'), rim=hex('#8fd0cc'), rip=hex('#d5f4f2'), seg=16, i, a0, a1, r0=r*0.78;
  for(i=0;i<seg;i++){
   a0=i/seg*TAU; a1=(i+1)/seg*TAU;
   b.polyOut([[0,0.045,0],[Math.cos(a0)*r0,0.048,Math.sin(a0)*r0],[Math.cos(a1)*r0,0.048,Math.sin(a1)*r0]],[0,-4,0],col,0.35);
   b.polyOut([[Math.cos(a0)*r0,0.048,Math.sin(a0)*r0],[Math.cos(a0)*r,0.055,Math.sin(a0)*r],[Math.cos(a1)*r,0.055,Math.sin(a1)*r],[Math.cos(a1)*r0,0.048,Math.sin(a1)*r0]],[0,-4,0],rim,0.35);
  }
+ function arc(rad){
+  var s, w=r*0.035, u0, u1;
+  for(s=0;s<12;s++){
+   if(s%4===0)continue;
+   u0=s/12*TAU; u1=(s+1)/12*TAU;
+   b.polyOut([[Math.cos(u0)*(rad-w),0.07,Math.sin(u0)*(rad-w)],[Math.cos(u0)*(rad+w),0.07,Math.sin(u0)*(rad+w)],[Math.cos(u1)*(rad+w),0.07,Math.sin(u1)*(rad+w)],[Math.cos(u1)*(rad-w),0.07,Math.sin(u1)*(rad-w)]],[0,-3,0],rip,0.35);
+  }
+ }
+ arc(r*0.42); arc(r*0.62);
  return pack(b);
 }
 function lilyMesh(){
