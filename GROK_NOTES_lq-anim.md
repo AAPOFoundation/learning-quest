@@ -77,6 +77,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 67. **Run and Check rise.** On a Python challenge, Run rises, then Check. The rise lets go, so a press can still sink. Reduced motion removes it.
 68. **The map draw loop reuses its place.** Each frame used to build a new function to paint the figures and buildings. A plain loop fills the same list. A collected cache is still skipped, and the picture does not change.
 69. **Close rises when a page opens.** The close button in the corner rises with the page. The rise lets go, so a press can still sink it. It does not rise again while the page stays open. Reduced motion removes it.
+70. **Pause rows let go after they rise.** Each pause-menu row still arrives just after the one above it. The rise no longer holds the button, so a press can sink it. Reduced motion removes the rise.
 
 ## Checked
 
