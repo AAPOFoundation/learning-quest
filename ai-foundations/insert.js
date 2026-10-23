@@ -1,7 +1,8 @@
 /* Adds Fluency Fields (4 habits for working with AI, citation and flattery checks, Autocomplete Workshop) after the last Foundations region. */
 (function(){var K=window.InsertKit,A=window.APP;if(!K||!window.NEWLV||!window.NEWLV.lF)return;var lk=K.lk;
-var R={lF:{name:'Fluency Fields',biome:'meadow',accent:'#6a8a3a',
- teacher:{name:'Steward Lio',title:'Keeper of the Four Habits',look:lk('#e3b896','#7a3b22','#3d6b4f','scholar')},
+var look=lk('#e3b896','#7a3b22','#3d6b4f','scholar');look.cape='#6a8a3a';
+var R={lF:{name:'Fluency Fields',biome:'meadow',accent:'#6a8a3a',tint:'#6a8a3a',motif:'quill',
+ teacher:{name:'Steward Lio',title:'Keeper of the Four Habits',look:look},
  gate:{name:'Warden Check',title:'Gatekeeper of the Fields',look:lk('#c99568','#2a2118','#33425a','helm',true)},
  guide:{name:'Ada the Gleaner',look:lk('#e8bd94','#5a3a20','#8a6a4a','cap'),hint:'Tip: whatever an AI tells you, look for the specific that you can check: a name, a number, a source. That is where the mistakes hide.'},
  hall:'Habit Hall',hallKind:'guild',
