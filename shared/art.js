@@ -107,7 +107,7 @@ function figure(g,x,y,look,o){var u=S/34,t=o.t||0,mv=o.moving,f=o.face||1,cel=!!
  g.save();g.translate(x,y+S*.38);
  /* contact shadow. Full effects casts it down-right, the same way as the key light (upper left). flat keeps the round shadow for portraits. Low effects keeps the old centred blob. */
  var sh=1-Math.min(1,bob/(12*u));
- if(!FX.low&&!o.flat){ell(g,6.5*u*sh,2.8*u,14*u*sh,4.1*u*sh,'rgba(8,10,16,.36)');ell(g,2.2*u*sh,1.1*u,6.2*u*sh,2*u*sh,'rgba(8,10,16,.2)');}
+ if(!FX.low&&!o.flat){ell(g,9*u*sh,4.2*u,15*u*sh,4.4*u*sh,'rgba(8,10,16,.40)');ell(g,3.2*u*sh,1.6*u,6.4*u*sh,2.1*u*sh,'rgba(8,10,16,.22)');}
  else{ell(g,0,.5*u,11*u*sh,3.6*u*sh,'rgba(10,8,4,.32)');ell(g,0,.5*u,6*u*sh,2*u*sh,'rgba(10,8,4,.25)');}
  g.translate(0,-bob);
  /* legs + boots */
@@ -224,7 +224,7 @@ function landmark(g,b,u,ac,t){g.save();
 /* buildings and props. (x,y)=hex centre. */
 function building(g,kind,x,y,o){var u=S/34,ac=o.accent||'#b5532f',t=o.t||0;g.save();g.translate(x,y+S*.5);
  if(FX.low){ell(g,4*u,1*u,29*u,8*u,'rgba(10,16,8,.22)');ell(g,0,0,24*u,6*u,'rgba(10,16,8,.22)');}
- else{ell(g,10*u,3.2*u,32*u,7.2*u,'rgba(8,10,16,.30)');ell(g,3*u,1.2*u,20*u,5*u,'rgba(8,10,16,.18)');}
+ else{ell(g,12*u,4.4*u,34*u,7.6*u,'rgba(8,10,16,.34)');ell(g,4*u,1.6*u,20*u,5*u,'rgba(8,10,16,.18)');}
  function wall(x0,w,h,col){wallG(g,x0,0,w,h,col)}
  function roof(x0,w,h,top,col){tri(g,x0-3*u,top,x0+w/2,top-h,x0+w+3*u,top,col);tri(g,x0+w/2,top-h,x0+w+3*u,top,x0+w/2+1,top,'rgba(0,0,0,.28)')}
  if(kind==='hall'){wall(-24*u,48*u,24*u,'#d9cfb6');g.fillStyle='#c9bf9f';g.fillRect(-27*u,-3*u,54*u,3*u);g.fillRect(-26*u,-27*u,52*u,3*u);

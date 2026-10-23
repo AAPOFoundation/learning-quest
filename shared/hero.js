@@ -40,9 +40,9 @@ function draw(){var full=X1-X0,z=Math.max(W/full,H/(S*1.5*6.8)),vw=W/z,vh=H/z,to
  g.setTransform(1,0,0,1,0,0);if(ov)g.drawImage(ov,0,0);
  if(window.LQLight){var ls=[],ss=[],scz=z*dpr,wy=hy(3);
   function PL(wx,wyy,rad,col){ls.push({x:(wx-cx)*scz,y:(wyy-cy)*scz,r:rad*scz,c:col})}
-  PL(hxp,wy-S*.15,64,[0.32,0.22,0.08]);ss.push({x:(hxp+7-cx)*scz,y:(wy+S*.55-cy)*scz,r:16*scz});
-  for(var ti=0;ti<TOWNS.length;ti++)PL(hx(TOWNS[ti].c,TOWNS[ti].r),hy(TOWNS[ti].r)-S*.4,40,[0.28,0.2,0.07]);
-  PL(hx(CAST.c,CAST.r),hy(CAST.r)-S*.8,78,[0.46,0.32,0.1]);
+  PL(hxp,wy-S*.15,48,[0.18,0.12,0.045]);ss.push({x:(hxp+9-cx)*scz,y:(wy+S*.38+4.2-cy)*scz,r:15*scz});
+  for(var ti=0;ti<TOWNS.length;ti++)PL(hx(TOWNS[ti].c,TOWNS[ti].r),hy(TOWNS[ti].r)-S*.4,36,[0.24,0.17,0.06]);
+  PL(hx(CAST.c,CAST.r),hy(CAST.r)-S*.8,70,[0.36,0.26,0.08]);
   LQLight.frame(cv,ls,ss,'home',cv.parentNode)}}
 function frame(ts){if(!running)return;requestAnimationFrame(frame);var dt=Math.min(.1,(ts-last)/1000||0);last=ts;acc+=dt;if(acc<1/30)return;T+=acc;acc=0;draw()}
 function update(){var want=!still()&&visible&&!document.hidden;if(want&&!running){running=true;last=performance.now();requestAnimationFrame(frame)}else if(!want){running=false;draw()}}
