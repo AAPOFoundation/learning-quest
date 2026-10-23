@@ -22,7 +22,7 @@ function review(el){
    var c=deck[i],q=c.q,order=shuffle(q.opts.map(function(_,k){return k}));
    var h='<div class="panel lesson lq-enter"><p class="kicker">'+(boss?'Mixed round ':'Review ')+(i+1)+' of '+deck.length+' &middot; '+esc(c.level)+'</p><div class="bar" role="progressbar" aria-label="Round progress" aria-valuemin="0" aria-valuemax="'+deck.length+'" aria-valuenow="'+i+'" style="margin:0 0 12px"><i style="width:0%"></i></div><p><b>'+q.q+'</b></p>'+(q.ex?'<div class="ex">'+esc(q.ex)+'</div>':'');
    order.forEach(function(k,n){h+='<button class="opt" data-k="'+k+'" style="animation:pop .22s ease backwards;animation-delay:'+(n*40)+'ms">'+q.opts[k]+'</button>'});
-   h+='<div id="rv-fb"></div></div>';el.innerHTML=h;
+   h+='<div id="rv-fb"></div></div>';el.innerHTML=h;var rbi=el.querySelector('.bar i');if(rbi){var rw=Math.round(100*i/Math.max(1,deck.length));requestAnimationFrame(function(){rbi.style.width=rw+'%'})}
    el.querySelectorAll('.opt').forEach(function(b){b.onclick=function(){var k=+b.getAttribute('data-k'),ok=k===q.a;
     el.querySelectorAll('.opt').forEach(function(x){x.disabled=true;x.style.animation='';var kk=+x.getAttribute('data-k');if(kk===q.a)x.className+=' ok';else if(x===b)x.className+=' no'});
     var s=st[c.id]||{box:0};s.box=ok?Math.min(s.box+1,GAP.length-1):0;s.due=Date.now()+GAP[s.box]*DAY;st[c.id]=s;store(st);if(ok)right++;
