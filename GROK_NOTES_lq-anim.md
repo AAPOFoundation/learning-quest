@@ -87,6 +87,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 77. **A guide, a spoken line and a clip fade in.** The lesson guide fades when it is ready. The spoken line fades when it appears. A short clip fades in, and Skip picks up a lighter edge, then sinks a pixel while it is held. Reduced motion removes all of it. The spoken line stays centred.
 78. **The sound icon pops when it changes.** Turning sound on or off plays a short pop on the new icon. The first paint of the map does not play it. Low effects and reduced motion skip it.
 79. **Workshop actions rise, and the text box eases.** Build the chain rises. Write 5 sentences rises, then Same dials, new luck. The sample text picks up the same gold edge as a code box. Reduced motion removes all of it. The odds bars were already easing.
+80. **An expedition note eases its edge.** The note you write on a stage uses the same dark field as the other boxes, and it picks up the gold edge. Reduced motion removes the ease. The word-list search is still left alone.
 
 ## Checked
 
