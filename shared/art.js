@@ -11,6 +11,15 @@ function hash(a,b,s){var h=(Math.imul(a|0,374761393)+Math.imul(b|0,668265263)+Ma
 function vnoise(x,y,s){var x0=Math.floor(x),y0=Math.floor(y),fx=x-x0,fy=y-y0;fx=fx*fx*(3-2*fx);fy=fy*fy*(3-2*fy);var a=hash(x0,y0,s),b=hash(x0+1,y0,s),c=hash(x0,y0+1,s),d=hash(x0+1,y0+1,s);return a+(b-a)*fx+(c-a)*fy+(a-b-c+d)*fx*fy}
 function hx(c,r){return S*SQ3*(c+0.5*(r&1))+S*SQ3/2}
 function hy(r){return S*1.5*r+S}
+/* Angled three-quarter camera. One projection for the relief, sprites and taps.
+   World +x is east, +y is south. View Y grows down. Height lifts straight up, so a cliff face is vertical.
+   vx = x + shear * y.  vy = y * v - h.
+   shear -0.36: a point 100px further south sits 36px to the left. v 0.62: north-south ground shrinks to 62%.
+   Pinned: project(100, 200, 40) is (28, 84). unproject(28, 124) is (100, 200). */
+var CAM={shear:-0.36,v:0.62};
+function groundH(t){switch(t){case 'water':return 0;case 'sand':case 'marsh':return 3;case 'snow':return 6;case 'plaza':return 6;case 'forest':return 14;case 'pine':return 18;case 'hills':return 26;case 'mountain':return 42;default:return 5}}
+function project(x,y,h){return {x:x+CAM.shear*y,y:y*CAM.v-(h||0)}}
+function unproject(vx,vy){var y=vy/CAM.v;return {x:vx-CAM.shear*y,y:y}}
 var DE=[[1,0],[-1,0],[0,-1],[-1,-1],[0,1],[-1,1]],DO=[[1,0],[-1,0],[1,-1],[0,-1],[1,1],[0,1]];
 function neigh(c,r,d){var v=(r&1?DO:DE)[d];return [c+v[0],r+v[1]]}
 function cube(c,r){var x=c-(r-(r&1))/2;return [x,-x-r,r]}
@@ -40,14 +49,13 @@ function bevel(g,x,y){var a=corner(x,y,3),b=corner(x,y,4),c=corner(x,y,5),d=corn
 function paintScene(sc){
  var W=Math.ceil(S*SQ3*(sc.cols+.5))+2,H=Math.ceil(S*1.5*sc.rows+S*.6)+2,cv=document.createElement('canvas');cv.width=W;cv.height=H;var g=cv.getContext('2d');
  var bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#1d3a4c');bg.addColorStop(1,'#0f2030');g.fillStyle=bg;g.fillRect(0,0,W,H);
- var c,r,t,x,y,h1,h2,i,decos=[],lift=[],busy={};if(!FX.low){(sc.roads||[]).forEach(function(rd){rd.forEach(function(p){busy[p[0]+','+p[1]]=1})});(sc.plaza||[]).forEach(function(p){busy[p[0]+','+p[1]]=1});(sc.objs||[]).forEach(function(o){busy[o.c+','+o.r]=1})}
+ var c,r,t,x,y,h1,h2,i,decos=[],busy={};if(!FX.low){(sc.roads||[]).forEach(function(rd){rd.forEach(function(p){busy[p[0]+','+p[1]]=1})});(sc.plaza||[]).forEach(function(p){busy[p[0]+','+p[1]]=1});(sc.objs||[]).forEach(function(o){busy[o.c+','+o.r]=1})}
  for(r=0;r<sc.rows;r++)for(c=0;c<sc.cols;c++){t=sc.t[c][r];x=hx(c,r);y=hy(r);h1=hash(c,r,sc.seed);h2=hash(c,r,sc.seed+7);
   var base=COL[t==='pine'?'forest':t]||COL.grass;
   if(t==='forest'||t==='pine'){base=COL.forest}
   var f=.9+h1*.2,n2=0;if(!FX.low){f=.84+vnoise(c*.3,r*.3,sc.seed)*.22+h1*.08;n2=vnoise(c*.22+9,r*.22,sc.seed+3)}
   hexPath(g,x,y,S*1.03);g.fillStyle=rgb(base,f);g.fill();
   if(!FX.low&&(n2>.56||n2<.4)){g.fillStyle=n2>.56?'rgba(255,226,150,'+((n2-.56)*.5).toFixed(3)+')':'rgba(50,90,150,'+((.4-n2)*.5).toFixed(3)+')';g.fill()}
-  if(!FX.low&&(t==='mountain'||t==='hills'||t==='forest'||t==='pine'))lift.push([y,x,t==='mountain'?4:t==='hills'?3:2,base,f]);
   if(t==='water'){var gr=g.createRadialGradient(x-S*.2,y-S*.3,2,x,y,S);gr.addColorStop(0,'rgba(140,215,240,.32)');gr.addColorStop(1,'rgba(10,40,80,.22)');g.fillStyle=gr;g.fill();
    g.strokeStyle='rgba(235,248,255,.16)';g.lineWidth=1.2;for(i=0;i<2;i++){var wx=x-S*.5+hash(c,r,i+3)*S,wy=y-S*.4+hash(c,r,i+9)*S*.8;g.beginPath();g.moveTo(wx-6,wy);g.quadraticCurveTo(wx,wy-3,wx+6,wy);g.stroke()}}
   else{var gr2=g.createRadialGradient(x-S*.3,y-S*.4,2,x,y,S*1.05);gr2.addColorStop(0,'rgba(255,246,214,.16)');gr2.addColorStop(1,'rgba(20,14,0,.12)');hexPath(g,x,y,S*1.03);g.fillStyle=gr2;g.fill();
@@ -56,12 +64,6 @@ function paintScene(sc){
   if(t==='forest')decos.push([y,'forest',x,y,h1,h2]);else if(t==='pine')decos.push([y,'pine',x,y,h1,h2]);else if(t==='mountain')decos.push([y,'mountain',x,y,h1,h2]);else if(t==='hills')decos.push([y,'hills',x,y,h1,h2]);
   else if(t==='grass'||t==='crown'){if(h1<.16)decos.push([y,'lone',x,y,h1,h2])}else if(t==='sand'){if(h1<.5)decos.push([y,'dune',x,y,h1,h2]);if(h2<.1)decos.push([y,'rock',x,y,h1,h2])}else if(t==='snow'){if(h1<.4)decos.push([y,'drift',x,y,h1,h2])}else if(t==='marsh'){decos.push([y,'reed',x,y,h1,h2])}
   if(!FX.low&&!busy[c+','+r])props(decos,t,x,y,c,r,sc.seed)}
- /* raised tiles (mountain, hills, forest): a side wall, a soft shadow and the top lifted a few pixels */
- lift.sort(function(a,b){return a[0]-b[0]});
- lift.forEach(function(d){var y0=d[0],x0=d[1],e=d[2],bs=d[3],ff=d[4],k,p;ell(g,x0+S*.12,y0+S*.9,S*.85,S*.26,'rgba(0,0,0,.2)');
-  var gw=g.createLinearGradient(x0-S,0,x0+S,0);gw.addColorStop(0,rgb(bs,ff*.62));gw.addColorStop(1,rgb(bs,ff*.4));g.fillStyle=gw;g.beginPath();
-  for(k=4;k>=0;k--){p=corner(x0,y0,k);k===4?g.moveTo(p[0],p[1]):g.lineTo(p[0],p[1])}for(k=0;k<5;k++){p=corner(x0,y0,k);g.lineTo(p[0],p[1]+e)}g.closePath();g.fill();
-  hexPath(g,x0,y0-e,S*1.01);g.fillStyle=rgb(bs,ff);g.fill();var l2=g.createRadialGradient(x0-S*.3,y0-e-S*.4,2,x0,y0-e,S*1.05);l2.addColorStop(0,'rgba(255,246,214,.16)');l2.addColorStop(1,'rgba(20,14,0,.12)');g.fillStyle=l2;g.fill();bevel(g,x0,y0-e)});
  /* shoreline foam */
  for(r=0;r<sc.rows;r++)for(c=0;c<sc.cols;c++){t=sc.t[c][r];if(t==='water')continue;x=hx(c,r);y=hy(r);for(i=0;i<6;i++){var n=neigh(c,r,i),nt=(n[0]>=0&&n[1]>=0&&n[0]<sc.cols&&n[1]<sc.rows)?sc.t[n[0]][n[1]]:null;if(nt==='water'){var p=corner(x,y,EDGE[i][0]),q=corner(x,y,EDGE[i][1]);g.strokeStyle='rgba(245,238,210,.5)';g.lineWidth=3;g.lineCap='round';g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(q[0],q[1]);g.stroke();g.strokeStyle='rgba(120,90,40,.35)';g.lineWidth=1;g.stroke()}}}
  /* roads */
@@ -84,7 +86,61 @@ function paintScene(sc){
   var dg=g.createLinearGradient(0,0,W,H);dg.addColorStop(.5,'rgba(20,30,70,0)');dg.addColorStop(1,'rgba(20,30,70,.2)');g.fillStyle=dg;g.fillRect(0,0,W,H)}
  /* grain */
  for(i=0;i<W*H/260;i++){g.fillStyle=Math.random()<.5?'rgba(255,245,210,.05)':'rgba(10,8,0,.05)';g.fillRect(Math.random()*W,Math.random()*H,2,2)}
- sc.cv=cv;sc.W=W;sc.H=H}
+ sc.cv=cv;sc.W=W;sc.H=H;paintRelief(sc)}
+/* Low-poly relief in the three-quarter projection. Tops are the painted tiles, lifted by groundH.
+   A drop to a lower neighbour becomes two cliff triangles (lit and shaded). Back faces sit under the cap.
+   sc.relief === false skips this (the home strip stays flat). Low effects skips it too. */
+function paintRelief(sc){
+ if(FX.low||sc.relief===false){sc.view=null;sc.fogView=null;return}
+ var pad=28,minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9,c,r,x,y,h,k,a,q;
+ for(r=0;r<sc.rows;r++)for(c=0;c<sc.cols;c++){x=hx(c,r);y=hy(r);h=groundH(sc.t[c][r]);
+  for(k=0;k<6;k++){a=(60*k-30)*PI/180;var p0=project(x+S*Math.cos(a),y+S*Math.sin(a),0),p1=project(x+S*Math.cos(a),y+S*Math.sin(a),h);
+   if(p0.x<minX)minX=p0.x;if(p1.x<minX)minX=p1.x;if(p0.y<minY)minY=p0.y;if(p1.y<minY)minY=p1.y;
+   if(p0.x>maxX)maxX=p0.x;if(p1.x>maxX)maxX=p1.x;if(p0.y>maxY)maxY=p0.y;if(p1.y>maxY)maxY=p1.y}}
+ var ox=pad-minX,oy=pad-minY,W=Math.ceil(maxX-minX+pad*2),Hh=Math.ceil(maxY-minY+pad*2);
+ var cv=document.createElement('canvas');cv.width=Math.max(1,W);cv.height=Math.max(1,Hh);var g=cv.getContext('2d');
+ var bg=g.createLinearGradient(0,0,0,Hh);bg.addColorStop(0,'#1d3a4c');bg.addColorStop(1,'#0f2030');g.fillStyle=bg;g.fillRect(0,0,cv.width,cv.height);
+ var tiles=[];for(r=0;r<sc.rows;r++)for(c=0;c<sc.cols;c++)tiles.push([hy(r),c,r]);
+ tiles.sort(function(a,b){return a[0]-b[0]||a[1]-b[1]});
+ var groups={},heights=[];
+ for(var i=0;i<tiles.length;i++){c=tiles[i][1];r=tiles[i][2];x=hx(c,r);y=hy(r);h=groundH(sc.t[c][r]);var base=COL[sc.t[c][r]==='pine'?'forest':sc.t[c][r]]||COL.grass;
+  for(var e=0;e<6;e++){var n=neigh(c,r,e),inside=n[0]>=0&&n[1]>=0&&n[0]<sc.cols&&n[1]<sc.rows,nh=inside?groundH(sc.t[n[0]][n[1]]):0;if(nh>=h-0.5)continue;
+   var ed=EDGE[e],A=corner(x,y,ed[0]),B=corner(x,y,ed[1]);
+   var tA=project(A[0],A[1],h),tB=project(B[0],B[1],h),bA=project(A[0],A[1],nh),bB=project(B[0],B[1],nh);
+   var nx=hx(n[0],n[1])-x,ny=hy(n[1])-y,ln=Math.hypot(nx,ny)||1;nx/=ln;ny/=ln;
+   var lam=nx*-0.55+ny*-0.84,sh=0.38+0.5*(lam*0.5+0.5);
+   var A1=[ox+tA.x,oy+tA.y],B1=[ox+tB.x,oy+tB.y],A0=[ox+bA.x,oy+bA.y],B0=[ox+bB.x,oy+bB.y];
+   g.fillStyle=rgb(base,sh*0.74);g.beginPath();g.moveTo(A1[0],A1[1]);g.lineTo(B1[0],B1[1]);g.lineTo(A0[0],A0[1]);g.closePath();g.fill();
+   g.fillStyle=rgb(base,sh*0.56);g.beginPath();g.moveTo(B1[0],B1[1]);g.lineTo(B0[0],B0[1]);g.lineTo(A0[0],A0[1]);g.closePath();g.fill();
+   g.strokeStyle='rgba(255,244,210,.32)';g.lineWidth=1.3;g.beginPath();g.moveTo(A1[0],A1[1]);g.lineTo(B1[0],B1[1]);g.stroke()}
+  if(!groups[h]){groups[h]=[];heights.push(h)}groups[h].push([c,r])}
+ heights.sort(function(a,b){return a-b});
+ heights.forEach(function(hv){g.save();g.beginPath();groups[hv].forEach(function(cr){var xx=hx(cr[0],cr[1]),yy=hy(cr[1]);
+  for(var k=0;k<6;k++){var ang=(60*k-30)*PI/180;q=project(xx+S*1.05*Math.cos(ang),yy+S*1.05*Math.sin(ang),hv);k?g.lineTo(ox+q.x,oy+q.y):g.moveTo(ox+q.x,oy+q.y)}g.closePath()});
+  g.clip();g.setTransform(1,0,CAM.shear,CAM.v,ox,oy-hv);g.drawImage(sc.cv,0,0);g.restore()});
+ sc.view=cv;sc.viewOx=ox;sc.viewOy=oy}
+/* Low-poly plinth under a building or landmark. (0,0) is the ground contact in upright sprite space.
+   The footprint uses the same shear and v as the ground, then extrudes straight up. West face is lit. */
+function podium(g,kind){var spec={hall:[26,14,8],guild:[24,13,7],smithy:[24,13,7],vault:[22,12,6],tower:[14,12,8],great:[36,16,9],town:[30,16,7],castle:[36,18,10],gate:[24,10,5],fountain:[16,10,4],landmark:[16,12,6]}[kind];if(!spec)return;
+ var u=S/34,hw=spec[0]*u,hd=spec[1]*u,ht=spec[2]*u,sh=CAM.shear,v=CAM.v;
+ function gp(gx,gy,up){return [gx+sh*gy,gy*v-up]}
+ /* Top is the foot line (up 0). The block hangs down-screen so the sprite stands on it. */
+ var p=[gp(-hw,-hd,0),gp(hw,-hd,0),gp(hw,hd,0),gp(-hw,hd,0),gp(-hw,-hd,-ht),gp(hw,-hd,-ht),gp(hw,hd,-ht),gp(-hw,hd,-ht)];
+ function quad(a,b,d,e,col){g.fillStyle=col;g.beginPath();g.moveTo(p[a][0],p[a][1]);g.lineTo(p[b][0],p[b][1]);g.lineTo(p[d][0],p[d][1]);g.lineTo(p[e][0],p[e][1]);g.closePath();g.fill()}
+ quad(3,2,6,7,'#6a5438');quad(0,3,7,4,'#d9cbb0');quad(1,2,6,5,'#3e342c');quad(0,1,2,3,'#efe4cc');
+ g.strokeStyle='#c8a86a';g.lineWidth=Math.max(1,1.1*u);g.beginPath();g.moveTo(p[0][0],p[0][1]);g.lineTo(p[1][0],p[1][1]);g.lineTo(p[2][0],p[2][1]);g.lineTo(p[3][0],p[3][1]);g.closePath();g.stroke()}
+function selfTestCam(){var errs=[],near=function(a,b){return Math.abs(a-b)<1e-4};
+ var p=project(100,200,40);if(!near(p.x,28)||!near(p.y,84))errs.push('pinned project');
+ var u=unproject(28,124);if(!near(u.x,100)||!near(u.y,200))errs.push('pinned unproject');
+ [[10,20,0],[100,400,42],[0,0,5],[800,50,18]].forEach(function(s){var g0=project(s[0],s[1],0),gh=project(s[0],s[1],s[2]);
+  if(!near(gh.x,g0.x))errs.push('height moved x');if(!near(gh.y,g0.y-s[2]))errs.push('height not vertical');
+  var w=unproject(g0.x,g0.y);if(Math.hypot(w.x-s[0],w.y-s[1])>1e-4)errs.push('roundtrip')});
+ var south=project(hx(4,5),hy(5),0),north=project(hx(4,4),hy(4),0);if(!(south.y>north.y))errs.push('south not down-screen');
+ var top=project(50,80,42),bot=project(50,80,5);if(!near(top.x,bot.x)||!near(bot.y-top.y,37))errs.push('cliff');
+ var cap=project(hx(3,4),hy(4),groundH('mountain')),y2=(cap.y+groundH('mountain'))/CAM.v,x2=cap.x-CAM.shear*y2,hit=px2hex(x2,y2);
+ if(hit[0]!==3||hit[1]!==4)errs.push('cap pick '+hit.join(','));
+ if(groundH('mountain')<=groundH('hills')||groundH('hills')<=groundH('forest')||groundH('grass')<=groundH('water'))errs.push('height order');
+ return {ok:!errs.length,errs:errs}}
 
 /* portraits */
 var pc={};
@@ -245,5 +301,5 @@ function building(g,kind,x,y,o){var u=S/34,ac=o.accent||'#b5532f',t=o.t||0;g.sav
  else if(kind==='cache'){var b=1+.12*Math.sin(t*3);g.fillStyle='#6a4a22';g.fillRect(-8*u,-10*u,16*u,10*u);g.fillStyle='#8a6528';g.fillRect(-8*u,-10*u,16*u,3*u);g.fillStyle='#d7b56a';g.fillRect(-1.5*u,-8*u,3*u,4*u);ell(g,0,-16*u*b,3*u,3*u,'rgba(243,226,176,.8)')}
  else if(kind==='chest'){var op=o.open;g.fillStyle='#6a4a22';g.fillRect(-12*u,-12*u,24*u,12*u);g.fillStyle='#8a6528';g.fillRect(-12*u,-12*u,24*u,3*u);g.fillStyle='#d7b56a';g.fillRect(-12*u,-6*u,24*u,2*u);if(op){g.fillStyle='#8a6528';g.beginPath();g.moveTo(-12*u,-12*u);g.lineTo(-10*u,-24*u);g.lineTo(10*u,-24*u);g.lineTo(12*u,-12*u);g.fill();ell(g,0,-13*u,9*u,3*u,'#f3e2b0')}else{g.fillStyle='#7a5628';g.beginPath();g.moveTo(-12*u,-12*u);g.quadraticCurveTo(0,-26*u,12*u,-12*u);g.fill();g.fillStyle='#d7b56a';g.fillRect(-2*u,-14*u,4*u,6*u);if(o.glow){var gl=.5+.5*Math.sin(t*4);var cg=g.createRadialGradient(0,-12*u,1,0,-12*u,26*u);cg.addColorStop(0,'rgba(255,230,140,'+(.45*gl)+')');cg.addColorStop(1,'rgba(255,230,140,0)');g.fillStyle=cg;g.fillRect(-28*u,-38*u,56*u,52*u)}}if(o.locked){g.fillStyle='#2a1d0a';g.fillRect(-3*u,-10*u,6*u,6*u)}}
  g.restore()}
-window.Art={S:S,SQ3:SQ3,hash:hash,vnoise:vnoise,hx:hx,hy:hy,neigh:neigh,hdist:hdist,px2hex:px2hex,hline:hline,hexPath:hexPath,paintScene:paintScene,portrait:portrait,figure:figure,building:building,COL:COL,ell:ell,mix:mix};
+window.Art={S:S,SQ3:SQ3,hash:hash,vnoise:vnoise,hx:hx,hy:hy,neigh:neigh,hdist:hdist,px2hex:px2hex,hline:hline,hexPath:hexPath,paintScene:paintScene,portrait:portrait,figure:figure,building:building,COL:COL,ell:ell,mix:mix,CAM:CAM,project:project,unproject:unproject,groundH:groundH,podium:podium,selfTestCam:selfTestCam};
 })();

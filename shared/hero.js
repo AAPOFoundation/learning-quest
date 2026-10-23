@@ -11,7 +11,7 @@ var HERO={skin:'#e2b48c',hair:'#3b2a1d',robe:'#274a7a',trim:'#d7b56a',cape:'#7a2
 function terrain(){var t=[];for(var c=0;c<COLS;c++){t.push([]);for(var r=0;r<ROWS;r++){var h=hash(c,r,SEED),e=Art.vnoise(c*.35,r*.5,SEED),v='grass';
   if(r>=6&&c<6)v=(r===6&&h<.35)?'grass':'water';else if(r===0&&(c>10||h<.3))v=c>16?'mountain':'hills';else if(c>=14&&c<=17&&r!==3)v=(h<.45?'pine':'snow');else if(c>=5&&c<=8&&r!==3)v=(e>.42?'forest':'grass');else if(c>=10&&c<=12&&r!==3&&h<.4)v='hills';else if(r>=6&&c>=19)v='water';else if(r===7&&c>=7&&c<=10)v='water';t[c].push(v)}}
  TOWNS.concat([CAST]).forEach(function(n){t[n.c][n.r]=n.biome==='tundra'?'snow':'grass'});return t}
-var sc={cols:COLS,rows:ROWS,seed:SEED,t:terrain(),roads:[(function(){var p=[];for(var c=1;c<=CAST.c;c++)p.push([c,3]);return p})()],objs:[],biome:'meadow'};
+var sc={cols:COLS,rows:ROWS,seed:SEED,t:terrain(),roads:[(function(){var p=[];for(var c=1;c<=CAST.c;c++)p.push([c,3]);return p})()],objs:[],biome:'meadow',relief:false};
 sc.objs=TOWNS.map(function(n){return {c:n.c,r:n.r}}).concat([{c:CAST.c,r:CAST.r}]);
 Art.paintScene(sc);
 var W=0,H=0,dpr=1,cam=0,T=0,last=0,acc=0,running=false,visible=true,ov=null,RM=FX.rm||{matches:false};
