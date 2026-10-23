@@ -144,7 +144,7 @@ The map stays painted 2D. WebGL is a post grade on a second canvas, `#lqgl`, not
 
 ### What changed
 
-`shared/fx2.js`. Course grades: Python green-gold, Foundations warm copper, Evals cool blue, Safety dusk amber, Portfolio ledger green. Up to 12 point lights. Glow motes (forest, marsh, crown) and the reward burst record a few lights. `LQLight.error()` is empty when the shader links.
+`shared/fx2.js`. Course grades: Python green-gold, Foundations warm copper, Evals cool blue, Safety dusk amber, Portfolio ledger green. Up to 12 point lights. Glow motes (forest, marsh, crown) and the reward burst record a few lights. The top of the frame cools slightly so the far ground sits back. `LQLight.error()` is empty when the shader links.
 
 `shared/world.js`. Lights on the hero, a glowing or open chest, smithy, tower, lit hall, great hall, castle, vault, landmark and town. The ground shear is −0.36 and the vertical scale is 0.62, pivoted on the hero so a lower tile does not slide off the side. People, buildings and labels stay upright. The tap math uses the same pivot. The minimap stays top-down. On a narrow screen the camera holds the hero at 42% of the height and may scroll past the map edge. A first level clear, a chest and the final challenge dispatch `lq:celebrate`. A party chime does not.
 
@@ -154,7 +154,7 @@ The map stays painted 2D. WebGL is a post grade on a second canvas, `#lqgl`, not
 
 ### Checked
 
-Headless Edge, effects forced full, local static server. Home and all five titles, then Begin on Python and Foundations. Python town at 390×844. No console exceptions. Shader error string empty, overlay visible, WebGL error 0. Tap round-trip error was 0. At 390×844 the guide did not meet the XP panel, the banner did not meet the guide, and the hero feet (about y=354) sat above both. Low effects then hid the overlay and flattened the shear, with no console exception. Begin wrote a save only in that temporary profile. Mark as done was not clicked. Not tested on a real phone, Safari, or Firefox.
+Headless Edge, effects forced full, local static server. Home and all five titles, then Begin on Python and Foundations. Python town at 390×844. No console exceptions. Shader error string empty, overlay visible, WebGL error 0. Tap round-trip error was 0. At 390×844 the guide did not meet the XP panel, the banner did not meet the guide, and the hero feet (about y=354) sat above both. Low effects then hid the overlay and flattened the shear, with no console exception. A later Python load checked the far-ground cool shade: the shader still linked and the page threw nothing. Begin wrote a save only in that temporary profile. Mark as done was not clicked. Not tested on a real phone, Safari, or Firefox.
 
 ### Open for Jensen
 
