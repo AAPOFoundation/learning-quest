@@ -20,12 +20,12 @@ function review(el){
   function show(){if(i>=deck.length){var pct=Math.round(100*right/deck.length);el.innerHTML='<div class="panel lesson"><p class="kicker">'+(boss?'Mixed round':'Review')+' complete</p><h3>'+right+' of '+deck.length+' ('+pct+'%)</h3><p>'+(pct>=80?'Strong. The cards you got right will come back later.':'Good practice. Missed cards return soon; re-read the matching lesson if one keeps slipping.')+'</p><p><button class="btn btn-primary" id="rv-home">Back to deck</button></p></div>';el.querySelector('#rv-home').onclick=home;return}
    var c=deck[i],q=c.q,order=shuffle(q.opts.map(function(_,k){return k}));
    var h='<div class="panel lesson"><p class="kicker">'+(boss?'Mixed round ':'Review ')+(i+1)+' of '+deck.length+' &middot; '+esc(c.level)+'</p><p><b>'+q.q+'</b></p>'+(q.ex?'<div class="ex">'+esc(q.ex)+'</div>':'');
-   order.forEach(function(k){h+='<button class="opt" data-k="'+k+'">'+q.opts[k]+'</button>'});
+   order.forEach(function(k,n){h+='<button class="opt" data-k="'+k+'" style="animation:pop .22s ease both;animation-delay:'+(n*40)+'ms">'+q.opts[k]+'</button>'});
    h+='<div id="rv-fb"></div></div>';el.innerHTML=h;
    el.querySelectorAll('.opt').forEach(function(b){b.onclick=function(){var k=+b.getAttribute('data-k'),ok=k===q.a;
     el.querySelectorAll('.opt').forEach(function(x){x.disabled=true;var kk=+x.getAttribute('data-k');if(kk===q.a)x.className+=' ok';else if(x===b)x.className+=' no'});
     var s=st[c.id]||{box:0};s.box=ok?Math.min(s.box+1,GAP.length-1):0;s.due=Date.now()+GAP[s.box]*DAY;st[c.id]=s;store(st);if(ok)right++;
-    el.querySelector('#rv-fb').innerHTML='<p><b>'+(ok?'Correct.':'Not quite.')+'</b> '+(q.why||'')+'</p><p><button class="btn btn-primary" id="rv-nx">'+(i+1>=deck.length?'Finish':'Next')+'</button></p>';
+    el.querySelector('#rv-fb').innerHTML='<p style="animation:pop .22s ease"><b>'+(ok?'Correct.':'Not quite.')+'</b> '+(q.why||'')+'</p><p style="animation:pop .22s ease both;animation-delay:70ms"><button class="btn btn-primary" id="rv-nx">'+(i+1>=deck.length?'Finish':'Next')+'</button></p>';
     el.querySelector('#rv-nx').onclick=function(){i++;show()}}})}
   show()}
  home()}
