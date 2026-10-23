@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
-  <g fill="none" stroke="#d7b56a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.28">
-    <path d="M78 104 C78 84 64 72 48 78 C60 86 66 98 64 114 C72 108 76 106 78 104 Z"/>
-    <path d="M64 110 C68 98 72 88 76 80"/>
-    <circle cx="100" cy="70" r="2.2" fill="#d7b56a" stroke="none"/>
+  <g fill="none" stroke="#d7b56a" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" opacity="0.26">
+    <path d="M40 118 L48 96 L56 118"/>
+    <path d="M36 104 H60"/>
+    <path d="M48 118 V132"/>
+    <path d="M44 132 H52"/>
+    <path d="M48 100 L48 78"/>
+    <path d="M48 86 L34 72"/>
+    <path d="M48 86 L62 72"/>
+    <path d="M48 86 L34 100"/>
+    <path d="M48 86 L62 100"/>
+    <circle cx="48" cy="86" r="3.2"/>
+    <path d="M108 58 C118 46 132 48 136 60 C140 72 128 78 120 70 C114 64 116 54 124 52"/>
+    <circle cx="122" cy="50" r="3.4"/>
+    <path d="M119 49.2 Q122 51.4 125.2 49"/>
+    <path d="M116 44 Q122 38 128 44"/>
+  </g>
+  <g fill="#d7b56a" opacity="0.16">
+    <circle cx="122" cy="48.6" r="1.1"/>
+    <circle cx="126.2" cy="49.2" r="1.1"/>
   </g>
 </svg>
