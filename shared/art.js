@@ -109,17 +109,17 @@ function portrait(look,size){var key=JSON.stringify(look)+size;if(pc[key])return
  var u=cv.toDataURL();pc[key]=u;return u}
 
 /* animated walking figure, feet at (x, y+0.35S). hop lifts the body only; the shadow stays down. */
+function limb(g,u,px,py,ang,len,col){g.save();g.translate(px,py);g.rotate(ang);g.fillStyle=col;g.fillRect(-1.7*u,0,3.4*u,len);g.restore()}
 function figure(g,x,y,look,o){look=look||{};o=o||{};var u=S/34,t=o.t||0,mv=!!o.moving,f=o.face||1,hop=typeof o.hop==='number'?o.hop:0,has=typeof o.step==='number';
  var phase=mv?(has?Math.sin(o.step*Math.PI)*(o.foot||1):Math.sin(t*10)):0,bob=!mv?Math.sin(t*2+x)*.7*u:(!has?Math.abs(phase)*2*u:0),swing=phase*.55,drag=-f*phase*3*u;
  g.save();g.translate(x,y+S*.38);var sh=Math.max(.55,1-hop/22);ell(g,0,0,11*u*sh,4*u*sh,'rgba(0,0,0,.3)');g.translate(0,-bob-hop);
  if(!mv)g.scale(1,1+Math.sin(t*2.2)*.012);else if(has&&o.step>.82)g.scale(1.04,.94);
  if(o.turn>0){var ts=.34+.66*(1-Math.min(1,o.turn));g.scale(ts,1)}
- function limb(px,py,ang,len,col){g.save();g.translate(px,py);g.rotate(ang);g.fillStyle=col;g.fillRect(-1.7*u,0,3.4*u,len);g.restore()}
- limb(-3.2*u,-6*u,swing,7*u,'#2a1d12');limb(3.2*u,-6*u,-swing,7*u,'#2a1d12');
+ limb(g,u,-3.2*u,-6*u,swing,7*u,'#2a1d12');limb(g,u,3.2*u,-6*u,-swing,7*u,'#2a1d12');
  var skin=look.skin||'#e2b48c',wave=o.wave||0,raise=wave>.35;
- if(raise){limb(8*u*f,-16*u,f>0?-2.15:2.15,8*u,mix(skin,'#000',.1));if(!look.staff)limb(-8*u*f,-16*u,swing*.25,8*u,mix(skin,'#000',.1))}
- else if(!look.staff){limb(-7*u,-16*u,-swing,8*u,mix(skin,'#000',.1));limb(7*u,-16*u,swing,8*u,mix(skin,'#000',.1))}
- else limb(-7*u*f,-16*u,-swing*.5,8*u,mix(skin,'#000',.1));
+ if(raise){limb(g,u,8*u*f,-16*u,f>0?-2.15:2.15,8*u,mix(skin,'#000',.1));if(!look.staff)limb(g,u,-8*u*f,-16*u,swing*.25,8*u,mix(skin,'#000',.1))}
+ else if(!look.staff){limb(g,u,-7*u,-16*u,-swing,8*u,mix(skin,'#000',.1));limb(g,u,7*u,-16*u,swing,8*u,mix(skin,'#000',.1))}
+ else limb(g,u,-7*u*f,-16*u,-swing*.5,8*u,mix(skin,'#000',.1));
  if(look.cape){var br=mv?0:Math.sin(t*1.3+(x||0))*1.6*u;g.fillStyle=look.cape;g.beginPath();g.moveTo(-6*u,-26*u);g.lineTo(6*u,-26*u);g.lineTo(11*u*(-f)+drag+br,-4*u);g.lineTo(-11*u*(-f)*-1+drag+br*.35,-4*u);g.closePath();g.fill()}
  var rb=g.createLinearGradient(-9*u,0,9*u,0);rb.addColorStop(0,mix(look.robe,'#ffffff',.18));rb.addColorStop(1,mix(look.robe,'#000000',.3));g.fillStyle=rb;g.beginPath();g.moveTo(-6*u,-26*u);g.quadraticCurveTo(-11*u,-12*u,-10*u,-4*u);g.lineTo(10*u,-4*u);g.quadraticCurveTo(11*u,-12*u,6*u,-26*u);g.closePath();g.fill();
  g.strokeStyle=look.trim;g.lineWidth=1.6*u;g.beginPath();g.moveTo(-10*u,-4.5*u);g.lineTo(10*u,-4.5*u);g.stroke();g.beginPath();g.moveTo(-6*u,-15*u);g.lineTo(6*u,-15*u);g.stroke();
