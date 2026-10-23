@@ -90,6 +90,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 80. **An expedition note eases its edge.** The note you write on a stage uses the same dark field as the other boxes, and it picks up the gold edge. Reduced motion removes the ease. The word-list search is still left alone.
 81. **Draw 30 words rises.** The temperature toy's draw button rises once when that page opens. The rise lets go, so a press can still sink. Reduced motion removes it. The bars were already easing.
 82. **Retry and Skip rise.** When Python cannot run, Retry rises, then Skip this challenge. The rise lets go, so a press can still sink. Reduced motion removes it.
+83. **Copied gives a small pop.** After a copy, the button word changes to Copied and the button pops, then the old word comes back. Reduced motion removes the pop. The word change stays.
 
 ## Checked
 

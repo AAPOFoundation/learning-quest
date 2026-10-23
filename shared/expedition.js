@@ -5,7 +5,7 @@
 var X=A.expedition;if(!X.camp)X.camp=window.EXPED_CAMP;
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 A.badges=A.badges.concat([{id:'camp',icon:'⛺',name:'Base camp',desc:'Set up Inspect and run the free dry run'},{id:'expedition',icon:'🥾',name:'Expeditioner',desc:'Finish every Expedition stage'}]);
-function copyText(t,btn){var done=function(){var o=btn.textContent;btn.textContent='Copied';setTimeout(function(){btn.textContent=o},1200)};
+function copyText(t,btn){var done=function(){var o=btn.textContent;btn.textContent='Copied';btn.style.animation='none';void btn.offsetWidth;btn.style.animation='optpop .2s ease';setTimeout(function(){btn.textContent=o;btn.style.animation=''},1200)};
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){fallback()});else fallback();
  function fallback(){var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){}ta.remove()}}
 function getFile(name){return fetch('../expedition/'+name).then(function(r){if(!r.ok)throw new Error('missing');return r.text()})}
