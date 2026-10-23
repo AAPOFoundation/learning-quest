@@ -23,7 +23,7 @@ body.world{height:100vh;height:100dvh;overflow:hidden;position:fixed;inset:0;wid
 #tr{position:absolute;right:max(8px,env(safe-area-inset-right));top:8px;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
 #mm{width:150px;height:110px;border:1px solid var(--brass);border-radius:10px;background:#0a0f15;box-shadow:0 0 0 1px var(--brass-ink),0 6px 16px #0008;pointer-events:auto;cursor:pointer}
 #tr .row{display:flex;gap:6px;flex-wrap:nowrap}#tr .row>*{flex:0 0 auto}
-.ib{pointer-events:auto;min-width:44px;min-height:44px;padding:0 10px;font:800 15px var(--font);color:#f4ead8;background:var(--panel);border:1px solid var(--brass-mid);border-radius:10px;cursor:pointer;box-shadow:inset 0 1px #f3e2b01f}
+.ib{pointer-events:auto;min-width:48px;min-height:48px;padding:0 10px;font:800 15px var(--font);color:#f4ead8;background:var(--panel);border:1px solid var(--brass-mid);border-radius:10px;cursor:pointer;box-shadow:inset 0 1px #f3e2b01f}
 .ib:hover,.ib:focus-visible{border-color:var(--gold-hi)}.ib:active{transform:translateY(1px)}
 #area{position:absolute;left:50%;top:14px;transform:translateX(-50%);text-align:center;opacity:0;transition:opacity .6s;pointer-events:none;padding:8px 26px;background:linear-gradient(90deg,transparent,#0a0f15e6 18%,#0a0f15e6 82%,transparent);border-top:1px solid #d7b56a99;border-bottom:1px solid #d7b56a99}
 #area.on{opacity:1}#area .kicker{margin:0;font-size:12px}#area b{font:700 24px/1.1 var(--display);color:var(--gold-hi);letter-spacing:.05em}
@@ -33,7 +33,17 @@ body.world{height:100vh;height:100dvh;overflow:hidden;position:fixed;inset:0;wid
 #acts .ib{width:76px;height:76px;border-radius:50%;font-size:24px;background:linear-gradient(180deg,#ecd28a,#c9a24f 52%,#b08a38);color:#1a1208;border-color:var(--brass-lo)}
 @media (pointer:coarse),(max-width:760px){#pad,#acts{display:grid}#acts{display:flex}}
 body.nopad #pad,body.nopad #acts{display:none!important}
-@media (max-width:560px){#lt{max-width:calc(100vw - 118px);top:76px}#party img.hp{width:42px;height:42px}#pm img{width:17px;height:17px}#mm{width:100px;height:74px}#tr{top:76px}#tr .row{flex-wrap:wrap;width:92px;justify-content:flex-end}.ib{min-width:42px;min-height:42px}#party .nm{font-size:15px}#party .rk{font-size:11px}#area{top:8px;bottom:auto;max-width:calc(100vw - 16px);padding:4px 14px}#area b{font-size:18px}}
+/* phone HUD (r2): a clean top stack. Left column = party + objective, right column = mini-map + a 2x2 grid of 48px buttons.
+   --lq-hud-b (set by guide.js from the real panel sizes) is the bottom edge of that stack; the region banner sits just under it,
+   above the hero (who stays near the middle of the screen), and the guide caption sits above the move pad, so nothing covers the hero or another panel. */
+@media (max-width:560px){#lt{top:max(8px,env(safe-area-inset-top));max-width:none;width:calc(100vw - 128px - env(safe-area-inset-left) - env(safe-area-inset-right))}
+#tr{top:max(8px,env(safe-area-inset-top));width:102px}
+#party{gap:8px}#party img.hp{width:42px;height:42px}#pm img{width:17px;height:17px}#pc img{width:22px;height:22px}
+#mm{width:102px;height:76px}#tr .row{display:grid;grid-template-columns:48px 48px;gap:6px;width:102px}
+#tr .ib{width:48px;height:48px;min-width:48px;min-height:48px;padding:0}
+#party .nm{font-size:16px}#party .rk{font-size:12px}#party .st{font-size:13px;gap:8px}
+#quest{width:100%;box-sizing:border-box;min-height:48px}#quest div{font-size:14px}
+#area{top:calc(var(--lq-hud-b,206px) + 6px);bottom:auto;width:max-content;max-width:calc(100vw - 24px);box-sizing:border-box;padding:6px 18px}#area .kicker{font-size:12px}#area b{font-size:19px;line-height:1.15}}
 #ov{position:fixed;inset:0;z-index:20;overflow:auto;background:#060a0ee6;touch-action:pan-y;user-select:text;-webkit-user-select:text}
 #ov[hidden],#dlg[hidden]{display:none}
 .ovbar{position:sticky;top:0;z-index:2;display:flex;justify-content:flex-end;padding:8px 12px;background:linear-gradient(#060a0e,#060a0e00)}
@@ -63,7 +73,15 @@ body.nopad #pad,body.nopad #acts{display:none!important}
 body.indlg #pad,body.indlg #acts{display:none!important}body.indlg #area{opacity:0!important}
 #narrcap{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:30;max-width:min(680px,92vw);padding:10px 16px;border:1px solid #d7b56a99;border-radius:12px;background:#0a0f15ee;color:#f3ead6;font-size:15px;line-height:1.4;pointer-events:none;display:flex;gap:10px;align-items:baseline}
 #narrcap[hidden]{display:none}#narrcap .who{font:700 12px var(--display);letter-spacing:.1em;text-transform:uppercase;color:#d7b56a;flex:none}
-@media (max-width:560px){#narrcap{bottom:auto;top:62px;font-size:13px}}
+/* while a dialogue is open the guide caption floats just above the dialogue box (--lq-dlg-h from guide.js) instead of under it */
+body.indlg #narrcap{bottom:calc(max(12px,env(safe-area-inset-bottom)) + var(--lq-dlg-h,150px) + 10px)}
+/* phone guide caption (r2): a full-width strip just under the top HUD stack (the map camera often parks the hero low on the screen,
+   above the move pad, so the bottom is not safe). While it shows, the region banner drops below it (--lq-cap-h comes from guide.js).
+   Short phones (<=760px tall) drop the region medallion row (the stats line already says n/N regions) and the banner kicker, so a centred hero stays clear. */
+@media (max-width:560px){#narrcap{top:calc(var(--lq-hud-b,206px) + 6px);bottom:auto;width:calc(100vw - 24px);max-width:none;box-sizing:border-box;font-size:14px;line-height:1.35;padding:8px 12px}
+body:has(#narrcap:not([hidden])) #area{top:calc(var(--lq-hud-b,206px) + var(--lq-cap-h,60px) + 12px)}
+body.indlg #narrcap{bottom:auto}
+@media (max-height:760px){#pm{display:none}#mm{height:60px}#narrcap{font-size:13px;padding:6px 10px}body:has(#narrcap:not([hidden])) #area{top:calc(var(--lq-hud-b,206px) + var(--lq-cap-h,60px) + 8px)}body:has(#narrcap:not([hidden])) #area{padding:4px 16px}body:has(#narrcap:not([hidden])) #area .kicker{display:none}body:has(#narrcap:not([hidden])) #area b{font-size:17px}}}
 
 #cutscene{position:fixed;inset:0;z-index:25;background:#000;display:flex;align-items:center;justify-content:center}#cutscene video{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain}#cutscene .skip{position:absolute;top:14px;right:14px;z-index:2;padding:8px 16px;border:1px solid #d7b56a;border-radius:10px;background:#0a0f15dd;color:#f3ead6;font:700 14px var(--display);cursor:pointer}
 /* Python challenges */

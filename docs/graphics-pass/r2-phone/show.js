@@ -1,0 +1,3 @@
+()=>{var a=document.querySelector('#area');if(a){a.querySelector('.kicker').textContent='Region 2';a.querySelector('b').textContent='The Whispering Library';a.classList.add('on');}
+var c=document.getElementById('narrcap');if(!c){c=document.createElement('div');c.id='narrcap';c.innerHTML='<span class="who">Guide</span><span class="tx"></span>';document.body.appendChild(c)}
+c.querySelector('.tx').textContent='Walk to the glowing marker to start your next lesson. Tap A to talk to a friend.';c.hidden=false;}
