@@ -73,7 +73,7 @@ function ask(q,idx,total,cb,headTitle){
   else if(q.t==='num'){h+='<div class="field"><label>Your answer'+(q.unit?' ('+esc(q.unit)+')':'')+'</label><input type="number" step="any" inputmode="decimal" id="nv" '+(res?'disabled':'')+' value="'+(sel===null?'':sel)+'"></div>'}
   else if(q.t==='grade'){q.items.forEach(function(it,i){h+='<div class="ex">'+esc(it.text)+'</div><div class="row" style="margin-bottom:10px">';['pass','fail'].forEach(function(v,n){var c='opt';if(sel[i]===v)c+=' sel';if(res){if(it.a===v)c+=' ok';else if(sel[i]===v)c+=' no'}h+='<button class="'+c+'" style="margin:0;text-align:center'+(born?'':';animation:pop .22s ease backwards;animation-delay:'+((i*2+n)*40)+'ms')+'" data-g="'+i+':'+v+'" '+(res?'disabled':'')+'>'+(v==='pass'?'✓ Pass':'✗ Fail')+'</button>'});h+='</div>'})}
   if(res)h+='<div class="fb '+(res.ok?'ok':'no')+'"><b>'+(res.ok?'Correct. ':'Not quite. ')+'</b>'+q.why+'</div><button class="btn btn-primary" id="nx" style="animation:pop .22s ease backwards;animation-delay:.08s">Next</button>';
-  else h+='<button class="btn btn-primary" id="ck">Check answer</button>';
+  else h+='<button class="btn btn-primary" id="ck"'+(born?'':' style="animation:pop .22s ease backwards;animation-delay:.08s"')+'>Check answer</button>';
   el.innerHTML=h+'</section>';
   if(!born){var qb=el.querySelector('.bar>i');if(qb){var bw=qb.style.width;qb.style.width='0%';requestAnimationFrame(function(){qb.style.width=bw})}}
   born=true}
@@ -101,7 +101,7 @@ function runQs(qs,title,fin){var i=0,right=0,box=document.createElement('div');
 function level(i,mode){
  var L=A.levels[i],step=0;MODE=mode||null;
  function lesson(){
-  var c=L.lesson,quiet=window.LQFx&&(LQFx.low||(LQFx.rm&&LQFx.rm.matches)),h='<section class="panel lesson'+(quiet?'':' stepin')+'"><p class="kicker">Level '+(i+1)+' · lesson '+(step+1)+' of '+c.length+'</p><h2>'+(step?esc(c[step].h):esc(L.title))+'</h2>'+(step===0&&window.LQGuide?window.LQGuide.slot(A.key+'-'+L.id):'')+(step===0?'<h3>'+esc(c[0].h)+'</h3>':'')+c[step].b+'<div class="row"><button class="btn btn-ghost" id="bk">'+(step?'Back':'Exit')+'</button><button class="btn btn-primary" id="fw">'+(step<c.length-1?'Next':(MODE==='lesson'?'Done':'Start the questions'))+'</button></div></section>';
+  var c=L.lesson,quiet=window.LQFx&&(LQFx.low||(LQFx.rm&&LQFx.rm.matches)),h='<section class="panel lesson'+(quiet?'':' stepin')+'"><p class="kicker">Level '+(i+1)+' · lesson '+(step+1)+' of '+c.length+'</p><h2>'+(step?esc(c[step].h):esc(L.title))+'</h2>'+(step===0&&window.LQGuide?window.LQGuide.slot(A.key+'-'+L.id):'')+(step===0?'<h3>'+esc(c[0].h)+'</h3>':'')+c[step].b+'<div class="row"><button class="btn btn-ghost" id="bk"'+(quiet?'':' style="animation:pop .22s ease backwards"')+'>'+(step?'Back':'Exit')+'</button><button class="btn btn-primary" id="fw"'+(quiet?'':' style="animation:pop .22s ease backwards;animation-delay:.06s"')+'>'+(step<c.length-1?'Next':(MODE==='lesson'?'Done':'Start the questions'))+'</button></div></section>';
   shell(h);if(window.LQGuide)window.LQGuide.scan();
   $('#bk').onclick=function(){step?(step--,lesson()):home()};
   $('#fw').onclick=function(){if(step<c.length-1){step++;lesson()}else if(MODE==='lesson'){E_.lessonDone=true;EXIT()}else quiz()}}
