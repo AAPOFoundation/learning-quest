@@ -427,6 +427,14 @@ function logMesh(){
  b.box(0.43,0.14,0,0.04,0.13,0.13,cut,0);
  return pack(b);
 }
+function blanketMesh(){
+ var b=new Builder(), cloth=hex('#8a3d4a'), hem=hex('#d7b56a');
+ card(b, [[-0.26,0.26,-0.02],[0.26,0.26,-0.02],[0.26,0.24,0.08],[-0.26,0.24,0.08]], cloth);
+ card(b, [[-0.28,0.25,-0.02],[-0.30,0.06,-0.20],[0.30,0.06,-0.20],[0.28,0.25,-0.02]], cloth);
+ card(b, [[-0.26,0.24,0.06],[0.26,0.24,0.06],[0.24,0.10,0.16],[-0.24,0.10,0.16]], mix(cloth,[0,0,0],0.16));
+ b.box(0, 0.27, 0.01, 0.5, 0.018, 0.05, hem, 0.55);
+ return pack(b);
+}
 function potMesh(){
  var b=new Builder(), iron=hex('#3a3532'), brass=hex('#d7b56a'), wood=hex('#5c3a28');
  var apex=[0,0.98,0], feet=[[0.26,0.08,0.14],[-0.26,0.08,0.14],[0.02,0.08,-0.28]], i;
@@ -575,6 +583,7 @@ function buildCamp(opts){
  put(shade,fx2,0,fz2,0,0.5,'shadow');
  put(lanternMesh(), 1.9,0,-1.75, 0,1,'lantern');
  put(logMesh(), 1.25,0,-1.05, 0.55,1,'log');
+ put(blanketMesh(), 1.25,0,-1.05, 0.55,1,'blanket');
  put(logMesh(), -1.05,0,-1.15, -0.4,1,'log');
  /* ry faces the cloth at the default camp camera. It sits on open grass, clear of the tent guys. */
  put(pennantMesh(), 2.7,0,0.85, 0.14,1,'pennant');
