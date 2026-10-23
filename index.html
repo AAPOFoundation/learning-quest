@@ -15,7 +15,7 @@
 (function(){var order=['python-basics','ai-foundations','ai-evals','ai-safety'],names={'python-basics':'Python Basics','ai-foundations':'AI Foundations','ai-evals':'AI Evaluation Skills','ai-safety':'AI Safety'},next=null;
 document.querySelectorAll('.prog').forEach(function(p){var k=p.getAttribute('data-k'),n=+p.getAttribute('data-n'),done=0,started=false;
  try{var s=JSON.parse(localStorage.getItem('learning-apps.'+k));if(s&&s.levels){started=true;Object.keys(s.levels).forEach(function(id){if(s.levels[id]&&s.levels[id].done)done++})}if(s&&(s.xp>0||s.w))started=true}catch(e){}
- done=Math.min(done,n);p.textContent=done?(done>=n?'All '+n+' levels cleared':done+' of '+n+' levels cleared'):(started?'Started':'Not started');
+ done=Math.min(done,n);p.textContent=done?(done>=n?'All '+n+' levels cleared':done+' of '+n+' levels cleared'):(started?'Started':'Not started');var bar=document.createElement('span'),fill=document.createElement('i');bar.className='jbar';bar.appendChild(fill);p.appendChild(bar);requestAnimationFrame(function(){fill.style.width=(n?done/n*100:0)+'%'});
  if(!next&&done<n)next=k});
 var el=document.getElementById('jnext');if(next){el.innerHTML='Suggested next: <b>'+names[next]+'</b>.';var a=document.getElementById('j-'+next);if(a)a.textContent=a.textContent+'  ·  next'}else el.textContent='You have cleared every level in all four worlds.'})();
 </script><script src="shared/art.js"></script><script src="shared/fx2.js"></script><script src="shared/hero.js"></script></body></html>
