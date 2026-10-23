@@ -545,6 +545,33 @@ function crateMesh(){
  b.box(0.11,0.16,-0.165,0.08,0.26,0.035,slat,0);
  return pack(b);
 }
+/* A low ridge. The camp places it on the -X rim, so the three-quarter camera (on +X) sees the face. */
+function cliffMesh(){
+ var b=new Builder(), rock=hex('#6e6860'), cap=hex('#8a8174'), moss=hex('#4e6a38');
+ var bits=[[-0.12,0.52,-1.7,1.15,1.05,1.15],[0.06,0.78,-0.4,1.35,1.55,1.25],[-0.05,0.95,0.8,1.2,1.9,1.25],[0.1,0.64,1.9,1.05,1.28,1.1]], i, p, top;
+ for(i=0;i<bits.length;i++){
+  p=bits[i];
+  b.box(p[0],p[1],p[2],p[3],p[4],p[5],rock,0);
+  top=p[1]+p[4]*0.5;
+  b.box(p[0],top-0.04,p[2],p[3]*0.7,0.08,p[5]*0.68,cap,0);
+ }
+ b.box(0.02,1.78,0.8,0.42,0.1,0.36,moss,0);
+ return pack(b);
+}
+/* Open trail shelter. Local -Z is the open side. No sign and no door text. */
+function shelterMesh(){
+ var b=new Builder(), wood=hex('#6b4428'), post=hex('#4e3422'), thatch=hex('#c4a36a'), shade=hex('#8d5a34');
+ b.box(-0.48,0.4,-0.36,0.1,0.8,0.1,post,0);
+ b.box(0.48,0.4,-0.36,0.1,0.8,0.1,post,0);
+ b.box(-0.48,0.56,0.38,0.1,1.12,0.1,wood,0);
+ b.box(0.48,0.56,0.38,0.1,1.12,0.1,wood,0);
+ b.box(0,0.06,0.05,1.15,0.08,0.95,hex('#7a6244'),0);
+ b.polyOut([[-0.78,0.78,-0.58],[0.78,0.78,-0.58],[0.78,1.16,0.58],[-0.78,1.16,0.58]],[0,0.2,0],thatch,0);
+ b.polyOut([[-0.78,0.72,-0.58],[-0.78,1.1,0.58],[0.78,1.1,0.58],[0.78,0.72,-0.58]],[0,1.6,0],shade,0);
+ b.polyOut([[-0.78,0.78,-0.58],[-0.78,1.16,0.58],[-0.78,1.1,0.58],[-0.78,0.72,-0.58]],[-2,0.9,0],shade,0);
+ b.polyOut([[0.78,0.78,-0.58],[0.78,0.72,-0.58],[0.78,1.1,0.58],[0.78,1.16,0.58]],[2,0.9,0],shade,0);
+ return pack(b);
+}
 function pennantMesh(){
  var b=new Builder(), cloth=hex('#d7b56a'), fold=hex('#c4a05a'), pole=hex('#5c4030');
  cyl(b,0,0.62,0,0.03,1.2,5,pole,0);
@@ -683,8 +710,16 @@ function buildCamp(opts){
  put(cupMesh(), 0.72,0,-1.02, 0.8,1.35,'cup');
  put(blanketMesh(), 1.25,0,-1.05, 0.55,1,'blanket');
  put(logMesh(), -1.05,0,-1.15, -0.4,1,'log');
- /* ry faces the cloth at the default camp camera. It sits on open grass, clear of the tent guys. */
- put(pennantMesh(), 2.7,0,0.85, 0.14,1,'pennant');
+ /* Three-quarter: camera sits on +X and -Z, above the people, so the cliff face and the shelter roof read. */
+ var view={yaw:0.78,pitch:0.56,radius:9.1,target:[-0.15,1.05,0.05]};
+ var vcp=Math.cos(view.pitch);
+ var eyeX=view.target[0]+Math.sin(view.yaw)*vcp*view.radius;
+ var eyeZ=view.target[2]-Math.cos(view.yaw)*vcp*view.radius;
+ /* ry faces the cloth at that camera. It sits on open grass, clear of the tent guys. */
+ put(pennantMesh(), 2.7,0,0.85, yawToward(2.7,0.85,eyeX,eyeZ),1,'pennant');
+ put(cliffMesh(), -4.55,0,0.35, 0.08,1,'cliff');
+ /* ry -pi/2 points local -Z at world +X, toward the camp. */
+ put(shelterMesh(), -2.9,0,0.15, -Math.PI/2,1,'shelter');
  put(woodpileMesh(), 2.15,0,-0.72, 0.3,1,'wood');
  var stones=[[-1.35,0.15],[-1.05,0.05],[-0.35,-0.45],[0.05,-0.95]];
  for(var si=0;si<stones.length;si++)put(stoneMesh(), stones[si][0],0,stones[si][1], si*0.3, 1, 'stone');
@@ -712,6 +747,7 @@ function buildCamp(opts){
   skyAmb:air.sky,
   groundAmb:air.gnd,
   grade:courseGrade(opts.key||''),
+  view:view,
   /* World positions. The viewer does not transform these. pos.w in the shader is the radius. */
   lights:[
    {name:'fire',pos:[0.12,0.55,-1.5],col:[1.0,0.48,0.16],radius:3.6,k:1},
@@ -862,6 +898,10 @@ function selfCheck(){
   }
   if(biomes[bi]==='meadow'){
    if(!meshBy(camp,'pot')||!meshBy(camp,'crate')||!meshBy(camp,'pennant')||!meshBy(camp,'grass')||!meshBy(camp,'log'))errors.push('meadow furniture');
+   var cliff=meshBy(camp,'cliff'), shelf=meshBy(camp,'shelter');
+   if(!cliff||!shelf)errors.push('camp height');
+   else if(boundsY(cliff)[1]<1.5)errors.push('cliff low '+boundsY(cliff)[1].toFixed(2));
+   if(!camp.view||camp.view.yaw<0.6||camp.view.pitch<0.48)errors.push('camera flat');
    if(hero&&(!band(hero.emissive,0.5,0.6)||!band(hero.emissive,0.85,0.95)))errors.push('hero materials');
   }
   if(biomes[bi]==='marsh'){
@@ -894,6 +934,13 @@ function selfCheck(){
  }
  var chestLamp=lampBy(evCamp,'chest');
  if(!chestLamp||chestLamp.col[0]<0.9||chestLamp.col[1]<0.6)errors.push('chest gold');
+ var pen=meshBy(evCamp,'pennant'), vw=evCamp.view;
+ if(pen&&vw){
+  var pcp=Math.cos(vw.pitch), peyeX=vw.target[0]+Math.sin(vw.yaw)*pcp*vw.radius, peyeZ=vw.target[2]-Math.cos(vw.yaw)*pcp*vw.radius;
+  var pdx=peyeX-pen.x, pdz=peyeZ-pen.z, plen=Math.sqrt(pdx*pdx+pdz*pdz)||1;
+  var pdot=((-Math.sin(pen.ry))*pdx+(-Math.cos(pen.ry))*pdz)/plen;
+  if(pdot<0.9)errors.push('pennant faces away '+pdot.toFixed(3));
+ }
  var img=raster(buildCamp({biome:'meadow', key:'ai-evals'}));
  var skin=hex('#e2b48c'), tent=hex('#f4ead4'), grass=hex('#5c8a3e'), grass2=hex('#3e6b32'), dirt=hex('#8a6840');
  var nSkin=countNear(img,function(c){return dist2(c,skin)<0.22*0.22}), nTent=countNear(img,function(c){return dist2(c,tent)<0.26*0.26||dist2(c,hex('#e4d2ae'))<0.26*0.26});

@@ -1,5 +1,5 @@
 /* Expedition camp viewer. A small WebGL diorama, no libraries.
-   Y-up, right-handed. Character front is local -Z, and the camera sits on -Z so faces look toward the viewer.
+   Y-up, right-handed. Character front is local -Z. The default camera is a three-quarter view from scene.view.
    Full effects: directional shadow map, a slow orbit, and a small idle bob.
    Five world-space point lights (fire, lantern, chest, hero, landmark) plus a course colour grade.
    Low effects or reduced motion: one still frame. Contact shadows are real meshes, so the still frame keeps them.
@@ -254,7 +254,8 @@ function mount(figureEl,opts){
   var model=new Float32Array(16),mvp=new Float32Array(16);
   var lproj=new Float32Array(16),lview=new Float32Array(16),lvp=new Float32Array(16);
   lvp[0]=lvp[5]=lvp[10]=lvp[15]=1;
-  var tx=0,ty=0.85,tz=0,yaw=0.2,pitch=0.46,radius=8.4,t=0;
+  var cam=scene.view||{}, aim=cam.target&&cam.target.length>=3?cam.target:[0,0.85,0];
+  var tx=aim[0],ty=aim[1],tz=aim[2],yaw=cam.yaw!=null?cam.yaw:0.78,pitch=cam.pitch!=null?cam.pitch:0.56,radius=cam.radius!=null?cam.radius:9.1,t=0;
   var rm=null;
   try{rm=window.matchMedia?window.matchMedia('(prefers-reduced-motion: reduce)'):null}catch(e2){rm=null}
   function paused(){return !!((window.LQFx&&window.LQFx.low)||(rm&&rm.matches))}
