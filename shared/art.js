@@ -339,7 +339,32 @@ function landmark(g,b,u,ac,t){g.save();
  g.restore()}
 
 /* buildings and props. (x,y)=hex centre. */
-function building(g,kind,x,y,o){var u=S/34,ac=o.accent||'#b5532f',t=o.t||0;g.save();g.translate(x,y+S*.5);ell(g,4*u,1*u,29*u,8*u,'rgba(10,16,8,.22)');ell(g,0,0,24*u,6*u,'rgba(10,16,8,.22)');
+/* Painted treatment for the Citadel, towers, halls and town landmarks (full effects only): the building is drawn to an offscreen canvas at the
+   current screen scale, given a soft ink outline (8-way silhouette), a warm-left / cool-right light glaze and a faint brush texture, then
+   composited. Animation is kept because it is redrawn every frame; ground shadows stay on the map so they are not outlined. Low effects: unchanged. */
+var PAINTED={castle:[-56,56,-124,14],great:[-48,48,-100,12],tower:[-24,24,-100,10],hall:[-34,34,-56,10]},LMBOX=[-26,26,-56,10],pcv=null,pol=null,ptex=null;
+function brushTex(){if(ptex)return ptex;var c=document.createElement('canvas');c.width=c.height=64;var x=c.getContext('2d');for(var i=0;i<140;i++){x.fillStyle=i%2?'rgba(255,240,210,.5)':'rgba(30,20,10,.5)';x.save();x.translate(hash(i,1,77)*64,hash(i,2,77)*64);x.rotate(hash(i,3,77)*PI);x.fillRect(-4,-.6,8,1.2);x.restore()}ptex=c;return c}
+function building(g,kind,x,y,o){var box=PAINTED[kind]||(kind==='tree'&&o.landmark?LMBOX:null);
+ if(FX.low||!box||!g.getTransform||o.raw)return buildingRaw(g,kind,x,y,o);
+ var m=g.getTransform();if(Math.abs(m.b)>1e-6||Math.abs(m.c)>1e-6)return buildingRaw(g,kind,x,y,o);
+ var u=S/34,sc=m.a,bx=x+box[0]*u,by=y+S*.5+box[2]*u,bw=(box[1]-box[0])*u,bh=(box[3]-box[2])*u,W=Math.ceil(bw*sc)+8,H=Math.ceil(bh*sc)+8;
+ if(W>2048||H>2048||W<8)return buildingRaw(g,kind,x,y,o);
+ if(!pcv){pcv=document.createElement('canvas');pol=document.createElement('canvas')}
+ if(pcv.width<W||pcv.height<H){pcv.width=pol.width=Math.max(W,pcv.width);pcv.height=pol.height=Math.max(H,pcv.height)}
+ var c=pcv.getContext('2d'),q=pol.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,W+2,H+2);q.setTransform(1,0,0,1,0,0);q.clearRect(0,0,W+2,H+2);
+ /* ground shadow straight onto the map */
+ g.save();g.translate(x,y+S*.5);if(kind!=='tree'){ell(g,4*u,1*u,29*u,8*u,'rgba(10,16,8,.22)');ell(g,0,0,24*u,6*u,'rgba(10,16,8,.22)')}else ell(g,1*u,1*u,13*u,4.6*u,'rgba(10,16,8,.22)');g.restore();
+ c.setTransform(sc,0,0,sc,(-bx)*sc+4,(-by)*sc+4);var o2={};for(var k in o)o2[k]=o[k];o2.noShadow=true;buildingRaw(c,kind,x,y,o2);
+ /* glaze: warm key light on the left, cool shade on the right, a little top light, then brush texture, all kept inside the building's own pixels */
+ c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';
+ var lg=c.createLinearGradient(0,0,W,0);lg.addColorStop(0,'rgba(255,226,170,.22)');lg.addColorStop(.45,'rgba(255,226,170,0)');lg.addColorStop(.62,'rgba(30,40,90,0)');lg.addColorStop(1,'rgba(30,40,90,.26)');c.fillStyle=lg;c.fillRect(0,0,W,H);
+ var tg=c.createLinearGradient(0,0,0,H);tg.addColorStop(0,'rgba(255,240,200,.12)');tg.addColorStop(.7,'rgba(0,0,0,0)');tg.addColorStop(1,'rgba(20,10,0,.18)');c.fillStyle=tg;c.fillRect(0,0,W,H);
+ c.globalAlpha=.07;c.fillStyle=c.createPattern(brushTex(),'repeat');c.fillRect(0,0,W,H);c.globalAlpha=1;c.globalCompositeOperation='source-over';
+ /* ink outline from the silhouette */
+ var d=Math.max(1,Math.round(sc*.55));[[d,0],[-d,0],[0,d],[0,-d],[d,d],[-d,d],[d,-d],[-d,-d]].forEach(function(v){q.drawImage(pcv,0,0,W,H,v[0],v[1],W,H)});
+ q.globalCompositeOperation='source-in';q.fillStyle='rgba(30,20,14,.78)';q.fillRect(0,0,W,H);q.globalCompositeOperation='source-over';
+ var dx=Math.round(m.a*bx+m.e-4),dy=Math.round(m.d*by+m.f-4);g.save();g.setTransform(1,0,0,1,0,0);g.drawImage(pol,0,0,W,H,dx,dy,W,H);g.drawImage(pcv,0,0,W,H,dx,dy,W,H);g.restore()}
+function buildingRaw(g,kind,x,y,o){var u=S/34,ac=o.accent||'#b5532f',t=o.t||0;g.save();g.translate(x,y+S*.5);if(!o.noShadow){ell(g,4*u,1*u,29*u,8*u,'rgba(10,16,8,.22)');ell(g,0,0,24*u,6*u,'rgba(10,16,8,.22)')}
  function wall(x0,w,h,col){wallG(g,x0,0,w,h,col)}
  function roof(x0,w,h,top,col){tri(g,x0-3*u,top,x0+w/2,top-h,x0+w+3*u,top,col);tri(g,x0+w/2,top-h,x0+w+3*u,top,x0+w/2+1,top,'rgba(0,0,0,.28)')}
  if(kind==='hall'){wall(-24*u,48*u,24*u,'#d9cfb6');g.fillStyle='#c9bf9f';g.fillRect(-27*u,-3*u,54*u,3*u);g.fillRect(-26*u,-27*u,52*u,3*u);
