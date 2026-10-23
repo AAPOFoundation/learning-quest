@@ -54,21 +54,18 @@ var Art=window.Art,FX=window.LQFx;if(!Art||!FX)return;
 var S=Art.S,hx=Art.hx,hy=Art.hy,hash=Art.hash;
 function waterList(sc){if(sc._wl)return sc._wl;var l=[];for(var c=0;c<sc.cols;c++)for(var r=0;r<sc.rows;r++)if(sc.t[c][r]==='water')l.push([hx(c,r),hy(r),hash(c,r,99)]);sc._wl=l;return l}
 /* water: two drifting highlight strokes and an occasional glint per visible water tile */
-/* round 2b: the shimmer is painted into an offscreen canvas about 12 times a second (it moves slowly, so this looks the same)
-   and the cached layer is blitted every frame. The cache covers the view plus a margin, so camera drift between repaints stays covered. */
-var WC={cv:null,sc:null,t:-1,ox:0,oy:0,w:0,h:0,k:0},WHZ=12;
+/* round 2b: the shimmer is batched. Each stroke's alpha is snapped to one of 5 levels and all strokes of a level go into one path,
+   so a frame costs about 5 stroke calls instead of 2 per water tile (and no per-stroke colour strings). Glints share one path too.
+   (An offscreen 12 Hz cache was measured first and was slower here: the full-view blit cost more than it saved.) */
+var NB=5,BK=[],BCOL=[];for(var bi=0;bi<NB;bi++){BK.push([]);BCOL.push('rgba(225,244,255,'+(.07+.09*(bi+.5)/NB).toFixed(3)+')')}
 function water(g,sc,T,cx,cy,vw,vh){if(FX.low||(FX.rm&&FX.rm.matches))return;var l=waterList(sc);if(!l.length)return;
- var tr=g.getTransform?g.getTransform():null,k=tr?Math.abs(tr.a):1,kc=Math.max(.5,k*.75),m=S*1.2;
- var stale=WC.sc!==sc||WC.k!==kc||T-WC.t>=1/WHZ||T<WC.t||cx<WC.ox||cy<WC.oy||cx+vw>WC.ox+WC.w||cy+vh>WC.oy+WC.h;
- if(stale){var w=vw+2*m,h=vh+2*m,pw=Math.ceil(w*kc),ph=Math.ceil(h*kc);if(!WC.cv)WC.cv=document.createElement('canvas');
-  if(WC.cv.width!==pw||WC.cv.height!==ph){WC.cv.width=pw;WC.cv.height=ph}var o=WC.cv.getContext('2d');o.setTransform(1,0,0,1,0,0);o.clearRect(0,0,pw,ph);
-  WC.ox=cx-m;WC.oy=cy-m;WC.w=w;WC.h=h;WC.k=kc;WC.sc=sc;WC.t=T;o.setTransform(kc,0,0,kc,-WC.ox*kc,-WC.oy*kc);waterPaint(o,l,T,WC.ox,WC.oy,w,h)}
- g.drawImage(WC.cv,WC.ox,WC.oy,WC.w,WC.h)}
-function waterPaint(g,l,T,cx,cy,vw,vh){g.save();g.lineCap='round';g.lineWidth=1.3;
- for(var i=0;i<l.length;i++){var w=l[i],x=w[0],y=w[1];if(x<cx-S||x>cx+vw+S||y<cy-S||y>cy+vh+S)continue;var ph=w[2]*6.28;
-  for(var k=0;k<2;k++){var a=.07+.09*(.5+.5*Math.sin(T*1.3+ph+k*2.1)),dx=Math.sin(T*.45+ph+k)*S*.22,yy=y-S*.22+k*S*.42+Math.sin(T*.8+ph)*1.5,xx=x-S*.18+k*S*.3+dx;
-   g.strokeStyle='rgba(225,244,255,'+a.toFixed(3)+')';g.beginPath();g.moveTo(xx-7,yy);g.quadraticCurveTo(xx,yy-2.6,xx+7,yy);g.stroke()}
-  var gl=Math.sin(T*2.2+ph*3);if(gl>.92){g.fillStyle='rgba(255,252,235,'+((gl-.92)*8).toFixed(3)+')';g.beginPath();g.arc(x+(w[2]-.5)*S*.8,y+(w[2]*7%1-.5)*S*.6,1.6,0,6.3);g.fill()}}
+ var i,k,b,gls=[],x0=cx-S,x1=cx+vw+S,y0=cy-S,y1=cy+vh+S;for(b=0;b<NB;b++)BK[b].length=0;
+ for(i=0;i<l.length;i++){var w=l[i],x=w[0],y=w[1];if(x<x0||x>x1||y<y0||y>y1)continue;var ph=w[2]*6.28,sy=Math.sin(T*.8+ph)*1.5;
+  for(k=0;k<2;k++){var q=.5+.5*Math.sin(T*1.3+ph+k*2.1);b=q*NB|0;if(b>=NB)b=NB-1;BK[b].push(x-S*.18+k*S*.3+Math.sin(T*.45+ph+k)*S*.22,y-S*.22+k*S*.42+sy)}
+  var gl=Math.sin(T*2.2+ph*3);if(gl>.92)gls.push(x+(w[2]-.5)*S*.8,y+(w[2]*7%1-.5)*S*.6,(gl-.92)*8)}
+ g.save();g.lineCap='round';g.lineWidth=1.3;
+ for(b=0;b<NB;b++){var L=BK[b];if(!L.length)continue;g.strokeStyle=BCOL[b];g.beginPath();for(i=0;i<L.length;i+=2){var xx=L[i],yy=L[i+1];g.moveTo(xx-7,yy);g.quadraticCurveTo(xx,yy-2.6,xx+7,yy)}g.stroke()}
+ if(gls.length){g.fillStyle='rgb(255,252,235)';for(i=0;i<gls.length;i+=3){g.globalAlpha=gls[i+2];g.beginPath();g.arc(gls[i],gls[i+1],1.6,0,6.3);g.fill()}}
  g.restore()}
 /* ambient particles */
 var KIND={meadow:{n:22,col:'243,226,176',sz:1.9,vy:-6,vx:5,glow:false},forest:{n:24,col:'214,240,140',sz:2.0,vy:-3,vx:4,glow:true},hills:{n:20,col:'243,226,176',sz:1.8,vy:-5,vx:7,glow:false},desert:{n:26,col:'226,196,140',sz:1.6,vy:-1,vx:22,glow:false},
