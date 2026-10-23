@@ -542,7 +542,7 @@ var PAL={
  desert:{g:'#c4a36a',g2:'#d8bc82',dirt:'#b08958',leaf:'#2f6a34',leaf2:'#c45a3a',rock:'#a09078',trunk:'#8a5a32'},
  tundra:{g:'#d5dde2',g2:'#b7c4cc',dirt:'#9aa6ae',leaf:'#2a4a44',leaf2:'#e8eef2',rock:'#9aa3aa',trunk:'#5c4636'},
  marsh:{g:'#3e5a38',g2:'#2a4030',dirt:'#5a4834',leaf:'#2a5530',leaf2:'#6a8a40',rock:'#6a6558',trunk:'#4a3828'},
- highland:{g:'#6a7058',g2:'#4e5444',dirt:'#6a5a44',leaf:'#3a5a34',leaf2:'#7a8a58',rock:'#9a948c',trunk:'#4a3a2c'}
+ highland:{g:'#6a7058',g2:'#4e5444',dirt:'#6a5a44',leaf:'#3a5a34',leaf2:'#7a8a58',rock:'#6e6860',trunk:'#4a3a2c'}
 };
 
 function dress(biome,P,put,key,shade){
