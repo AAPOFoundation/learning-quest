@@ -92,7 +92,7 @@ function portrait(look,size){var key=JSON.stringify(look)+size;if(pc[key])return
  var gr=g.createLinearGradient(0,0,0,s);gr.addColorStop(0,mix(look.robe,'#1c2733',.55));gr.addColorStop(1,'#0a0f15');g.fillStyle=gr;g.fillRect(0,0,s,s);
  var rg=g.createRadialGradient(s*.5,s*.3,2,s*.5,s*.4,s*.6);rg.addColorStop(0,'rgba(243,226,176,.35)');rg.addColorStop(1,'rgba(243,226,176,0)');g.fillStyle=rg;g.fillRect(0,0,s,s);
  /* head-and-shoulders crop of the in-game figure, so portraits match the characters on the map */
- var k=s/27,lk2={};for(var kk in look)lk2[kk]=look[kk];lk2.staff=false;g.save();g.scale(k,k);figure(g,13.5,31.6,lk2,{t:0,face:1});g.restore();
+ var k=s/27,lk2={};for(var kk in look)lk2[kk]=look[kk];lk2.staff=false;g.save();g.scale(k,k);figure(g,13.5,31.6,lk2,{t:0,face:1,flat:1});g.restore();
  var vg=g.createRadialGradient(s*.5,s*.45,s*.3,s*.5,s*.5,s*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.35)');g.fillStyle=vg;g.fillRect(0,0,s,s);
  var u=cv.toDataURL();pc[key]=u;return u}
 
@@ -105,8 +105,10 @@ function figure(g,x,y,look,o){var u=S/34,t=o.t||0,mv=o.moving,f=o.face||1,cel=!!
   bob=mv?Math.abs(Math.sin(ph))*2.2*u:cel?Math.abs(Math.sin(t*7))*7*u:0,breath=mv||cel?0:Math.sin(t*2.2+x*.13)*.6*u,
   blink=((t+x*.017)%3.7)<.12,robeD=mix(look.robe,'#000000',.32),robeL=mix(look.robe,'#ffffff',.22),skinD=mix(look.skin,'#5a2a1a',.22);
  g.save();g.translate(x,y+S*.38);
- /* soft contact shadow, shrinks while hopping */
- var sh=1-bob/(12*u);ell(g,0,.5*u,11*u*sh,3.6*u*sh,'rgba(10,8,4,.32)');ell(g,0,.5*u,6*u*sh,2*u*sh,'rgba(10,8,4,.25)');
+ /* contact shadow. Full effects casts it down-right, the same way as the key light (upper left). flat keeps the round shadow for portraits. Low effects keeps the old centred blob. */
+ var sh=1-Math.min(1,bob/(12*u));
+ if(!FX.low&&!o.flat){ell(g,9*u*sh,4.2*u,15*u*sh,4.4*u*sh,'rgba(8,10,16,.40)');ell(g,3.2*u*sh,1.6*u,6.4*u*sh,2.1*u*sh,'rgba(8,10,16,.22)');}
+ else{ell(g,0,.5*u,11*u*sh,3.6*u*sh,'rgba(10,8,4,.32)');ell(g,0,.5*u,6*u*sh,2*u*sh,'rgba(10,8,4,.25)');}
  g.translate(0,-bob);
  /* legs + boots */
  var sw=mv?Math.sin(ph)*3.4*u:0;limb(g,-2.6*u,-9*u,-2.6*u+sw*.6,-1.6*u,3.4*u,robeD,lw);limb(g,2.6*u,-9*u,2.6*u-sw*.6,-1.6*u,3.4*u,robeD,lw);
@@ -220,7 +222,9 @@ function landmark(g,b,u,ac,t){g.save();
  g.restore()}
 
 /* buildings and props. (x,y)=hex centre. */
-function building(g,kind,x,y,o){var u=S/34,ac=o.accent||'#b5532f',t=o.t||0;g.save();g.translate(x,y+S*.5);ell(g,4*u,1*u,29*u,8*u,'rgba(10,16,8,.22)');ell(g,0,0,24*u,6*u,'rgba(10,16,8,.22)');
+function building(g,kind,x,y,o){var u=S/34,ac=o.accent||'#b5532f',t=o.t||0;g.save();g.translate(x,y+S*.5);
+ if(FX.low){ell(g,4*u,1*u,29*u,8*u,'rgba(10,16,8,.22)');ell(g,0,0,24*u,6*u,'rgba(10,16,8,.22)');}
+ else{ell(g,12*u,4.4*u,34*u,7.6*u,'rgba(8,10,16,.34)');ell(g,4*u,1.6*u,20*u,5*u,'rgba(8,10,16,.18)');}
  function wall(x0,w,h,col){wallG(g,x0,0,w,h,col)}
  function roof(x0,w,h,top,col){tri(g,x0-3*u,top,x0+w/2,top-h,x0+w+3*u,top,col);tri(g,x0+w/2,top-h,x0+w+3*u,top,x0+w/2+1,top,'rgba(0,0,0,.28)')}
  if(kind==='hall'){wall(-24*u,48*u,24*u,'#d9cfb6');g.fillStyle='#c9bf9f';g.fillRect(-27*u,-3*u,54*u,3*u);g.fillRect(-26*u,-27*u,52*u,3*u);

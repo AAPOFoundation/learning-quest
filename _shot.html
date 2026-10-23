@@ -1,0 +1,26 @@
+<!doctype html><html><head><meta charset="utf-8"><title>shot</title>
+<style>html,body{margin:0;height:100%;background:#000}iframe{width:100vw;height:100vh;border:0;display:block}</style>
+</head><body><iframe id="g"></iframe><pre id="grid" style="position:absolute;left:-8000px"></pre>
+<script>
+localStorage.setItem('learning-apps.fx','full');
+try{localStorage.removeItem('learning-apps.python-basics')}catch(e){}
+var fr=document.getElementById('g');
+fr.src='python-basics/index.html';
+fr.onload=function(){
+ setTimeout(function(){
+  var w=fr.contentWindow,d=w.document,btn=d.getElementById('tc');
+  if(btn)btn.click();
+  setTimeout(function(){
+   w.__w.warp('t0',7,8);
+   setTimeout(function(){
+    ['dlg','narrcap','ttl'].forEach(function(id){var e=d.getElementById(id);if(e)e.style.display='none'});
+    w.__w.draw();
+    var gl=d.getElementById('lqgl'),hud=d.getElementById('hud');
+    var gs=gl?getComputedStyle(gl):null,hs=hud?getComputedStyle(hud):null;
+    document.getElementById('grid').textContent='gl='+(gl?gl.style.visibility+' z='+(gs&&gs.zIndex):'none')+' hudZ='+(hs&&hs.zIndex)+' err='+(w.LQLight.error()||'')+' lim='+JSON.stringify(w.LQLight.limits());
+    document.title='SHOT ok';
+   },400);
+  },400);
+ },300);
+};
+</script></body></html>

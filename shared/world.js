@@ -292,7 +292,36 @@ function update(dt){st.time+=dt;
   else if(st.path&&st.path.length){var nx=st.path[0],d=dirTo([h.c,h.r],nx);if(d<0){st.path=null}else{var rs=stepDir(d);if(rs==='moved')st.path.shift();else st.path=null}}}
 }
 function figDraw(g,sp,x,y,o){Art.figure(g,x,y,sp.look||sp,o)}
-function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=st.hero,g=ctx;g.setTransform(1,0,0,1,0,0);g.fillStyle='#0a0f15';g.fillRect(0,0,cv.width,cv.height);
+/* Point lights for the WebGL pass. World pixels. Priority 0 is kept first (the hero). */
+var lights=[],shadows=[];
+var MARK={
+ 'python-basics':{dy:0.06,r:68,c:[0.36,0.26,0.07]},
+ 'ai-foundations':{dy:-0.16,r:78,c:[0.14,0.28,0.48]},
+ 'ai-evals':{dy:-1.01,r:64,c:[0.38,0.28,0.08]},
+ 'ai-safety':{dy:-1.01,r:80,c:[0.38,0.28,0.1]},
+ 'portfolio-guide':{dy:-0.92,r:76,c:[0.38,0.28,0.08]}
+};
+function addLight(x,y,r,col,pri){lights.push({x:x,y:y,r:r,c:col,p:pri==null?5:pri})}
+function addShadow(x,y,keep){var u=S/34;shadows.push({x:x+9*u,y:y+S*.38+4.2*u,r:15*u,keep:!!keep})}
+function lamp(o,x,y,op){var k=o.kind;
+ if(o.type==='chest'){if(op.glow)addLight(x,y+S*.42,42,[0.12,0.08,0.025],1);else if(op.open)addLight(x,y+S*.42,28,[0.1,0.07,0.02],4);return}
+ if(o.landmark){var m=MARK[A.key]||{dy:-0.45,r:78,c:[0.42,0.32,0.12]};addLight(x,y+m.dy*S,m.r,m.c,2);return}
+ if(k==='smithy')addLight(x-6,y+S*.5-8,70,[0.62,0.24,0.05],2);
+ else if(k==='tower'){addLight(x,y+S*.5-46,52,[0.48,0.36,0.12],2);addLight(x,y+S*.5-90,28,[0.5,0.4,0.14],3)}
+ else if(k==='hall'&&op.lit)addLight(x,y+S*.5-12,68,[0.46,0.32,0.1],2);
+ else if(k==='great'&&op.lit)addLight(x,y+S*.5-16,80,[0.48,0.34,0.1],2);
+ else if(k==='castle')addLight(x,y-S*.7,100,[0.42,0.3,0.1],3);
+ else if(k==='vault')addLight(x,y+S*.5-12,48,[0.4,0.32,0.12],3);
+ else if(k==='cache')addLight(x,y-S*.2,30,[0.42,0.32,0.1],4);
+ else if(k==='town'||o.type==='node')addLight(x,y-S*.35,44,[0.3,0.22,0.08],5)}
+function packLights(cx,cy,z){var sc=z*dpr,i,L,sx,sy,rr,out=[],sh=[];
+ for(i=0;i<lights.length;i++){L=lights[i];sx=(L.x-cx)*sc;sy=(L.y-cy)*sc;rr=L.r*sc;if(sx<-rr||sy<-rr||sx>cv.width+rr||sy>cv.height+rr)continue;
+  var dx=sx-cv.width*.5,dy=sy-cv.height*.5;out.push({x:sx,y:sy,r:rr,c:L.c,p:L.p,d:dx*dx+dy*dy})}
+ out.sort(function(a,b){return a.p-b.p||a.d-b.d});if(out.length>12)out.length=12;
+ for(i=0;i<shadows.length;i++){L=shadows[i];sx=(L.x-cx)*sc;sy=(L.y-cy)*sc;rr=Math.max(8,L.r*sc);if(sx<-rr||sy<-rr||sx>cv.width+rr||sy>cv.height+rr)continue;
+  sh.push({x:sx,y:sy,r:rr,k:L.keep?0:1,d:(sx-cv.width*.5)*(sx-cv.width*.5)+(sy-cv.height*.5)*(sy-cv.height*.5)})}
+ sh.sort(function(a,b){return a.k-b.k||a.d-b.d});if(sh.length>8)sh.length=8;return {lights:out,shadows:sh}}
+function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=st.hero,g=ctx;lights.length=0;shadows.length=0;g.setTransform(1,0,0,1,0,0);g.fillStyle='#0a0f15';g.fillRect(0,0,cv.width,cv.height);
  var tx=h.x-vw/2,ty=h.y-vh/2;if(st.mode==='title'&&sc.id==='w'){tx=hx(NODES[0][0],NODES[0][1])-vw/2+Math.sin(st.time*.2)*40;ty=hy(NODES[0][1])-vh/2}
  var mx=sc.W-vw,my=sc.H-vh,hp=window.LQHudPad,pt=hp&&hp.on?hp.t/z:0,pb=hp&&hp.on?hp.b/z:0;tx=mx<0?mx/2:Math.max(0,Math.min(mx,tx));ty=my<0?my/2:Math.max(-pt,Math.min(my+pb,ty));/* phone: camera may scroll past the map edge by the HUD height (guide.js) so the hero never sits under the HUD */
  if(st.cam.snap){st.cam.x=tx;st.cam.y=ty;st.cam.snap=false}else{st.cam.x+=(tx-st.cam.x)*.18;st.cam.y+=(ty-st.cam.y)*.18}
@@ -301,28 +330,29 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
  sc.objs.forEach(function(o){if(world&&!zoneOpen(sc.zone[o.c][o.r])&&st.fog[sc.zone[o.c][o.r]]>.8)return;list.push({y:hy(o.r),o:o})});
  if(st.mode!=='title')list.push({y:h.y,hero:true});list.sort(function(a,b){return a.y-b.y});
  var w=P().w||{chests:{},caches:{}};
- list.forEach(function(it){if(it.hero){Art.figure(g,h.x,h.y,C.hero,{t:T,moving:!!h.mv,face:h.face,celebrate:!h.mv&&st.celUntil>T});return}
+ list.forEach(function(it){if(it.hero){Art.figure(g,h.x,h.y,C.hero,{t:T,moving:!!h.mv,face:h.face,celebrate:!h.mv&&st.celUntil>T});if(!FX.low){addLight(h.x,h.y-S*.22,76,[0.17,0.12,0.04],0);if(C.hero.staff)addLight(h.x+h.face*8,h.y-S*.95,28,[0.42,0.32,0.1],1);addShadow(h.x,h.y,true)}return}
   var o=it.o,x=hx(o.c,o.r),y=hy(o.r);if(x<cx-90||x>cx+vw+90||y<cy-130||y>cy+vh+90)return;
-  if(o.type==='npc'){var fc=h.x<x?-1:1;Art.figure(g,x,y,o.sp.look,{t:T+o.c,face:fc});
+  if(o.type==='npc'){var fc=h.x<x?-1:1;Art.figure(g,x,y,o.sp.look,{t:T+o.c,face:fc});if(!FX.low){addShadow(x,y);var nm=o.name||'';if(/lamp|wick|lantern/i.test(nm))addLight(x+(fc>0?8:-8),y-S*.2,36,[0.3,0.21,0.06],2);if(o.sp&&o.sp.look&&o.sp.look.staff)addLight(x+fc*7,y-S*.8,28,[0.42,0.32,0.1],3)}
    if(Math.abs(h.x-x)<S*3&&Math.abs(h.y-y)<S*3){g.font='700 13px "Cormorant Garamond",Georgia,serif';g.textAlign='center';g.lineWidth=4;g.strokeStyle='rgba(10,15,21,.9)';g.strokeText(o.name,x,y-S*1.45);g.fillStyle='#f3e2b0';g.fillText(o.name,x,y-S*1.45)}}
   else{var op={accent:o.accent,t:T,pine:o.pine,snow:o.snow,v:o.v,landmark:o.landmark,biome:o.type==='node'?bio(o.i):null};
    if(o.type==='chest'){op.open=o.i>=NR?!!w.chests[o.i]:!!w.chests[o.i];op.glow=!op.open&&(o.i>=NR?bossDone():levelDone(o.i));op.locked=!(o.i>=NR?bossDone():levelDone(o.i))}
    if(o.role==='hall')op.lit=o.kind==='great'?bossDone():levelDone(region());
    if(o.type==='cache'&&w.caches[o.i])return;
    if(o.type==='node'){var cl=o.i<NR?levelDone(o.i):bossDone();if(cl)op.accent='#c9a24f'}
-   Art.building(g,o.kind,x,y,op);
+   Art.building(g,o.kind,x,y,op);if(!FX.low)lamp(o,x,y,op);
    if(o.type==='node'&&(zoneOpen(o.i)||st.fog[o.i]<.8)){var nm=o.i<NR?C.regions[o.i].name:C.castle.name,cl2=o.i<NR?levelDone(o.i):bossDone();g.font='700 15px "Cormorant Garamond",Georgia,serif';g.textAlign='center';var tw=g.measureText(nm).width+22,by=y-S*(o.kind==='castle'?2.7:2.15);
     g.fillStyle='rgba(10,15,21,.88)';g.strokeStyle='#c8a86a';g.lineWidth=1.3;g.beginPath();g.rect(x-tw/2,by-13,tw,21);g.fill();g.stroke();g.fillStyle=cl2?'#f3e2b0':'#e8dcc4';g.fillText((cl2?'★ ':'')+nm,x,by+2)}}});
- if(!FX.low&&window.LQAnim){var zb=world?sc.zone[h.c]&&sc.zone[h.c][h.r]:null;LQAnim.particles(g,world?bio(zb==null||zb<0?0:zb):(sc.biome||'meadow'),st.dtRaw||0,cx,cy,vw,vh,T)}
+ if(!FX.low&&window.LQAnim){var zb=world?sc.zone[h.c]&&sc.zone[h.c][h.r]:null;LQAnim.particles(g,world?bio(zb==null||zb<0?0:zb):(sc.biome||'meadow'),st.dtRaw||0,cx,cy,vw,vh,T);if(LQAnim.glows)LQAnim.glows.forEach(function(q){addLight(q[0],q[1],q[2],q[3],8)})}
  if(world){g.drawImage(sc.fogCv,0,0,sc.W,sc.H)}
  /* quest marker */
  if(cur&&cur.sid===sc.id){var nd=world&&sc.objs.filter(function(o){return o.type==='node'&&o.c===cur.c&&o.r===cur.r})[0];/* on an overworld town or castle, float above its name plaque */
   var qx=hx(cur.c,cur.r),qy=(nd?hy(cur.r)-S*(nd.kind==='castle'?2.7:2.15)-13-16:hy(cur.r)-S*(world?2.4:2.2))+Math.sin(T*4)*4;g.fillStyle='#f3e2b0';g.strokeStyle='#6b4a0e';g.lineWidth=2;g.beginPath();g.moveTo(qx,qy+12);g.lineTo(qx-9,qy-2);g.lineTo(qx+9,qy-2);g.closePath();g.fill();g.stroke();
   var pr=(T*1.5)%1;g.strokeStyle='rgba(243,226,176,'+(1-pr)+')';g.lineWidth=2.5;Art.hexPath(g,hx(cur.c,cur.r),hy(cur.r),S*(.7+pr*.5));g.stroke()}
- g.setTransform(1,0,0,1,0,0);if(!FX.low){if(!fxl||fxl.w!==cv.width||fxl.h!==cv.height)mkLight();g.drawImage(fxl.c,0,0)}
  g.setTransform(dpr,0,0,dpr,0,0);
  if(cur&&cur.sid===sc.id&&st.mode==='play'){var sx=(hx(cur.c,cur.r)-cx)*z,sy=(hy(cur.r)-cy)*z;if(sx<10||sx>CW-10||sy<10||sy>CH-10){var ang=Math.atan2(sy-CH/2,sx-CW/2),ex=CW/2+Math.cos(ang)*Math.min(CW,CH)*.42,ey=CH/2+Math.sin(ang)*Math.min(CW,CH)*.42;g.save();g.translate(ex,ey);g.rotate(ang);g.fillStyle='#f3e2b0';g.strokeStyle='#6b4a0e';g.lineWidth=2;g.beginPath();g.moveTo(16,0);g.lineTo(-8,-11);g.lineTo(-3,0);g.lineTo(-8,11);g.closePath();g.fill();g.stroke();g.restore()}}
  var vg=g.createRadialGradient(CW/2,CH/2,Math.min(CW,CH)*.35,CW/2,CH/2,Math.max(CW,CH)*.75);vg.addColorStop(0,'rgba(8,10,16,0)');vg.addColorStop(1,'rgba(8,10,16,.55)');g.fillStyle=vg;g.fillRect(0,0,CW,CH);
+ var glOk=false;if(window.LQLight){var pk=packLights(cx,cy,z);glOk=LQLight.frame(cv,pk.lights,pk.shadows,A.key)}
+ if(!FX.low&&!glOk){g.setTransform(1,0,0,1,0,0);if(!fxl||fxl.w!==cv.width||fxl.h!==cv.height)mkLight();g.drawImage(fxl.c,0,0)}
  st.mmT-=1;if(st.mmT<=0){st.mmT=6;drawMM()}}
 function drawMM(){if(!mm||!st.scene)return;var sc=st.scene,g=mmg,W=mm.width,H=mm.height,k=Math.min(W/sc.W,H/sc.H),ox=(W-sc.W*k)/2,oy=(H-sc.H*k)/2;g.fillStyle='#0a0f15';g.fillRect(0,0,W,H);g.drawImage(sc.cv,ox,oy,sc.W*k,sc.H*k);if(sc.id==='w')g.drawImage(sc.fogCv,ox,oy,sc.W*k,sc.H*k);
  if(sc.id==='w')NODES.forEach(function(nd,i){g.fillStyle=zoneOpen(i)?'#f3e2b0':'#555b64';g.beginPath();g.arc(ox+hx(nd[0],nd[1])*k,oy+hy(nd[1])*k,i<NR?5:7,0,7);g.fill();g.strokeStyle='#2a1d0a';g.lineWidth=1.5;g.stroke()});
@@ -348,6 +378,6 @@ function init(){cv=$('#cv');ctx=cv.getContext('2d');resize();window.addEventList
  document.body.addEventListener('pointerdown',function(){gest=true},{passive:true});
  var w=P().w;if(w&&w.sid){var sc=w.sid==='w'?st.world:null;if(sc){st.hero.c=w.c;st.hero.r=w.r}}
  title();requestAnimationFrame(frame);
- window.__w={interact:interact,st:st,walkTo:function(c,r){return new Promise(function(res){if(!walkTo(c,r))return res(false);var t0=Date.now();(function p(){if(!st.path&&!st.hero.mv||Date.now()-t0>60000)res(true);else setTimeout(p,30)})()})},warp:function(sid,c,r){enter(sid,c,r)},objective:objective,speed:function(n){st.speed=n},NODES:NODES,hud:hud,scene:function(){return st.scene},bfs:bfs,getScene:getScene,zoneOpen:zoneOpen,adv:adv,pick:pick,neigh:neigh,canWalk:canWalk,start:start}}
+ window.__w={interact:interact,st:st,walkTo:function(c,r){return new Promise(function(res){if(!walkTo(c,r))return res(false);var t0=Date.now();(function p(){if(!st.path&&!st.hero.mv||Date.now()-t0>60000)res(true);else setTimeout(p,30)})()})},warp:function(sid,c,r){enter(sid,c,r)},objective:objective,speed:function(n){st.speed=n},NODES:NODES,hud:hud,scene:function(){return st.scene},bfs:bfs,getScene:getScene,zoneOpen:zoneOpen,adv:adv,pick:pick,neigh:neigh,canWalk:canWalk,start:start,draw:function(){draw()}}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
