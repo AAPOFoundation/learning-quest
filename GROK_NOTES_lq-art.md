@@ -51,6 +51,7 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - Watermark tiles stay at 0.26 opacity so the words stay clear.
 - Checked in headless Edge: a sheet of the covers, badges and plates, and the home at 390×1600 and 1100×1400. Course covers are 168px tall on a wide screen and 140px on a phone, so the mill, the cabin and the scales stay in frame. A real phone was not used.
 - On a phone, the region name sat over the hero. At 390×844 it now sits in the top band, and the XP row starts below it. The guide speech stays at the bottom. Measured in headless Edge: the banner is y 8–58, the objective row ends at y 244, and the speech starts at y 639. A real phone was not used.
+- The pause menu no longer squashes the cover to 112px. It keeps the 16:9 frame. On a 390px screen the cover was 338×190, with Resume still in view.
 
 ## Not done
 

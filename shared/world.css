@@ -51,7 +51,6 @@ body.nopad #pad,body.nopad #acts{display:none!important}
 #ttl{position:fixed;inset:0;z-index:25;display:none;align-items:center;justify-content:center;padding:14px;background:radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15;overflow:auto;touch-action:pan-y pinch-zoom}
 #ttl .panel{max-width:520px;width:100%;margin:auto}
 #ov{background-image:linear-gradient(#060a0ee8,#060a0ee8),var(--world-bg,none);background-size:auto,160px 160px;background-color:#060a0e}
-#ov .world-cover img{height:112px}
 .kbd{display:inline-block;min-width:22px;padding:0 6px;border:1px solid var(--brass-mid);border-bottom-width:2px;border-radius:5px;background:#070b10;font:800 12px/20px var(--font);text-align:center;color:var(--gold-hi)}
 .toast{z-index:40}
 .mapfull{width:100%;border:1px solid var(--brass);border-radius:10px;background:#0a0f15;display:block;margin-bottom:10px}
