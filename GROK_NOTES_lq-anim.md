@@ -61,6 +61,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 51. **Result buttons rise.** After a level, the re-read button rises, then Back to the map. After a final-challenge step, Continue rises. At the end, Replay rises, then Back to the map. The rise lets go, so a press can still sink the button. Reduced motion removes it.
 52. **The home strip reuses its draw list.** Each frame used to build a new list of the four towns, the citadel and the wanderer. The same slots are filled again. The picture does not change.
 53. **A failed test settles sideways.** A passing test still rises. A failing one shifts a few pixels, then rests, on the same beat as a wrong quiz choice. Reduced motion removes it.
+54. **The way back rises.** Leave, Back, Got it and Back to the map rise when that page opens. The rise lets go, so a press can still sink the button. Reduced motion removes it. The menu rows already arrive on their own.
 
 ## Checked
 

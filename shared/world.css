@@ -32,7 +32,7 @@ body.world{height:100vh;height:100dvh;overflow:hidden;position:fixed;inset:0;wid
 @media (pointer:coarse),(max-width:760px){#pad,#acts{display:grid}#acts{display:flex}}
 body.nopad #pad,body.nopad #acts{display:none!important}
 @media (max-width:560px){#lt{max-width:calc(100vw - 118px)}#party img.hp{width:42px;height:42px}#pm img{width:17px;height:17px}#mm{width:100px;height:74px}#tr .row{flex-wrap:wrap;width:92px;justify-content:flex-end}.ib{min-width:42px;min-height:42px}#party .nm{font-size:15px}#party .rk{font-size:11px}#area{top:auto;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 250px);max-width:92vw;padding:6px 14px}#area b{font-size:19px}}
-#ov{position:fixed;inset:0;z-index:20;overflow:auto;background:#060a0ee6;touch-action:pan-y;user-select:text;-webkit-user-select:text}#ov:not([hidden]){animation:ovfade .18s ease}
+#ov{position:fixed;inset:0;z-index:20;overflow:auto;background:#060a0ee6;touch-action:pan-y;user-select:text;-webkit-user-select:text}#ov:not([hidden]){animation:ovfade .18s ease}#ov .rise{animation:pop .22s ease backwards}
 #ov[hidden],#dlg[hidden]{display:none}
 .ovbar{position:sticky;top:0;z-index:2;display:flex;justify-content:flex-end;padding:8px 12px;background:linear-gradient(#060a0e,#060a0e00)}
 #ovbody .wrap{padding-top:4px}
