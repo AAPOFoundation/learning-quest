@@ -10,15 +10,15 @@
 </ol>
 <p class="small dim" id="jnext" style="margin:6px 0 12px"></p>
 <p class="small dim" style="margin:0 0 12px">The order is a suggestion, not a lock: every world is open. Python tasks run in your browser using the Pyodide engine, downloaded from a public CDN the first time (about 10 MB), so they need an internet connection. Each later task has "Python ideas used here" buttons that reopen the matching Python Basics lesson.</p><div class="rule"></div><p class="kicker">Separate topic</p>
-<a class="btn btn-ghost" href="portfolio-guide/index.html">Portfolio Guide</a></section>
+<a class="btn btn-ghost" href="portfolio-guide/index.html" style="animation:pop .28s ease backwards;animation-delay:.28s">Portfolio Guide</a></section>
 <p class="disc">General education only, not career, financial or investment advice. Styled after the Pocket Reserve design language.</p></main>
 <script>
 (function(){var names={'python-basics':'Python Basics','ai-foundations':'AI Foundations','ai-evals':'AI Evaluation Skills','ai-safety':'AI Safety'},next=null;
 document.querySelectorAll('.prog').forEach(function(p){var k=p.getAttribute('data-k'),n=+p.getAttribute('data-n'),done=0,started=false;
  try{var s=JSON.parse(localStorage.getItem('learning-apps.'+k));if(s&&s.levels){started=true;Object.keys(s.levels).forEach(function(id){if(s.levels[id]&&s.levels[id].done)done++})}if(s&&(s.xp>0||s.w))started=true}catch(e){}
- done=Math.min(done,n);p.textContent=done?(done>=n?'All '+n+' levels cleared!':done+' of '+n+' levels cleared'):(started?'Started':'Not started yet');
- var card=p.closest('.qcard'),bar=card&&card.querySelector('.bar'),a=document.getElementById('j-'+k);
- if(bar){bar.setAttribute('aria-valuenow',done);bar.firstChild.style.width=Math.round(100*done/n)+'%'}
+ done=Math.min(done,n);p.textContent=done?(done>=n?'All '+n+' levels cleared':done+' of '+n+' levels cleared'):(started?'Started':'Not started');
+ var card=p.closest('.qcard'),bar=card&&card.querySelector('.bar'),a=document.getElementById('j-'+k),pct=n?Math.round(100*done/n):0;
+ if(bar){bar.setAttribute('aria-valuenow',done);var fill=bar.firstChild;fill.style.width='0%';requestAnimationFrame(function(){fill.style.width=pct+'%'})}
  if(a)a.textContent=done>=n?'Play again':(started?'Keep going':'Play');
  if(card&&done>=n)card.classList.add('is-done');
  if(!next&&done<n)next=k});
