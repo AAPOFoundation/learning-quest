@@ -15,7 +15,7 @@
   <path d="M134 82 C138 64 132 52 138 46" fill="none" stroke="#4f7a3a" stroke-width="2.3" stroke-linecap="round"/>
   <ellipse cx="140" cy="44" rx="3" ry="6" fill="#4f7a3a" transform="rotate(-14 140 44)"/>
   <path d="M20 78 C48 72 78 82 110 74 C128 70 142 76 150 74" fill="none" stroke="#e8dcc4" stroke-width="1.4" stroke-linecap="round" opacity="0.35"/>
-  <circle cx="80" cy="60" r="23" fill="#7a2e2a"/>
+  <circle cx="80" cy="60" r="23" fill="#121a24"/>
   <circle cx="80" cy="60" r="23" fill="none" stroke="#d7b56a" stroke-width="3.5"/>
   <circle cx="80" cy="60" r="16" fill="none" stroke="#c8a86a" stroke-width="1.5"/>
   <path d="M68 61 L77 72 L94 48" fill="none" stroke="#f3e2b0" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>

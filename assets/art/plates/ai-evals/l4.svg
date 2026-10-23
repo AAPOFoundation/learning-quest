@@ -7,7 +7,7 @@
   <path d="M0 72 C40 64 80 80 120 70 C140 66 152 74 160 70 V100 H0 Z" fill="#6b4a0e"/>
   <path d="M0 86 C50 80 100 92 160 84 V100 H0 Z" fill="#8a6528"/>
   <ellipse cx="80" cy="76" rx="66" ry="18" fill="#8a6528"/>
-  <path d="M22 70 C46 64 70 76 96 68 C118 62 136 70 148 66" fill="none" stroke="#c8a86a" stroke-width="1.5" stroke-linecap="round" opacity="0.55"/>
+  <path d="M18 80 C44 74 78 86 112 78 C130 74 144 80 152 76" fill="none" stroke="#c8a86a" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>
   <ellipse cx="80" cy="72" rx="52" ry="5" fill="#6b4a0e" opacity="0.45"/>
   <rect x="26" y="58" width="108" height="16" rx="3" fill="#c8a86a"/>
   <rect x="28" y="60" width="104" height="12" rx="2" fill="#d7b56a"/>
