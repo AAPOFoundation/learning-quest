@@ -85,9 +85,14 @@ function paintScene(sc){
   var tn=!FX.low?tileTint(sc,c,r):null;if(tn){var al=(t==='water'||t==='crown')?0.08:t==='road'?0.06:0.16,tc=t==='road'?'rgba(255,230,180,'+al+')':rgbaHex(tn,al);if(tc){hexPath(g,x,y,S*1.03);g.fillStyle=tc;g.fill()}}
   if(!FX.low&&(t==='mountain'||t==='hills'||t==='forest'||t==='pine'))lift.push([y,x,t==='mountain'?4:t==='hills'?3:2,base,f,tn]);
   if(t==='water'){g.drawImage(litWtr,x-litW/2,y-litW/2);
+   g.save();hexPath(g,x,y,S*.98);g.clip();g.fillStyle='rgba(6,22,46,.34)';g.beginPath();g.ellipse(x+S*.22,y+S*.16,S*.4,S*.2,-.35,0,PI*2);g.fill();
+   g.strokeStyle='rgba(214,238,255,.28)';g.lineWidth=1.3;g.beginPath();g.moveTo(x-S*.38,y-S*.12);g.quadraticCurveTo(x-S*.05,y-S*.3,x+S*.22,y-S*.1);g.stroke();g.restore();
    g.strokeStyle='rgba(235,248,255,.16)';g.lineWidth=1.2;for(i=0;i<2;i++){var wx=x-S*.5+hash(c,r,i+3)*S,wy=y-S*.4+hash(c,r,i+9)*S*.8;g.beginPath();g.moveTo(wx-6,wy);g.quadraticCurveTo(wx,wy-3,wx+6,wy);g.stroke()}}
   else{g.drawImage(litHex,x-litW/2,y-litW/2);
    g.save();hexPath(g,x,y,S);g.clip();for(i=0;i<5;i++){var a=hash(c,r,20+i),b=hash(c,r,40+i);g.fillStyle=(i%2?'rgba(255,240,190,.07)':'rgba(30,20,0,.07)');g.beginPath();g.ellipse(x-S*.7+a*S*1.4,y-S*.7+b*S*1.4,S*.35,S*.12,a*3,0,PI*2);g.fill()}
+   if(t==='snow'){g.fillStyle='rgba(62,98,128,.18)';g.beginPath();g.ellipse(x+S*.18,y+S*.12,S*.4,S*.18,0,0,PI*2);g.fill()}
+   else if(t==='sand'){g.fillStyle='rgba(110,62,18,.16)';g.beginPath();g.ellipse(x+S*.16,y+S*.1,S*.46,S*.16,-.25,0,PI*2);g.fill()}
+   else if(t==='marsh'){g.fillStyle='rgba(16,52,62,.22)';g.beginPath();g.ellipse(x+S*.04,y+S*.08,S*.36,S*.16,0,0,PI*2);g.fill()}
    if(!FX.low)matHint(g,t,x,y,c,r,sc.seed);g.restore()}
   hexPath(g,x,y,S);g.strokeStyle='rgba(30,22,6,.10)';g.lineWidth=1;g.stroke();if(!FX.low&&t!=='water')bevel(g,x,y);
   if(t==='forest')decos.push([y,'forest',x,y,h1,h2]);else if(t==='pine')decos.push([y,'pine',x,y,h1,h2]);else if(t==='mountain')decos.push([y,'mountain',x,y,h1,h2]);else if(t==='hills')decos.push([y,'hills',x,y,h1,h2]);
