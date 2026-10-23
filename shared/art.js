@@ -6,7 +6,7 @@ var S=34,SQ3=Math.sqrt(3),PI=Math.PI,stamps={};
 var FX=window.LQFx={low:(function(){try{var v=localStorage.getItem('learning-apps.fx');if(v)return v==='low'}catch(e){}return !!((window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)||(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2))})(),
  /* live reduced-motion query: animation (water shimmer, particles, the home hero walk) stops while it matches, even after Low effects has been toggled */
  rm:window.matchMedia?matchMedia('(prefers-reduced-motion: reduce)'):{matches:false},
- set:function(v){FX.low=!!v;stamps={};try{localStorage.setItem('learning-apps.fx',v?'low':'full')}catch(e){}}};
+ set:function(v){FX.low=!!v;stamps={};bslots={};bcount=0;try{localStorage.setItem('learning-apps.fx',v?'low':'full')}catch(e){}}};
 function hash(a,b,s){var h=(Math.imul(a|0,374761393)+Math.imul(b|0,668265263)+Math.imul(s|0,1442695041))|0;h=Math.imul(h^(h>>>13),1274126177);h^=h>>>16;return (h>>>0)/4294967296}
 function vnoise(x,y,s){var x0=Math.floor(x),y0=Math.floor(y),fx=x-x0,fy=y-y0;fx=fx*fx*(3-2*fx);fy=fy*fy*(3-2*fy);var a=hash(x0,y0,s),b=hash(x0+1,y0,s),c=hash(x0,y0+1,s),d=hash(x0+1,y0+1,s);return a+(b-a)*fx+(c-a)*fy+(a-b-c+d)*fx*fy}
 function hx(c,r){return S*SQ3*(c+0.5*(r&1))+S*SQ3/2}
@@ -200,10 +200,17 @@ function landmark(g,b,u,ac,t){g.save();
  else if(b==='highland'){ell(g,0,0,10*u,4*u,'rgba(0,0,0,.25)');for(var i=0;i<4;i++){var w=(9-i*2)*u;g.fillStyle=i%2?'#8d877c':'#a9a294';g.fillRect(-w/2,-(i+1)*6*u,w,6*u)}flag(g,0,-24*u,12*u,ac,t,u)}
  g.restore()}
 
-/* buildings and props. (x,y)=hex centre. Static trees and rocks are stamped once (2x) and blitted. */
+/* buildings and props. (x,y)=hex centre. Static trees and rocks are stamped once (2x) and blitted.
+   Other buildings are painted into a shared 2x sprite and blitted. A moving one (flag, wheel, smoke, flame) is redrawn about 15 times a second. A still one is painted once. Low effects skips the cache and draws live. A chest lid mid-swing and the town gate stay live so those motions stay smooth. */
+var bslots={},bcount=0,bclock=0,BW=280,BH=320;
+function animKind(kind,o){if(kind==='tree'&&o.landmark)return true;if(kind==='chest')return !!o.glow;return kind==='smithy'||kind==='tower'||kind==='great'||kind==='town'||kind==='castle'||kind==='fountain'||kind==='banner'||kind==='cache'}
+function bkey(kind,o){var acc=(kind==='fountain'||kind==='vault'||kind==='cache'||kind==='chest')?'':(o.accent||'');var bio=kind==='town'?(o.biome||''):'';var lm=kind==='tree'?(o.landmark||''):'';return kind+'|'+acc+'|'+bio+'|'+lm+'|'+(o.lit?1:0)+'|'+(o.open?1:0)+'|'+(o.locked?1:0)+'|'+(o.glow?1:0)}
+function bslot(kind,o){if(FX.low||kind==='gate')return null;if(kind==='chest'&&typeof o.lid==='number'&&o.lid>0.04&&o.lid<0.96)return null;var ph=animKind(kind,o)?Math.floor((o.t||0)*15):0,id=bkey(kind,o),slot=bslots[id],k;if(!slot){if(bcount>=48){var old=1e15,drop=null;for(k in bslots)if(bslots[k].used<old){old=bslots[k].used;drop=k}if(drop){delete bslots[drop];bcount--}}var cv=document.createElement('canvas');cv.width=BW;cv.height=BH;slot=bslots[id]={cv:cv,g:cv.getContext('2d'),ph:-1e9,used:0};bcount++}slot.used=++bclock;if(slot.ph===ph){slot.ready=true;return slot}var sg=slot.g;sg.setTransform(1,0,0,1,0,0);sg.globalAlpha=1;sg.clearRect(0,0,BW,BH);sg.setTransform(2,0,0,2,140,280);slot.want=ph;slot.ready=false;return slot}
 function propKey(kind,o){if(kind==='rock')return 'rock';if(!FX.low&&o.v!=null&&o.v<.2)return 'bush'+(o.snow?1:0);if(!FX.low&&o.v!=null&&o.v<.3)return 'stone'+(o.snow?1:0);return 'tree|'+(o.pine?1:0)+'|'+(o.snow?1:0)+'|'+(FX.low?1:0)}
 function propStamp(kind,o){var id=propKey(kind,o),c=stamps[id];if(c)return c;c=document.createElement('canvas');c.width=c.height=256;var sg=c.getContext('2d');sg.setTransform(2,0,0,2,0,0);sg.translate(64,100);var u=S/34;ell(sg,0,0,26*u,7*u,'rgba(0,0,0,.28)');if(kind==='rock')hill(sg,0,2*u,24*u,12*u,COL.rock);else if(!FX.low&&o.v!=null&&o.v<.2)bush(sg,0,0,S*.9,o.snow?'#5a7a6a':'#4f7f45');else if(!FX.low&&o.v!=null&&o.v<.3)stone(sg,0,0,S*.85,!!o.snow);else tree(sg,0,0,S*1.05,o.pine?'pine':'oak',!!o.snow);stamps[id]=c;return c}
-function building(g,kind,x,y,o){o=o||{};if(kind==='rock'||(kind==='tree'&&!o.landmark)){g.drawImage(propStamp(kind,o),x-64,y+S*.5-100,128,128);return}var u=S/34,ac=o.accent||'#b5532f',t=o.t||0;g.save();g.translate(x,y+S*.5);ell(g,0,0,26*u,7*u,'rgba(0,0,0,.28)');
+function building(g,kind,x,y,o){o=o||{};if(kind==='rock'||(kind==='tree'&&!o.landmark)){g.drawImage(propStamp(kind,o),x-64,y+S*.5-100,128,128);return}
+ var host=g,ax=x,ay=y,slot=bslot(kind,o);if(slot&&slot.ready){host.drawImage(slot.cv,ax-70,ay+S*.5-140,140,160);return}if(slot){g=slot.g;x=0;y=-S*.5}
+ var u=S/34,ac=o.accent||'#b5532f',t=o.t||0;g.save();g.translate(x,y+S*.5);ell(g,0,0,26*u,7*u,'rgba(0,0,0,.28)');
  function wall(x0,w,h,col){wallG(g,x0,0,w,h,col)}
  function roof(x0,w,h,top,col){tri(g,x0-3*u,top,x0+w/2,top-h,x0+w+3*u,top,col);tri(g,x0+w/2,top-h,x0+w+3*u,top,x0+w/2+1,top,'rgba(0,0,0,.28)')}
  if(kind==='hall'){wall(-24*u,48*u,24*u,'#d9cfb6');g.fillStyle='#c9bf9f';g.fillRect(-27*u,-3*u,54*u,3*u);g.fillRect(-26*u,-27*u,52*u,3*u);
@@ -227,6 +234,6 @@ function building(g,kind,x,y,o){o=o||{};if(kind==='rock'||(kind==='tree'&&!o.lan
  else if(kind==='gate'){var lift=Math.max(0,Math.min(1,o.lift||0));g.fillStyle='#8a7a5a';g.fillRect(-22*u,-24*u,6*u,24*u);g.fillRect(16*u,-24*u,6*u,24*u);g.fillStyle='#d7b56a';g.fillRect(-24*u,-27*u,48*u,4*u);g.save();g.beginPath();g.rect(-16*u,-24*u,32*u,24*u);g.clip();g.fillStyle='rgba(243,215,138,.28)';g.fillRect(-16*u,-24*u-lift*28*u,32*u,24*u);g.restore()}
  else if(kind==='cache'){var b=1+.12*Math.sin(t*3);g.fillStyle='#6a4a22';g.fillRect(-8*u,-10*u,16*u,10*u);g.fillStyle='#8a6528';g.fillRect(-8*u,-10*u,16*u,3*u);g.fillStyle='#d7b56a';g.fillRect(-1.5*u,-8*u,3*u,4*u);ell(g,0,-16*u*b,3*u,3*u,'rgba(243,226,176,.8)')}
  else if(kind==='chest'){var lid=typeof o.lid==='number'?Math.max(0,Math.min(1,o.lid)):(o.open?1:0);g.fillStyle='#6a4a22';g.fillRect(-12*u,-12*u,24*u,12*u);g.fillStyle='#8a6528';g.fillRect(-12*u,-12*u,24*u,3*u);g.fillStyle='#d7b56a';g.fillRect(-12*u,-6*u,24*u,2*u);if(lid>.04)ell(g,0,-13*u,9*u,3*u,'#f3e2b0');g.save();g.translate(0,-12*u);g.rotate(-lid*1.15);g.fillStyle='#7a5628';g.beginPath();g.moveTo(-12*u,0);g.quadraticCurveTo(0,-14*u,12*u,0);g.fill();if(lid<.45){g.fillStyle='#d7b56a';g.fillRect(-2*u,-2*u,4*u,5*u)}g.restore();if(o.glow&&lid<.2){var gl=.5+.5*Math.sin(t*4);var cg=g.createRadialGradient(0,-12*u,1,0,-12*u,26*u);cg.addColorStop(0,'rgba(255,230,140,'+(.45*gl)+')');cg.addColorStop(1,'rgba(255,230,140,0)');g.fillStyle=cg;g.fillRect(-28*u,-38*u,56*u,52*u)}if(o.locked){g.fillStyle='#2a1d0a';g.fillRect(-3*u,-10*u,6*u,6*u)}}
- g.restore()}
+ g.restore();if(slot){slot.ph=slot.want;host.drawImage(slot.cv,ax-70,ay+S*.5-140,140,160)}}
 window.Art={S:S,SQ3:SQ3,hash:hash,vnoise:vnoise,hx:hx,hy:hy,neigh:neigh,hdist:hdist,px2hex:px2hex,hline:hline,hexPath:hexPath,paintScene:paintScene,portrait:portrait,figure:figure,building:building,COL:COL,ell:ell,mix:mix};
 })();

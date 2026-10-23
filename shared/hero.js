@@ -14,7 +14,7 @@ function terrain(){var t=[];for(var c=0;c<COLS;c++){t.push([]);for(var r=0;r<ROW
 var sc={cols:COLS,rows:ROWS,seed:SEED,t:terrain(),roads:[(function(){var p=[];for(var c=1;c<=CAST.c;c++)p.push([c,3]);return p})()],objs:[],biome:'meadow'};
 sc.objs=TOWNS.map(function(n){return {c:n.c,r:n.r}}).concat([{c:CAST.c,r:CAST.r}]);
 Art.paintScene(sc);
-var W=0,H=0,dpr=1,cam=0,T=0,last=0,acc=0,running=false,visible=true,ov=null,RM=FX.rm||{matches:false};
+var W=0,H=0,dpr=1,cam=0,T=0,last=0,acc=0,running=false,visible=true,ov=null,names={},RM=FX.rm||{matches:false};
 function still(){return FX.low||RM.matches}
 /* the three light/shade overlays are baked once per size into one offscreen canvas */
 function size(){var r=cv.getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));cv.width=W*dpr;cv.height=H*dpr;
@@ -34,7 +34,7 @@ function draw(){var full=X1-X0,z=Math.max(W/full,H/(S*1.5*6.8)),vw=W/z,vh=H/z,to
  var st=still(),hxp=st?hx(5,3):hp[0],dist=T*26,stride=42,step=st?0:(dist/stride)%1,foot=(Math.floor(dist/stride)%2)?-1:1;/* still frame: on the road between towns 1 and 2 */list.push({y:hy(3)+1,f:function(){Art.figure(g,hxp,hy(3)+S*.2,HERO,{t:T,moving:!st,face:st?1:hp[1],step:step,hop:st?0:Math.sin(step*Math.PI)*4.5,foot:foot})}});
  list.sort(function(a,b){return a.y-b.y}).forEach(function(o){o.f()});
  /* name plaques, in the map's own style */
- var fs=Math.min(30,(W<520?10:11)/z),short=W<520;g.font='700 '+fs+'px "Cormorant Garamond",Georgia,serif';g.textAlign='center';TOWNS.concat([CAST]).forEach(function(n,i){var nm=short?n.name.replace(/^(AI |Python )/,''):n.name,x=hx(n.c,n.r),y=hy(n.r)+S*1.15,tw=g.measureText((i<4?(i+1)+' · ':'')+nm).width+fs*1.2;g.fillStyle='rgba(10,15,21,.86)';g.strokeStyle='#c8a86a';g.lineWidth=1/z;g.beginPath();g.rect(x-tw/2,y-fs*.95,tw,fs*1.45);g.fill();g.stroke();g.fillStyle='#f3e2b0';g.fillText((i<4?(i+1)+' · ':'')+nm,x,y+fs*.12)});
+ var fs=Math.min(30,(W<520?10:11)/z),short=W<520;g.font='700 '+fs+'px "Cormorant Garamond",Georgia,serif';g.textAlign='center';TOWNS.concat([CAST]).forEach(function(n,i){var nm=short?n.name.replace(/^(AI |Python )/,''):n.name,label=(i<4?(i+1)+' · ':'')+nm,nk=fs+'|'+label,x=hx(n.c,n.r),y=hy(n.r)+S*1.15,tw=names[nk];if(tw==null)tw=names[nk]=g.measureText(label).width;tw+=fs*1.2;g.fillStyle='rgba(10,15,21,.86)';g.strokeStyle='#c8a86a';g.lineWidth=1/z;g.beginPath();g.rect(x-tw/2,y-fs*.95,tw,fs*1.45);g.fill();g.stroke();g.fillStyle='#f3e2b0';g.fillText(label,x,y+fs*.12)});
  if(!FX.low&&window.LQAnim)LQAnim.particles(g,'meadow',1/30,cx,cy,vw,vh,T);
  g.setTransform(1,0,0,1,0,0);if(ov)g.drawImage(ov,0,0)}
 function frame(ts){if(!running)return;requestAnimationFrame(frame);var dt=Math.min(.1,(ts-last)/1000||0);last=ts;acc+=dt;if(acc<1/30)return;T+=acc;acc=0;draw()}
