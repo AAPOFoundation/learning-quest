@@ -16,3 +16,11 @@ function fill(el,id){var v=document.createElement('video');v.preload='metadata';
 function scan(root){Array.prototype.forEach.call((root||document).querySelectorAll('.lq-guide[data-guide]:not([data-done])'),function(el){var id=el.getAttribute('data-guide');el.setAttribute('data-done','1');if(known[id]===0){el.remove();return}fill(el,id)})}
 window.LQGuide={slot:slot,scan:scan,base:BASE,ids:IDS};
 })();
+/* Phone HUD layout helper (r2): publish the bottom edge of the top HUD stack (#lt + #tr) as --lq-hud-b, so the region banner
+   and guide caption can sit just under it whatever the objective text length or screen size. Layout only; no game logic. */
+(function(){'use strict';if(!window.ResizeObserver||!document.getElementById('hud'))return;
+var root=document.documentElement,ro=new ResizeObserver(upd),seen=[];
+function upd(){var b=0;['lt','tr'].forEach(function(id){var e=document.getElementById(id);if(e&&e.offsetParent!==null){var r=e.getBoundingClientRect();if(r.bottom>b)b=r.bottom}});if(b)root.style.setProperty('--lq-hud-b',Math.round(b)+'px');var c=document.getElementById('narrcap');if(c&&!c.hidden)root.style.setProperty('--lq-cap-h',Math.round(c.getBoundingClientRect().height)+'px')}
+function watch(){['lt','tr','narrcap'].forEach(function(id){var e=document.getElementById(id);if(e&&seen.indexOf(e)<0){seen.push(e);ro.observe(e)}});upd()}
+new MutationObserver(watch).observe(document.getElementById('hud'),{childList:true});new MutationObserver(watch).observe(document.body,{childList:true});window.addEventListener('resize',upd);watch()})();
+
