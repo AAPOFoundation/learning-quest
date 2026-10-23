@@ -315,20 +315,25 @@ function groundMesh(P){
  return pack(b);
 }
 function pineMesh(snow){
- var b=new Builder(), trunk=hex('#5c4030');
+ var b=new Builder(), trunk=hex('#5c4030'), bark=hex('#4a3424');
  var a=snow?hex('#b7ccc8'):hex('#1e5a32'), c=snow?hex('#e4eef0'):hex('#347a40'), d=snow?hex('#f5f8f8'):hex('#256838');
- cyl(b,0,0.28,0,0.07,0.55,6,trunk,0);
- cone(b,0,0.4,0,0.62,0.75,7,a,0);
- cone(b,0,0.78,0,0.46,0.64,7,c,0);
- cone(b,0,1.15,0,0.28,0.52,6,d,0);
+ shaft(b, [0,0.02,0], [0.06,0.48,0.02], 0.065, trunk, 0);
+ shaft(b, [0.06,0.48,0.02], [0.12,0.84,-0.02], 0.04, bark, 0);
+ shaft(b, [0.1,0.62,0.02], [0.72,0.46,0.2], 0.026, bark, 0);
+ cone(b,0.04,0.36,0,0.62,0.7,7,a,0);
+ cone(b,0.06,0.72,0,0.46,0.58,7,c,0);
+ cone(b,0.08,1.05,0,0.26,0.48,6,d,0);
  return pack(b);
 }
 function roundTreeMesh(leaf,leaf2,trunk){
  var b=new Builder();
- cyl(b,0,0.32,0,0.08,0.64,6,trunk,0);
- sphere(b,0,1.02,0,0.42,8,5,leaf,0);
- sphere(b,-0.22,0.88,0.08,0.28,6,4,leaf2,0);
- sphere(b,0.18,0.9,-0.1,0.24,6,4,mix(leaf,leaf2,0.4),0);
+ shaft(b, [0,0.02,0], [0,0.42,0], 0.08, trunk, 0);
+ shaft(b, [0,0.36,0], [-0.55,0.68,0.16], 0.05, trunk, 0);
+ shaft(b, [0,0.36,0], [0.52,0.64,-0.18], 0.044, mix(trunk,[0,0,0],0.16), 0);
+ sphere(b,0.02,1.0,0,0.4,7,5,leaf,0);
+ sphere(b,-0.22,0.88,0.1,0.26,6,4,leaf2,0);
+ sphere(b,0.2,0.9,-0.1,0.24,6,4,mix(leaf,leaf2,0.45),0);
+ sphere(b,0.04,1.22,0.02,0.18,5,4,mix(leaf,[1,1,1],0.1),0);
  return pack(b);
 }
 function bushMesh(col){var b=new Builder(); sphere(b,0,0.16,0,0.22,6,4,col,0); sphere(b,0.14,0.12,0.05,0.15,5,3,mix(col,[1,1,1],0.12),0); return pack(b)}
