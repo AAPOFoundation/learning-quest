@@ -89,6 +89,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 79. **Workshop actions rise, and the text box eases.** Build the chain rises. Write 5 sentences rises, then Same dials, new luck. The sample text picks up the same gold edge as a code box. Reduced motion removes all of it. The odds bars were already easing.
 80. **An expedition note eases its edge.** The note you write on a stage uses the same dark field as the other boxes, and it picks up the gold edge. Reduced motion removes the ease. The word-list search is still left alone.
 81. **Draw 30 words rises.** The temperature toy's draw button rises once when that page opens. The rise lets go, so a press can still sink. Reduced motion removes it. The bars were already easing.
+82. **Retry and Skip rise.** When Python cannot run, Retry rises, then Skip this challenge. The rise lets go, so a press can still sink. Reduced motion removes it.
 
 ## Checked
 
