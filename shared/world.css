@@ -13,7 +13,7 @@ body.world{height:100vh;height:100dvh;overflow:hidden;position:fixed;inset:0;wid
 #party .bar{height:8px;margin:4px 0}
 #party .st{font-size:12px;color:var(--ink-dim);display:flex;gap:10px;flex-wrap:wrap}
 #pm{display:flex;gap:3px;margin-top:5px}
-#pc{display:flex;gap:4px;margin-top:4px}#pc img{width:26px;height:26px;border-radius:6px;border:1px solid var(--gold);background:#0e141c;animation:idlebreath 3.4s ease-in-out infinite}#pc img:nth-child(2){animation-delay:.35s}#pc img:nth-child(3){animation-delay:.7s}#pc img:nth-child(4){animation-delay:1.05s}
+#pc{display:flex;gap:4px;margin-top:4px}#pc img{width:26px;height:26px;border-radius:6px;border:1px solid var(--gold);background:#0e141c;animation:idlebreath 3.4s ease-in-out infinite}#pc img:nth-child(2){animation-delay:.35s}#pc img:nth-child(3){animation-delay:.7s}#pc img:nth-child(4){animation-delay:1.05s}#pc img.just{animation:arrive .35s ease both,idlebreath 3.4s ease-in-out infinite}
 #pm img{width:24px;height:24px;border-radius:50%;border:1px solid var(--brass-mid);filter:grayscale(1) brightness(.55);opacity:.7;transition:filter .25s,opacity .25s,border-color .25s}
 #pm img.on{filter:none;opacity:1;border-color:var(--gold)}
 #quest{width:min(300px,100%);cursor:pointer}
@@ -122,6 +122,7 @@ pre.code{margin:10px 0;padding:10px 12px;background:#070b10;border:1px solid #2b
 @keyframes ovfade{from{opacity:0}to{opacity:1}}
 @keyframes cqcheer{50%{box-shadow:0 0 0 3px #d7b56acc,0 0 16px 2px #d7b56a80}}
 @keyframes idlebreath{50%{transform:translateY(1px)}}
+@keyframes arrive{from{opacity:0}to{opacity:1}}
 @keyframes qping{0%{box-shadow:0 0 0 0 #d7b56a88}100%{box-shadow:0 0 0 10px #d7b56a00}}
 @keyframes xpup{40%{transform:scale(1.12)}to{transform:none}}
 #quest.ping{animation:qping .6s ease}#xpn.xpup{display:inline-block;animation:xpup .45s ease}

@@ -40,8 +40,8 @@ var CREW=[
   ok:function(){return done('ai-safety','l3')||done('ai-evals','l6')},
   tips:{'python-basics':['Try to break your own function with an odd input. That is testing, and it is the same habit.'],'ai-foundations':['Ask what the model was never shown. That is where it will surprise you.'],'ai-evals':['Agree the scope first, log everything, rank by severity, and retest a fix with reworded attacks.','A clean run proves little. State how hard you tried.'],'ai-safety':['Keep every test harmless and within scope. If you find a real weakness, report it privately first.','A defence is only as good as the attack you tried against it. Say which attacks you did not try.']}}];
 function joined(){return CREW.filter(function(c){return c.ok()})}
-var Party={crew:CREW,joined:joined,
- hud:function(el){var j=joined();el.innerHTML=j.map(function(c){return '<img alt="'+esc(c.name)+'" title="'+esc(c.name+', '+c.role)+'" src="'+Art.portrait(c.look,26)+'">'}).join('')},
+var seenCrew=null,Party={crew:CREW,joined:joined,
+ hud:function(el){var j=joined(),grew=seenCrew!=null&&j.length>seenCrew;seenCrew=j.length;el.innerHTML=j.map(function(c,i){return '<img'+(grew&&i===j.length-1?' class="just"':'')+' alt="'+esc(c.name)+'" title="'+esc(c.name+', '+c.role)+'" src="'+Art.portrait(c.look,26)+'">'}).join('')},
  cameo:function(add,i,castle,mir){
   if(castle){if(A.capstone)add({type:'npc',role:'workshop',c:mir(4,i),r:7,block:true,name:'Artificer Wren',sp:{name:'Artificer Wren',title:'Keeper of the Citadel Workshop',look:CREW[1].look},crew:'wren'});return}
   var j=joined();if(!j.length)return;var c=j[i%j.length];
