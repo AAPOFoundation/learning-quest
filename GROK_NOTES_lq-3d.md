@@ -113,3 +113,14 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 ## Check, pass 8
 
 `node shared/lq3d-geom.js` prints `"ok": true`. Headless Edge, low effects, shows three stones of different heights on a grey shelf behind the shelter, with a lighter top course. The camp in front is unchanged. Not tried on a phone.
+
+## Pass 9 (same day)
+
+- `origin/main` is still an ancestor of this branch. Nothing new to merge.
+- The robe was four flat sides, so the three-quarter camera read it as a crate. It is now eight sides. The front edge still straddles local -Z. The hem stays about x ±0.36, so the cape still hangs past it. A small nose sits just in front of the eyes. Each boot has a toe, and the sole stays on the ground.
+- The shelter roof was one slab. It now has a thick thatch sheet, a short cap, three dark courses, and a straw fringe on the open side. A plank rail faces the camera, a bench sits inside, and three boards close the back. No sign. The roof stays under 1.3, below the ridge.
+- Phone layout and the 2D celebrate hook stay on origin/main. This pass did not touch them.
+
+## Check, pass 9
+
+`node shared/lq3d-geom.js` prints `"ok": true`. Hero heading dot is 1. The robe check finds waist facets, and the nose check finds the front of the face. The shelter check finds the back wall, the bench and a roof under 1.7. Headless Edge, low effects, shows the meadow with dark bands on the shelter roof, straw hanging at the open side, and a bench under the roof. The hood, the cape, the stick, the friend's cap and the book still read. Not tried on a phone.

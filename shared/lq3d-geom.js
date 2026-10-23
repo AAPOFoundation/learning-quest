@@ -125,10 +125,19 @@ function limb(b,a,c,rad,col){
  b.axesBox(mid, fr.x, fr.y, fr.z, rad*2, len, rad*2, col, 0);
  sphere(b, c[0], c[1], c[2], rad*1.2, 6, 4, col, 0);
 }
-function ring(y,w,d){return [[-w,y,-d],[w,y,-d],[w,y,d],[-w,y,d]]}
+/* Eight sides. The first edge straddles local -Z, so the front camera still sees a flat panel
+   and a three-quarter camera sees the facets. */
+function ovalRing(y,rx,rz){
+ var pts=[], i, a, n=8;
+ for(i=0;i<n;i++){
+  a=-Math.PI/2-Math.PI/n+i*(TAU/n);
+  pts.push([Math.cos(a)*rx, y, Math.sin(a)*rz]);
+ }
+ return pts;
+}
 function linkRings(b,a,c,inside,col){
- var i, j;
- for(i=0;i<4;i++){j=(i+1)%4; b.polyOut([a[i],a[j],c[j],c[i]], inside, col, 0)}
+ var i, j, n=a.length;
+ for(i=0;i<n;i++){j=(i+1)%n; b.polyOut([a[i],a[j],c[j],c[i]], inside, col, 0)}
 }
 function hood(b,col){
  /* Pointed cowl: brim over the eyes, cloth on the shoulders, drape down the back. */
@@ -155,7 +164,7 @@ function person(o){
  o=o||{};
  var skin=hex(o.skin||'#e2b48c'), hair=hex(o.hair||'#3b2a1d'), robe=hex(o.robe||'#274a7a'), trim=hex(o.trim||'#d7b56a');
  var boot=hex('#3a2a22'), trouser=hex('#2a3138'), hs=o.head||1, hr=0.26*hs, hy=1.42;
- var top=ring(1.08, 0.34, 0.18), waist=ring(0.74, 0.19, 0.13), hem=ring(0.40, 0.36, 0.22);
+ var top=ovalRing(1.08, 0.34, 0.18), waist=ovalRing(0.74, 0.19, 0.13), hem=ovalRing(0.40, 0.36, 0.22);
  var eyeY=hy+0.03, eyeZ=-0.33, brow=hex('#241812');
  linkRings(b, top, waist, [0,0.9,0], robe);
  linkRings(b, waist, hem, [0,0.55,0], robe);
@@ -173,7 +182,8 @@ function person(o){
  sphere(b, -0.075, eyeY+0.02, eyeZ-0.055, 0.012, 4, 2, hex('#fff6d8'), 0.9);
  b.box(0.09, eyeY+0.075, eyeZ+0.01, 0.07, 0.016, 0.018, brow, 0);
  b.box(-0.09, eyeY+0.075, eyeZ+0.01, 0.07, 0.016, 0.018, brow, 0);
- sphere(b, 0, hy-0.04, eyeZ+0.02, 0.032, 5, 3, skin, 0);
+ /* Nose sits on local -Z, just past the eyes, so the three-quarter view has a face. */
+ sphere(b, 0, hy-0.03, eyeZ-0.07, 0.034, 5, 3, mix(skin,[0.72,0.42,0.34],0.18), 0);
  b.box(0, hy-0.09, eyeZ+0.015, 0.08, 0.016, 0.018, hex('#c47a74'), 0);
  if(o.hat==='cap'){
   cyl(b, 0, hy+hr*0.78, 0.02, hr*1.12, 0.16, 8, robe, 0);
@@ -192,8 +202,10 @@ function person(o){
   card(b, [[-0.26,1.12,0.16],[0.26,1.12,0.16],[0.32,0.40,0.32],[-0.32,0.40,0.32]], cape);
   b.box(0, 1.15, -0.20, 0.07, 0.045, 0.03, trim, 0.55);
  }
- b.box(-0.11, 0.06, -0.03, 0.15, 0.12, 0.26, boot, 0);
- b.box(0.12, 0.06, -0.03, 0.15, 0.12, 0.26, boot, 0);
+ b.box(-0.11, 0.07, -0.02, 0.14, 0.10, 0.20, boot, 0);
+ b.box(0.12, 0.07, -0.02, 0.14, 0.10, 0.20, boot, 0);
+ sphere(b, -0.11, 0.065, -0.14, 0.062, 6, 4, boot, 0);
+ sphere(b, 0.12, 0.065, -0.14, 0.062, 6, 4, boot, 0);
  limb(b, [-0.10,0.46,0.02], [-0.12,0.26,-0.05], 0.068, trouser);
  limb(b, [-0.12,0.26,-0.05], [-0.11,0.13,0.0], 0.055, trouser);
  limb(b, [0.10,0.46,0.02], [0.13,0.26,-0.05], 0.068, trouser);
@@ -581,18 +593,36 @@ function cliffMesh(){
  sphere(b,-0.08,0.94,-0.58,0.06,5,3,moss,0);
  return pack(b);
 }
-/* Open trail shelter. Local -Z is the open side. No sign and no door text. */
+/* Open trail shelter. Local -Z is the open side, toward the camp. No sign and no door text.
+   The roof is two thatch sheets plus a short cap, so the three-quarter camera sees thickness. */
 function shelterMesh(){
- var b=new Builder(), wood=hex('#6b4428'), post=hex('#4e3422'), thatch=hex('#c4a36a'), shade=hex('#8d5a34');
- b.box(-0.48,0.4,-0.36,0.1,0.8,0.1,post,0);
- b.box(0.48,0.4,-0.36,0.1,0.8,0.1,post,0);
- b.box(-0.48,0.56,0.38,0.1,1.12,0.1,wood,0);
- b.box(0.48,0.56,0.38,0.1,1.12,0.1,wood,0);
- b.box(0,0.06,0.05,1.15,0.08,0.95,hex('#7a6244'),0);
- b.polyOut([[-0.78,0.78,-0.58],[0.78,0.78,-0.58],[0.78,1.16,0.58],[-0.78,1.16,0.58]],[0,0.2,0],thatch,0);
- b.polyOut([[-0.78,0.72,-0.58],[-0.78,1.1,0.58],[0.78,1.1,0.58],[0.78,0.72,-0.58]],[0,1.6,0],shade,0);
- b.polyOut([[-0.78,0.78,-0.58],[-0.78,1.16,0.58],[-0.78,1.1,0.58],[-0.78,0.72,-0.58]],[-2,0.9,0],shade,0);
- b.polyOut([[0.78,0.78,-0.58],[0.78,0.72,-0.58],[0.78,1.1,0.58],[0.78,1.16,0.58]],[2,0.9,0],shade,0);
+ var b=new Builder(), wood=hex('#6b4428'), post=hex('#4e3422'), thatch=hex('#c4a36a'), shade=hex('#8d5a34'), straw=hex('#d8bc82'), plank=hex('#7a5a3a');
+ b.box(-0.48,0.42,-0.42,0.09,0.84,0.09,post,0);
+ b.box(0.48,0.42,-0.42,0.09,0.84,0.09,post,0);
+ b.box(-0.48,0.58,0.42,0.09,1.16,0.09,wood,0);
+ b.box(0.48,0.58,0.42,0.09,1.16,0.09,wood,0);
+ b.box(0,0.05,0.02,1.12,0.08,0.92,hex('#7a6244'),0);
+ b.box(-0.28,0.46,0.46,0.16,0.74,0.06,plank,0);
+ b.box(0,0.46,0.46,0.16,0.74,0.06,wood,0);
+ b.box(0.28,0.46,0.46,0.16,0.74,0.06,plank,0);
+ b.box(0,0.84,-0.42,0.96,0.07,0.08,wood,0);
+ /* Local -X faces the three-quarter camera, so this rail reads as a wall. */
+ b.box(-0.50,0.32,0.02,0.07,0.42,0.72,plank,0);
+ b.box(0,0.22,0.22,0.72,0.06,0.22,hex('#8a5a32'),0);
+ b.box(-0.28,0.12,0.22,0.06,0.14,0.06,post,0);
+ b.box(0.28,0.12,0.22,0.06,0.14,0.06,post,0);
+ b.polyOut([[-0.92,0.78,-0.66],[0.92,0.78,-0.66],[0.78,1.18,0.66],[-0.78,1.18,0.66]],[0,0.3,0],thatch,0);
+ b.polyOut([[-0.86,0.70,-0.62],[-0.72,1.08,0.62],[0.72,1.08,0.62],[0.86,0.70,-0.62]],[0,1.7,0],shade,0);
+ b.polyOut([[-0.86,0.70,-0.62],[-0.92,0.78,-0.66],[-0.78,1.18,0.66],[-0.72,1.08,0.62]],[-2,1,0],shade,0);
+ b.polyOut([[0.92,0.78,-0.66],[0.86,0.70,-0.62],[0.72,1.08,0.62],[0.78,1.18,0.66]],[2,1,0],shade,0);
+ b.polyOut([[-0.52,0.92,-0.18],[0.52,0.92,-0.18],[0.40,1.26,0.34],[-0.40,1.26,0.34]],[0,0.4,0],straw,0);
+ /* Dark courses across the slope, so the roof is thatch and not one slab. */
+ b.polyOut([[-0.84,0.86,-0.42],[0.84,0.86,-0.42],[0.78,0.92,-0.22],[-0.78,0.92,-0.22]],[0,0.2,0],shade,0);
+ b.polyOut([[-0.74,1.00,-0.02],[0.74,1.00,-0.02],[0.66,1.06,0.16],[-0.66,1.06,0.16]],[0,0.2,0],wood,0);
+ b.polyOut([[-0.62,1.12,0.32],[0.62,1.12,0.32],[0.54,1.17,0.48],[-0.54,1.17,0.48]],[0,0.2,0],shade,0);
+ card(b, [[-0.70,0.76,-0.64],[-0.42,0.76,-0.64],[-0.38,0.36,-0.96],[-0.76,0.34,-0.92]], straw);
+ card(b, [[-0.16,0.76,-0.66],[0.16,0.76,-0.66],[0.12,0.32,-1.00],[-0.12,0.32,-0.96]], thatch);
+ card(b, [[0.42,0.76,-0.64],[0.72,0.76,-0.64],[0.78,0.34,-0.92],[0.40,0.36,-0.96]], straw);
  return pack(b);
 }
 function pennantMesh(){
@@ -984,6 +1014,26 @@ function selfCheck(){
    }
    if(!camp.view||camp.view.yaw<0.6||camp.view.pitch<0.48)errors.push('camera flat');
    if(hero&&(!band(hero.emissive,0.5,0.6)||!band(hero.emissive,0.85,0.95)))errors.push('hero materials');
+   if(hero){
+    var hp=hero.positions, fac=0, nose=0, hi;
+    for(hi=0;hi<hp.length;hi+=3){
+     if(Math.abs(hp[hi+1]-0.74)<0.02&&Math.abs(hp[hi])>0.12&&Math.abs(hp[hi])<0.185&&Math.abs(hp[hi+2])<0.08)fac++;
+     if(Math.abs(hp[hi])<0.04&&hp[hi+1]>1.34&&hp[hi+1]<1.46&&hp[hi+2]<-0.38)nose++;
+    }
+    if(fac<4)errors.push('robe box '+fac);
+    if(nose<4)errors.push('nose '+nose);
+   }
+   if(shelf){
+    var shy=boundsY(shelf);
+    if(shy[1]<1.15||shy[1]>1.7)errors.push('shelter height '+shy[1].toFixed(2));
+    var sp=shelf.positions, wall=false, bench=false, si2;
+    for(si2=0;si2<sp.length;si2+=3){
+     if(sp[si2+2]>0.4&&sp[si2+1]>0.2&&sp[si2+1]<0.9)wall=true;
+     if(sp[si2+1]>0.18&&sp[si2+1]<0.28&&sp[si2+2]>0.1&&sp[si2+2]<0.36)bench=true;
+    }
+    if(!wall)errors.push('shelter wall');
+    if(!bench)errors.push('shelter bench');
+   }
   }
   if(biomes[bi]==='marsh'){
    var water=meshBy(camp,'water');

@@ -98,3 +98,6 @@ The camp keeps a sixth lamp for a few embers at the fire. Those embers are small
 
 ## v16: camp ridge (23 Oct 2026)
 The cliff on the left rim is a battered ridge. Each course steps back, the top of a course is a lighter shelf, and three stones of different heights break the skyline. It stays low. The open shelter in front of it is unchanged. The hex map stays 2D.
+
+## v17: camp people and the trail shelter (23 Oct 2026)
+The robe is an eight-sided shape, so a three-quarter view shows facets instead of a crate. A small nose sits on the front of the face, and each boot has a rounded toe. The trail shelter keeps an open front and gains a plank rail on the camera side, a bench, a back wall, two thatch sheets with dark courses, and a straw fringe. No sign. The hex map stays 2D.
