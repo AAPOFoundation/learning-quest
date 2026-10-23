@@ -45,3 +45,41 @@ castle:{name:'Citadel of the Eval Designer',biome:'crown',accent:'#c9a24f',
  herald:{name:'Herald Cael',look:{skin:'#e3b896',hair:'#5a3a22',robe:'#274a7a',trim:'#f3e2b0',hat:'cap'},hint:'The Council will ask for five design choices: decision, cases, grading, metrics and what you do about gaming. Use what the seven regions taught you.'},
  chest:'Eval Designer\'s Crown',hall:'Great Hall'}
 };
+/* ---- Course scene art (graphics pass): colour identity + themed landmark and map props for ai-evals.
+   Uses only window.Art (S, building, ell, mix) and window.LQFx.low from shared/. Full effects only; Low effects keeps the shared art. ---- */
+(function(){
+var W=window.WORLD;if(!W)return;
+var PAL=['#2a8a7a','#c98a2a','#3a6aa8','#c0603a','#4a8aa8','#a8445a','#2f6a9a','#7a5ab0','#3a9a6a','#b0782a','#4a6ab0','#9a4a8a'];
+W.palette=PAL;W.regions.forEach(function(r,i){r.accent=PAL[i%PAL.length]});if(W.castle)W.castle.accent='#d7b56a';
+Object.assign(W.hero,{robe:'#1f5f66',cape:'#c98a2a',trim:'#f3e2b0'});
+var PI=Math.PI;
+function E(g,x,y,rx,ry,c){g.fillStyle=c;g.beginPath();g.ellipse(x,y,Math.max(rx,.1),Math.max(ry,.1),0,0,PI*2);g.fill()}
+function R(g,x,y,w,h,c){g.fillStyle=c;g.fillRect(x,y,w,h)}
+function T(g,a,b,c,d,e,f,col){g.fillStyle=col;g.beginPath();g.moveTo(a,b);g.lineTo(c,d);g.lineTo(e,f);g.fill()}
+function L(g,pts,c,w){g.strokeStyle=c;g.lineWidth=w;g.lineCap='round';g.beginPath();g.moveTo(pts[0],pts[1]);for(var i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);g.stroke()}
+function glow(g,x,y,r,col,a){var gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,col.replace('A',a));gr.addColorStop(1,col.replace('A',0));g.fillStyle=gr;g.fillRect(x-r,y-r,2*r,2*r)}
+function plinth(g,u,w,col){E(g,0,0,w*1.2*u,w*.45*u,'rgba(0,0,0,.28)');R(g,-w*u,-5*u,2*w*u,5*u,col);R(g,-w*u,-5*u,2*w*u,1.4*u,'rgba(255,255,255,.22)');R(g,(w-3)*u,-5*u,3*u,5*u,'rgba(0,0,0,.18)')}
+/* AI Evals: a measuring lab. Landmark = golden balance scale over a checklist board; map prop = a scoreboard with ticks. */
+function landmark(g,u,ac,t,b){plinth(g,u,13,'#cfc6b0');
+ R(g,-1.4*u,-40*u,2.8*u,35*u,'#8a6a2a');R(g,-1.4*u,-40*u,1*u,35*u,'#c9a24f');
+ var tilt=Math.sin(t*1.2)*.12;g.save();g.translate(0,-40*u);g.rotate(tilt);R(g,-18*u,-1.2*u,36*u,2.4*u,'#c9a24f');
+ [-16,16].forEach(function(dx,i){var dy=0;L(g,[dx*u,0,(dx-5)*u,12*u],'#8a6a2a',.8*u);L(g,[dx*u,0,(dx+5)*u,12*u],'#8a6a2a',.8*u);
+  g.save();g.translate(dx*u,12*u);g.rotate(-tilt);E(g,0,0,7*u,2.4*u,'#d7b56a');E(g,0,-.6*u,5.5*u,1.4*u,'#f3e2b0');
+  if(i===0){E(g,-1.5*u,-2.2*u,2*u,2*u,'#3aa86a');L(g,[-2.6*u,-2.2*u,-1.6*u,-1.2*u,0,-3.6*u],'#fff',.7*u)}else{E(g,1.5*u,-2.2*u,2*u,2*u,ac)}g.restore()});
+ g.restore();E(g,0,-41*u,2.6*u,2.6*u,'#f3e2b0');
+ /* checklist board leaning on the plinth */
+ g.save();g.translate(-17*u,-4*u);g.rotate(-.12);R(g,-6*u,-16*u,12*u,16*u,'#7a5530');R(g,-5*u,-15*u,10*u,14*u,'#f6efdc');
+ for(var k=0;k<3;k++){var yy=-12.5*u+k*4.3*u;L(g,[-3.6*u,yy,-2.6*u,yy+1*u,-1*u,yy-1.2*u],k===2?ac:'#2f8a5a',.9*u);R(g,0,yy-.4*u,4*u,.9*u,'#9a9080')}g.restore();
+ var p=.5+.5*Math.sin(t*3);glow(g,0,-41*u,9*u,'rgba(243,226,176,A)',.45*p)}
+function mapProp(g,u,ac,t,kind){E(g,0,0,7*u,2.4*u,'rgba(0,0,0,.25)');R(g,-.8*u,-12*u,1.6*u,12*u,'#6a4a22');
+ R(g,-7*u,-20*u,14*u,9*u,'#2a3a48');R(g,-6.2*u,-19.2*u,12.4*u,7.4*u,'#34505e');
+ var bars=[3,5,4.2];bars.forEach(function(h,i){var hh=h*u*(.85+.15*Math.sin(t*2+i));R(g,(-4.8+i*3.6)*u,-12.6*u-hh,2.4*u,hh,i===1?ac:'#7fd0a8')});
+ E(g,6*u,-21*u,2.4*u,2.4*u,'#2f8a5a');L(g,[4.9*u,-21*u,5.8*u,-20*u,7.2*u,-22.2*u],'#fff',.7*u)}
+
+function install(){var A=window.Art;if(!A||!A.building||A.__courseArt)return;var base=A.building;A.__courseArt=W.key;
+ A.building=function(g,kind,x,y,o){var low=!window.LQFx||window.LQFx.low;o=o||{};
+  if(!low&&kind==='tree'&&o.landmark){var u=A.S/34;g.save();g.translate(x,y+A.S*.5);g.scale(1.25,1.25);try{landmark(g,u,o.accent||PAL[0],o.t||0,o.landmark)}catch(e){}g.restore();return}
+  base.apply(this,arguments);
+  if(!low&&(kind==='town'||kind==='castle')){var u2=A.S/34;g.save();g.translate(x-(kind==='castle'?34:26)*u2,y+A.S*.5-2*u2);g.scale(1.7,1.7);try{mapProp(g,u2,o.accent||PAL[0],o.t||0,kind)}catch(e){}g.restore()}};}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else setTimeout(install,0);
+})();

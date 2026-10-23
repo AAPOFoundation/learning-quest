@@ -17,7 +17,7 @@ function bossDone(){return !!(P().boss&&P().boss.done)}
 var AC=null,muted=false,gest=false;try{muted=localStorage.getItem('learning-apps.mute')==='1'}catch(e){}
 function blip(f,d,v,type,f2){if(muted||!gest)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();var o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.linearRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v||.025,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
 function motionOn(){return !FX.low&&!(FX.rm&&FX.rm.matches)}
-function chime(msg){try{if(motionOn()&&window.LQAnim&&st&&st.hero){LQAnim.burst(st.hero.x,st.hero.y-S*.9);if(msg&&LQAnim.floatText)LQAnim.floatText(st.hero.x,st.hero.y-S*1.4,msg)}}catch(e){}blip(660,.25,.04,'triangle',880);setTimeout(function(){blip(990,.4,.035,'triangle')},120)}
+function chime(msg){if(st)st.celUntil=(st.time||0)+2.4;try{if(motionOn()&&window.LQAnim&&st&&st.hero){LQAnim.burst(st.hero.x,st.hero.y-S*.9);if(msg&&LQAnim.floatText)LQAnim.floatText(st.hero.x,st.hero.y-S*1.4,msg)}}catch(e){}blip(660,.25,.04,'triangle',880);setTimeout(function(){blip(990,.4,.035,'triangle')},120)}
 /* ---------- scenes ---------- */
 var BIG=[[4,26],[13,27],[22,25],[31,27],[40,25],[42,17],[33,13],[24,15],[15,12],[7,8],[17,4]];
 var BASE8=[[4,21],[12,22],[20,19],[28,21],[31,12],[21,9],[11,10],[5,4]];
@@ -155,7 +155,7 @@ function lessonOf(i){var T=C.regions[i].teacher;openOv(function(){E.lessonDone=f
 function gateTalk(i){var R=C.regions[i],G=R.gate,done=levelDone(i);
  if(!done)say(G,['Halt, traveller. I am '+G.name+', '+G.title.toLowerCase()+'.','Answer the questions in the '+R.hall+' and score at least 60% to pass. There is no penalty for trying again.'],function(){ask(G,'Will you take the trial?',[{t:'Take the trial',fn:function(){trial(i)}},{t:'Not yet'}])});
  else say(G,['You have passed, traveller. The way onward is open, and a chest awaits you in this town.'],function(){ask(G,'Replay the trial for a better score?',[{t:'Replay the trial',fn:function(){trial(i)}},{t:'No, thanks'}])})}
-function trial(i){var G=C.regions[i].gate,was=levelDone(i);openOv(function(){E.level(i,'quiz')},function(){var now=levelDone(i);if(now&&!was){chime('Cleared');var nx=i<NR-1?'The fog lifts from '+C.regions[i+1].name+'.':'The gates of the '+C.castle.name+' now stand open.';say(G,['Well fought. You may pass. '+nx,'Open the chest in this town, then take the south gate back to the map.'])}else if(!now)say(G,['Not this time. Re-read the lesson with the teacher and try again; there is no penalty.'])})}
+function trial(i){var G=C.regions[i].gate,was=levelDone(i);openOv(function(){E.level(i,'quiz')},function(){var now=levelDone(i);if(now&&!was){chime('Cleared');var hp=scr(st.hero.x,st.hero.y-S*.5);cele({msg:'The way is open!',vfx:'shockwave',x:hp[0],y:hp[1],confetti:false});var nx=i<NR-1?'The fog lifts from '+C.regions[i+1].name+'.':'The gates of the '+C.castle.name+' now stand open.';say(G,['Well fought. You may pass. '+nx,'Open the chest in this town, then take the south gate back to the map.'])}else if(!now)say(G,['Not this time. Re-read the lesson with the teacher and try again; there is no penalty.'])})}
 function simTalk(i){var R=C.regions[i],s=R.sim,sp={name:s.name,icon:({vault:'🏦',guild:'📏',smithy:'🔨',tower:'🗼',lab:'🧪',observatory:'🔭'})[s.building]||'📜'};
  say(sp,[s.blurb+(s.render?' (A toy example with made-up numbers, not real model data.)':' (Example data, not advice. Nothing is ordered or connected.)')],function(){ask(sp,s.kind==='lesson'?'Climb the tower?':'Step inside?',[{t:'Enter',fn:function(){openSim(i)}},{t:'Not now'}])})}
 function openSim(i){var s=C.regions[i].sim,w=PW();w.sim[i]=1;
@@ -166,13 +166,17 @@ function openSim(i){var s=C.regions[i].sim,w=PW();w.sim[i]=1;
   var host=$('#simhost'),tab=A.tabs[0];tab.render(host,{award:E.award,save:E.save,toast:E.toast,P:P()});
   ['#s1','#s2','#s3'].forEach(function(id){if(id!==map[s.kind]){var e=$(id,host);if(e)e.style.display='none'}})
   host.insertAdjacentHTML('beforeend','<button class="btn btn-primary rise" id="simx">Leave</button>');$('#simx').onclick=function(){closeOv()}})}
+/* round 2 fx: world point -> screen px (for lighting a chest or the hero), and fire the shared lq:celebrate event */
+function scr(x,y){try{var r=cv.getBoundingClientRect(),z=zoom();return [r.left+(x-st.cam.x)*z,r.top+(y-st.cam.y)*z]}catch(e){return [innerWidth/2,innerHeight/2]}}
+function cele(d){try{document.dispatchEvent(new CustomEvent('lq:celebrate',{detail:d}))}catch(e){}}
+function chestFx(o,msg){var p=scr(hx(o.c,o.r),hy(o.r)-S*.25);cele({msg:msg,vfx:'beam',x:p[0],y:p[1]})}
 function chestOpen(o){var i=o.i,w=PW(),sp={name:'Treasure chest',icon:'🎁'};
  if(i>=NR){if(!bossDone()){if(motionOn())o._nudge=.28;return say(sp,['The chest is sealed. Only the Council can open it: finish the final challenge first.']);}
-  if(w.chests[i])return say(sp,['Empty now. You already took the '+C.castle.chest+'.']);w.chests[i]=1;P().xp+=50;E.award('crown');chime('+50 XP');E.save();hud();return say(sp,['You found the '+C.castle.chest+'! +50 XP and a badge.','The realm is yours to explore. Revisit any trial to earn three stars.'])}
+  if(w.chests[i])return say(sp,['Empty now. You already took the '+C.castle.chest+'.']);w.chests[i]=1;P().xp+=50;E.award('crown');chime('+50 XP');chestFx(o,'Treasure found!');E.save();hud();return say(sp,['You found the '+C.castle.chest+'! +50 XP and a badge.','The realm is yours to explore. Revisit any trial to earn three stars.'])}
  var R=C.regions[i];
  if(!levelDone(i)){if(motionOn())o._nudge=.28;return say(sp,['The chest is locked. '+R.gate.name+' holds the key: pass the trial first.']);}
  if(w.chests[i])return say(sp,['Empty now. You already took the Seal of '+R.name+'.']);
- w.chests[i]=1;P().xp+=25;E.award('seal_'+A.levels[i].id);chime('+25 XP');E.save();hud();say(sp,['You found the Seal of '+R.name+'! +25 XP and a badge.'])}
+ w.chests[i]=1;P().xp+=25;E.award('seal_'+A.levels[i].id);chime('+25 XP');chestFx(o,'Seal found!');E.save();hud();say(sp,['You found the Seal of '+R.name+'! +25 XP and a badge.'])}
 function bossTalk(){var B=C.castle.boss;
  if(!allDone())return say(B,['You are not ready. Clear all '+NR+' regions first.']);
  say(B,bossDone()?['You have faced us already, and did well. Care to try for a higher score?']:['So you have crossed the whole realm. I am '+B.name+'.',B.title+'. Make your five choices wisely.'],function(){ask(B,bossDone()?'Face the challenge again?':'Begin the final challenge?',[{t:'Begin',fn:function(){openOv(function(){E.boss()},function(){if(bossDone()){chime('Well done');say(B,['A fine piece of work. Open the chest by the wall, and take your crown.'])}})}},{t:'Not yet'}])})}
@@ -276,9 +280,9 @@ function mkBlob(rad,col0,col1){var c=document.createElement('canvas');c.width=c.
 function syncFog(snap){for(var z=0;z<=NR;z++){st.fogTgt[z]=zoneOpen(z)?0:1;if(snap||st.fog[z]===undefined)st.fog[z]=st.fogTgt[z]}redrawFog(true)}
 /* full effects: fog is drawn at half size with bigger, softer blobs so its edge feathers into the open land */
 function mkFogCv(sc){var k=FX.low?1:.5;sc.fogK=k;sc.fogCv=document.createElement('canvas');sc.fogCv.width=Math.ceil(sc.W*k);sc.fogCv.height=Math.ceil(sc.H*k)}
-function mkSoft(rad){var c=document.createElement('canvas');c.width=c.height=Math.ceil(rad*2);var g=c.getContext('2d'),gr=g.createRadialGradient(rad,rad,0,rad,rad,rad);gr.addColorStop(0,'rgba(26,34,46,.96)');gr.addColorStop(.4,'rgba(26,34,46,.82)');gr.addColorStop(.7,'rgba(26,34,46,.34)');gr.addColorStop(1,'rgba(26,34,46,0)');g.fillStyle=gr;g.fillRect(0,0,c.width,c.height);return c}
+function mkSoft(rad){var c=document.createElement('canvas');c.width=c.height=Math.ceil(rad*2);var g=c.getContext('2d'),gr=g.createRadialGradient(rad,rad,0,rad,rad,rad);gr.addColorStop(0,'rgba(58,74,112,.97)');gr.addColorStop(.4,'rgba(58,74,112,.84)');gr.addColorStop(.7,'rgba(58,74,112,.36)');gr.addColorStop(1,'rgba(58,74,112,0)');g.fillStyle=gr;g.fillRect(0,0,c.width,c.height);return c}
 var blobMode=null;
-function redrawFog(force){var sc=st.world;if(blobMode!==FX.low||!blobA){blobMode=FX.low;blobA=FX.low?mkBlob(S*1.25,'rgba(26,34,46,.95)','rgba(26,34,46,0)'):mkSoft(S*1.7);blobB=mkBlob(S*1.1,'rgba(150,158,170,.32)','rgba(150,158,170,0)')}
+function redrawFog(force){var sc=st.world;if(blobMode!==FX.low||!blobA){blobMode=FX.low;blobA=FX.low?mkBlob(S*1.25,'rgba(26,34,46,.95)','rgba(26,34,46,0)'):mkSoft(S*1.7);blobB=mkBlob(S*1.1,'rgba(200,212,236,.38)','rgba(200,212,236,0)')}
  var fk=sc.fogK||1,fr=FX.low?S*1.25:S*1.7;
  var g=sc.fogCv.getContext('2d');g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,sc.fogCv.width,sc.fogCv.height);g.setTransform(fk,0,0,fk,0,0);for(var r=0;r<sc.rows;r++)for(var c=0;c<sc.cols;c++){var a=st.fog[sc.zone[c][r]];if(a<=.01)continue;var x=hx(c,r),y=hy(r);g.globalAlpha=a;g.drawImage(blobA,x-fr,y-fr);if(Art.hash(c,r,2)<.6){g.globalAlpha=a*.8;g.drawImage(blobB,x-S*1.1+(Art.hash(c,r,3)-.5)*S,y-S*1.1+(Art.hash(c,r,4)-.5)*S)}}g.globalAlpha=1;g.setTransform(1,0,0,1,0,0)}
 /* ---------- main loop / drawing ---------- */
@@ -323,7 +327,7 @@ var routePts=[];function drawRoute(g,rings){if(st.mode!=='play')return;if(!rings
 var drawList=[],drawOp={},emptyW={chests:{},caches:{}};function byY(a,b){return a.y-b.y}
 function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=st.hero,g=ctx;g.setTransform(1,0,0,1,0,0);g.fillStyle='#0a0f15';g.fillRect(0,0,cv.width,cv.height);
  var tx=h.x-vw/2,ty=h.y-vh/2;if(st.mode==='title'&&sc.id==='w'){tx=hx(NODES[0][0],NODES[0][1])-vw/2+(motionOn()?Math.sin(st.time*.2)*40:0);ty=hy(NODES[0][1])-vh/2}
- var mx=sc.W-vw,my=sc.H-vh;tx=mx<0?mx/2:Math.max(0,Math.min(mx,tx));ty=my<0?my/2:Math.max(0,Math.min(my,ty));
+ var mx=sc.W-vw,my=sc.H-vh,hp=window.LQHudPad,pt=hp&&hp.on?hp.t/z:0,pb=hp&&hp.on?hp.b/z:0;tx=mx<0?mx/2:Math.max(0,Math.min(mx,tx));ty=my<0?my/2:Math.max(-pt,Math.min(my+pb,ty));
  if(st.cam.snap){st.cam.x=tx;st.cam.y=ty;st.cam.snap=false}else{var ck=1-Math.pow(0.82,Math.min(3,(st.dtRaw||1/60)*60));st.cam.x+=(tx-st.cam.x)*ck;st.cam.y+=(ty-st.cam.y)*ck}
  st.cam.err=Math.abs(tx-st.cam.x)+Math.abs(ty-st.cam.y);
  var shx=0,shy=0;if(st.shake>0&&motionOn()){var a=st.shake/.16;shx=Math.sin(st.time*62)*5*a;shy=Math.cos(st.time*48)*2.5*a}
@@ -333,7 +337,7 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
  if(st.mode!=='title'){it=drawList[n]||(drawList[n]={});it.y=h.y;it.o=null;it.hero=true;n++}
  drawList.length=n;drawList.sort(byY);
  var w=P().w||emptyW;
- for(var di=0;di<n;di++){it=drawList[di];if(it.hero){Art.figure(g,h.x,h.y,C.hero,{t:T,moving:!!h.mv,face:h.face,step:h.mv?h.step:0,hop:h.hop||0,foot:h.foot||1,turn:h.turn||0});continue}
+ for(var di=0;di<n;di++){it=drawList[di];if(it.hero){Art.figure(g,h.x,h.y,C.hero,{t:T,moving:!!h.mv,face:h.face,step:h.mv?h.step:0,hop:h.hop||0,foot:h.foot||1,turn:h.turn||0,celebrate:!h.mv&&st.celUntil>T});continue}
   var o=it.o,x=hx(o.c,o.r),y=hy(o.r);
   if(o.type==='npc'){var fc=h.x<x?-1:1,dx=Math.abs(h.x-x),dy=Math.abs(h.y-y),near=dx<S*2.2&&dy<S*2.2;Art.figure(g,x,y,o.sp.look,{t:T+o.c*.7,face:fc,wave:near&&motionOn()?.5+.5*Math.sin(T*3+o.c):0});
    var nd=Math.max(dx,dy)/S,al=motionOn()?(nd>=3?0:nd>2.2?(3-nd)/.8:1):(nd<3?1:0);
