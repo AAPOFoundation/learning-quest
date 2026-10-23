@@ -59,8 +59,9 @@ function softmax(host){
  +'<div class="sim-row"><label>Temperature T: <b id="sm-v">1.00</b><input type="range" id="sm-t" min="0.1" max="3" step="0.05" value="1"></label></div><div id="sm-bars"></div><div id="sm-out"></div><p><button class="btn btn-ghost btn-sm" id="sm-draw">Draw 30 words</button></p><p class="small" id="sm-s"></p></section>';
  var $=function(s){return host.querySelector(s)};
  function probs(){var z=logits.map(function(x){return x/T}),m=Math.max.apply(null,z),e=z.map(function(x){return Math.exp(x-m)}),s=e.reduce(function(a,b){return a+b},0);return e.map(function(x){return x/s})}
- function draw(){var p=probs(),h=0;p.forEach(function(x){if(x>0)h-=x*Math.log2(x)});
-  $('#sm-bars').innerHTML=toks.map(function(t,i){return '<div class="sm-bar"><span class="sm-t">'+t+'</span><span class="sm-b"><i style="width:'+(p[i]*100).toFixed(1)+'%"></i></span><span class="sm-p">'+(p[i]*100).toFixed(1)+'%</span></div>'}).join('');
+ function draw(){var p=probs(),h=0,box=$('#sm-bars');p.forEach(function(x){if(x>0)h-=x*Math.log2(x)});
+  if(box.children.length!==toks.length)box.innerHTML=toks.map(function(t){return '<div class="sm-bar"><span class="sm-t">'+t+'</span><span class="sm-b"><i></i></span><span class="sm-p"></span></div>'}).join('');
+  [].forEach.call(box.children,function(row,i){var bar=row.querySelector('i'),pct=(p[i]*100).toFixed(1)+'%';if(!bar.style.width){bar.style.width='0%';requestAnimationFrame(function(){bar.style.width=pct})}else bar.style.width=pct;row.querySelector('.sm-p').textContent=pct});
   var msg=T<.35?'Close to always picking the top word (near-greedy). Very repeatable, but every answer is alike.':T>2?'Close to a coin toss between all words, including the nonsense one. Varied, but unreliable.':T>1.2?'Flatter: more variety, and the unlikely words get a real chance.':T<.8?'Sharper: the top word dominates, answers become more predictable.':'Around the model\'s own scores (T = 1).';
   $('#sm-out').innerHTML='<p>Entropy (spread of the choice): <b>'+f1(h)+' bits</b> out of a maximum of '+f1(Math.log2(toks.length))+'. '+msg+'</p>'}
  $('#sm-t').oninput=function(){T=+this.value;$('#sm-v').textContent=f1(T);$('#sm-s').textContent='';draw()};

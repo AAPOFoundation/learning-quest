@@ -22,6 +22,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 12. **Small UI beats.** The place name rises as it fades in. A dialogue portrait breathes. The pad shows a press. The quest card pulses when the next objective changes. Test rows arrive one after another. Each home-page world fills a thin bar to its cleared fraction. The vignette is painted once per window size, and the scene fade no longer builds a colour string each frame.
 13. **Buildings are blitted in full effects.** Each kind is painted into one shared 2× sprite (about 280×320). Flags, smoke, wheels and flames redraw about 15 times a second. A still building is painted once. Fountains share a sprite, since they do not use the region colour. At most 48 sprites, and the least recently shown one is dropped. Low effects still draws live, and turning low effects on frees the sprites. A chest lid mid-swing and the town gate stay live so those stay smooth. Home-page name plaques cache their width. Objects outside the view are left out of the sort.
 14. **A cleared town breathes.** Its name plate edge pulses gold while motion is on. Dialogue choices arrive one after another. The arrow that points to an off-screen objective pulses. The hero portrait and the party faces rise and fall by a pixel. Reduced motion removes those.
+15. **Simulator bars ease in place.** Temperature, autocomplete and the context bench used to replace their markup on every slider tick, so a width transition never ran. Rows stay put and only the width changes, over 0.28s. The first paint grows from empty. Autocomplete rebuilds only when the word list changes, and a cut-off row fades. The learning-rate chart still redraws. Reduced motion already turns transitions off.
 
 ## Checked
 
@@ -29,4 +30,4 @@ A mock canvas ran the stride, the idle blink, the wave, shared tree stamps, the 
 
 ## Not done
 
-No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings still move, but in full effects they move from a shared sprite at about 15 frames a second rather than being redrawn every frame.
+No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings still move, but in full effects they move from a shared sprite at about 15 frames a second rather than being redrawn every frame. The learning-rate dots and the threshold dots still jump when a slider moves. Simulator bars were syntax-checked, not clicked in a browser.

@@ -33,9 +33,11 @@ function workshop(host){
  var $=function(s){return host.querySelector(s)};
  function fillWords(){var ks=Object.keys(chain.m).sort(),sel=$('#ac-w'),keep=st.start;sel.innerHTML=ks.map(function(k){return '<option value="'+esc(k)+'">'+esc(k==='.'?'. (sentence end)':k)+'</option>'}).join('');if(ks.indexOf(keep)<0)keep=ks.indexOf('the')>=0?'the':ks[0];st.start=keep;sel.value=keep;
   $('#ac-info').textContent=chain.n+' words read, '+chain.v+' different words have a next word.'}
- function bars(){var c=chain.m[st.start];if(!c){$('#ac-bars').innerHTML='<p class="small dim">That word was never followed by anything in the text.</p>';return}
-  var d=dist(c,st.T,st.k,st.top);
-  $('#ac-bars').innerHTML=d.map(function(o){return '<div style="display:flex;align-items:center;gap:8px;margin:3px 0;opacity:'+(o.kept?1:.4)+'"><span style="width:90px">'+esc(o.w==='.'?'. (end)':o.w)+'</span><span style="flex:1;background:#0b1118;border-radius:6px;overflow:hidden;height:14px"><span style="display:block;height:14px;width:'+Math.round(o.p*100)+'%;background:'+(o.kept?'#d7b56a':'#4a5663')+'"></span></span><span class="small" style="width:150px">'+(o.kept?Math.round(o.p*100)+'%':'cut off')+' <span class="dim">(raw '+Math.round(o.raw*100)+'%)</span></span></div>'}).join('')}
+ function bars(){var c=chain.m[st.start],box=$('#ac-bars');if(!c){box.dataset.key='';box.innerHTML='<p class="small dim">That word was never followed by anything in the text.</p>';return}
+  var d=dist(c,st.T,st.k,st.top),key=d.map(function(o){return o.w}).join('\n');
+  function paint(){[].forEach.call(box.querySelectorAll('.ac-row'),function(row,i){var o=d[i];if(!o)return;row.style.opacity=o.kept?'1':'.4';var fill=row.querySelector('.ac-fill'),w=Math.round(o.p*100)+'%',col=o.kept?'#d7b56a':'#4a5663';if(!fill.style.width||fill.style.width==='0%'||fill.style.width==='0px'){fill.style.width='0%';requestAnimationFrame(function(){fill.style.width=w;fill.style.background=col})}else{fill.style.width=w;fill.style.background=col}row.querySelector('.ac-lab').innerHTML=(o.kept?Math.round(o.p*100)+'%':'cut off')+' <span class="dim">(raw '+Math.round(o.raw*100)+'%)</span>'})}
+  if(box.dataset.key!==key){box.dataset.key=key;box.innerHTML=d.map(function(o){return '<div class="ac-row" style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:90px">'+esc(o.w==='.'?'. (end)':o.w)+'</span><span style="flex:1;background:#0b1118;border-radius:6px;overflow:hidden;height:14px"><span class="ac-fill" style="display:block;height:14px;width:0;background:#d7b56a"></span></span><span class="small ac-lab" style="width:150px"></span></div>'}).join('')}
+  paint()}
  function gen(){var r=lcg(st.seed*7919+13),out=[],sent=0,w=st.start==='.'?'the':st.start,cur=[],guard=0;
   if(!chain.m[w]){$('#ac-out').textContent='Pick a word that has followers.';return}
   cur.push(w);
