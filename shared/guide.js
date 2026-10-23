@@ -9,7 +9,7 @@ var s=document.querySelector('script[src$="shared/guide.js"]'),BASE=s?s.src.repl
 var IDS={'ai-evals-l4':1,'ai-evals-lS':1,'ai-foundations-l3':1,'ai-foundations-l5':1,'ai-safety-cp':1};
 function slot(id){if(!id||!IDS[id])return '';return '<div class="lq-guide" data-guide="'+String(id).replace(/[^a-zA-Z0-9_-]/g,'')+'" hidden></div>'}
 function fill(el,id){var v=document.createElement('video');v.preload='metadata';v.controls=true;v.playsInline=true;v.setAttribute('playsinline','');v.className='lq-guide-v';
- v.addEventListener('loadedmetadata',function(){known[id]=1;el.innerHTML='<p class="kicker">Guide</p>';el.appendChild(v);var t=document.createElement('track');t.kind='captions';t.srclang='en';t.label='English';t.src=BASE+id+'.vtt';v.appendChild(t);el.hidden=false},{once:true});
+ v.addEventListener('loadedmetadata',function(){known[id]=1;el.innerHTML='<p class="kicker">Watch a short guide</p>';el.classList.add('lq-enter');el.appendChild(v);var t=document.createElement('track');t.kind='captions';t.srclang='en';t.label='English';t.src=BASE+id+'.vtt';v.appendChild(t);el.hidden=false},{once:true});
  v.addEventListener('error',function(){known[id]=0;el.remove()},{once:true});
  /* H.264 MP4 plays on Safari, Chrome, Edge and Firefox; a browser without it (e.g. some Linux builds) looks for a WebM twin instead */
  var mp4=v.canPlayType&&v.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');v.src=BASE+id+(mp4?'.mp4':'.webm')}
