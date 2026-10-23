@@ -30,6 +30,8 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 20. **Quest marks keep one gold.** The cleared name edge and the quest ring used to build a new colour string each frame. They now set the opacity on one gold.
 21. **Dialogue stays put between lines.** A new line from the same speaker no longer rebuilds the box, so it does not rise again. A different speaker still gets the short rise. Closing the box clears that memory, so the next talk rises once.
 22. **Lists arrive in turn.** The pause menu, the quest log and the world-map rows each rise a little after the one above. The delay stops growing after the tenth row.
+23. **The home path arrives in order.** The four world buttons, then the portfolio button, rise one after another. Reduced motion removes it.
+24. **Skills bars grow, badges rise.** A skills bar starts empty and eases to the saved score. Badges rise without a fade, so a locked badge stays dim. The rise stops adding delay after the twelfth badge.
 
 ## Checked
 
