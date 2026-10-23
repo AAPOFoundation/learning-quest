@@ -287,6 +287,7 @@ function vigLayer(){if(vig&&vig.w===CW&&vig.h===CH)return vig.c;var c=document.c
 function resize(){var r=$('#stage').getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);CW=r.width;CH=r.height;cv.width=Math.round(CW*dpr);cv.height=Math.round(CH*dpr)}
 function zoom(){return Math.max(.8,Math.min(1.35,Math.min(CW,CH)/640))}
 function fogBusy(){for(var z=0;z<st.fog.length;z++)if(Math.abs((st.fog[z]||0)-(st.fogTgt[z]||0))>.01)return true;return false}
+function markAct(){var h=st.hero;if(!h)return;var key=(st.scene?st.scene.id:'')+'|'+h.c+'|'+h.r+'|'+st.mode+'|'+(motionOn()?1:0);if(key===st.actKey)return;st.actKey=key;var on=false,d,n;if(st.mode==='play'&&motionOn()&&st.scene){for(d=0;d<6&&!on;d++){n=neigh(h.c,h.r,d);if(interactive(objAt(n[0],n[1])))on=true}}var ba=$('#bact');if(ba)ba.classList.toggle('ready',on)}
 function update(dt){st.time+=dt;if(st.shake>0)st.shake=Math.max(0,st.shake-dt);if(st.veil>0)st.veil=Math.max(0,st.veil-dt*2.4);
  if(st.hero.turn>0)st.hero.turn=Math.max(0,st.hero.turn-dt/.14);
  if(st.rip){st.rip.t+=dt;if(st.rip.t>.42)st.rip=null}
@@ -301,7 +302,7 @@ function update(dt){st.time+=dt;if(st.shake>0)st.shake=Math.max(0,st.shake-dt);i
  if(!h.mv&&st.mode==='play'){var dd=dirFromKeys();
   if(dd){st.path=null;for(var i=0;i<dd.length;i++){var res=stepDir(dd[i]);if(res==='moved'){if(dd.length===2)st.zig=!st.zig;break}if(res==='bump')break}}
   else if(st.path&&st.path.length){var nx=st.path[0],d=dirTo([h.c,h.r],nx);if(d<0){st.path=null}else{var rs=stepDir(d);if(rs==='moved')st.path.shift();else st.path=null}}}
-}
+ markAct()}
 function figDraw(g,sp,x,y,o){Art.figure(g,x,y,sp.look||sp,o)}
 /* Dots march along a tapped route. The destination ring and the tap ripple draw later, on top of sprites and under the fog. */
 function drawRoute(g,rings){if(st.mode!=='play')return;if(!rings){var pth=st.path;if(!pth||!pth.length)return;var pts=[[st.hero.x,st.hero.y]],i,dx,dy,len,acc,x,y,n=0,step=14,march=motionOn()?(st.time*34)%step:7;

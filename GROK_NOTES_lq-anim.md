@@ -35,6 +35,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 25. **A new companion fades in.** The first time the party is drawn, the faces you already have stay steady. A later join fades the newest face in. The fade is opacity only, so the breath can still move the face. Reduced motion removes it.
 26. **The title actions rise.** Continue or Begin, then New journey when there is a save, then All games. The heading stays still. Reduced motion removes the rise.
 27. **A cleared region portrait pops once.** The row of small portraits already brightens when a region is cleared. The one that just changed also pops. The first draw after a save only brightens, so old clears do not all pop at once.
+28. **The talk button glows when it will do something.** On a touch pad, A pulses while a person, a hall, or a chest is on a neighbouring tile. It checks again only when the tile, the place, or the motion setting changes. Low effects and reduced motion leave it still.
 
 ## Checked
 
