@@ -440,6 +440,17 @@ function bedMesh(){
  b.box(0,0.1,0,0.06,0.18,0.18,band,0.55);
  return pack(b);
 }
+function woodpileMesh(){
+ var b=new Builder(), bark=hex('#5c4030'), cut=hex('#c4a574'), i, L, fr, logs=[
+  [-0.1,0.07,0.02,0.4],[0.08,0.08,-0.05,-0.55],[0.0,0.15,0.04,0.15],[-0.04,0.21,0.0,0.85]
+ ];
+ for(i=0;i<logs.length;i++){
+  L=logs[i]; fr=frameY([Math.cos(L[3]), 0.12, Math.sin(L[3])]);
+  b.axesBox([L[0],L[1],L[2]], fr.x, fr.y, fr.z, 0.08, 0.44, 0.08, i%2?bark:hex('#6b4428'), 0);
+ }
+ b.box(0.2,0.09,0.02,0.04,0.09,0.09,cut,0);
+ return pack(b);
+}
 function logMesh(){
  var b=new Builder(), bark=hex('#5c4030'), cut=hex('#c4a574'), fr=frameY([1,0.04,0]);
  b.axesBox([0,0.14,0], fr.x, fr.y, fr.z, 0.16, 0.86, 0.15, bark, 0);
@@ -617,6 +628,7 @@ function buildCamp(opts){
  put(logMesh(), -1.05,0,-1.15, -0.4,1,'log');
  /* ry faces the cloth at the default camp camera. It sits on open grass, clear of the tent guys. */
  put(pennantMesh(), 2.7,0,0.85, 0.14,1,'pennant');
+ put(woodpileMesh(), 2.15,0,-0.72, 0.3,1,'wood');
  var stones=[[-1.35,0.15],[-1.05,0.05],[-0.35,-0.45],[0.05,-0.95]];
  for(var si=0;si<stones.length;si++)put(stoneMesh(), stones[si][0],0,stones[si][1], si*0.3, 1, 'stone');
  var rim=mix(hex(P.g2),[0.12,0.13,0.12],0.4);

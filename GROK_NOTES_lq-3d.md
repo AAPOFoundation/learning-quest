@@ -51,3 +51,5 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 - The marsh pool was a flat disc. Two broken rings sit on it at 0.42 and 0.62 of the radius, same water material id 0.35. A marsh frame calls them ripples, and the lily is still there. Reeds, the cape, the book and the cup still read in that frame.
 - The tent door roll was three spheres, so it read as stones. It is now one cloth cylinder with two rope ties beside the opening. A meadow frame calls it a rolled flap.
 - Stepping stones were flat decals. Each slab is now thicker, with a lighter cap, and a meadow frame calls them stones on the dirt path.
+- A woodpile of four short logs sits at (2.15, 0, -0.72), clear of the seats. A meadow frame calls it a pile of sticks by the lantern. It is firewood, not a tool.
+- The tree helper returned a second pine and round-tree after those meshes were already framed and committed. Kept the framed version. The helper did not edit the file.
