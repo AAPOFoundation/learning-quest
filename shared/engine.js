@@ -63,17 +63,19 @@ function qView(q,state,done){ // state: {sel}
 function shuf(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
 function ask(q,idx,total,cb,headTitle){
  if(q.t==='code'){var ce=document.createElement('div');if(window.CodeQ)window.CodeQ.mount(q,ce,{idx:idx,total:total,title:headTitle,done:function(ok){cb(!!ok)}});else ce.innerHTML='<section class="panel"><p class="dim">The Python challenge component did not load.</p><button class="btn btn-primary" id="cq-x">Skip</button></section>',ce.onclick=function(e){if(e.target.id==='cq-x')cb(false)};return ce}
- var sel=q.t==='multi'?[]:q.t==='grade'?q.items.map(function(){return null}):null,answered=false,wrong=0;
+ var sel=q.t==='multi'?[]:q.t==='grade'?q.items.map(function(){return null}):null,answered=false,wrong=0,born=false;
  var el=document.createElement('div'),perm=(q.opts||[]).map(function(_,k){return k});
  if((q.t==='mc'||q.t==='multi')&&!q.fixed&&!perm.some(function(k){return /\b(all|none) of the above\b/i.test(q.opts[k])}))perm=shuf(perm);
  function draw(res){
   var h='<section class="panel"><p class="small dim">'+esc(headTitle)+' · question '+(idx+1)+' of '+total+'</p><div class="bar" style="margin-bottom:12px"><i style="width:'+Math.round(100*idx/total)+'%"></i></div>'+qView(q);
-  if(q.t==='mc'||q.t==='multi'){perm.forEach(function(i){var o=q.opts[i];var c='opt';if(q.t==='mc'?sel===i:sel.indexOf(i)>=0)c+=' sel';if(res){var corr=q.t==='mc'?q.a===i:q.a.indexOf(i)>=0;if(corr)c+=' ok';else if(c.indexOf('sel')>=0)c+=' no'}h+='<button class="'+c+'" data-o="'+i+'" '+(res?'disabled':'')+'>'+o+'</button>'})}
+  if(q.t==='mc'||q.t==='multi'){perm.forEach(function(i,n){var o=q.opts[i];var c='opt';if(q.t==='mc'?sel===i:sel.indexOf(i)>=0)c+=' sel';if(res){var corr=q.t==='mc'?q.a===i:q.a.indexOf(i)>=0;if(corr)c+=' ok';else if(c.indexOf('sel')>=0)c+=' no'}h+='<button class="'+c+'"'+(born?'':' style="animation:pop .22s ease both;animation-delay:'+(n*40)+'ms"')+' data-o="'+i+'" '+(res?'disabled':'')+'>'+o+'</button>'})}
   else if(q.t==='num'){h+='<div class="field"><label>Your answer'+(q.unit?' ('+esc(q.unit)+')':'')+'</label><input type="number" step="any" inputmode="decimal" id="nv" '+(res?'disabled':'')+' value="'+(sel===null?'':sel)+'"></div>'}
-  else if(q.t==='grade'){q.items.forEach(function(it,i){h+='<div class="ex">'+esc(it.text)+'</div><div class="row" style="margin-bottom:10px">';['pass','fail'].forEach(function(v){var c='opt';if(sel[i]===v)c+=' sel';if(res){if(it.a===v)c+=' ok';else if(sel[i]===v)c+=' no'}h+='<button class="'+c+'" style="margin:0;text-align:center" data-g="'+i+':'+v+'" '+(res?'disabled':'')+'>'+(v==='pass'?'✓ Pass':'✗ Fail')+'</button>'});h+='</div>'})}
+  else if(q.t==='grade'){q.items.forEach(function(it,i){h+='<div class="ex">'+esc(it.text)+'</div><div class="row" style="margin-bottom:10px">';['pass','fail'].forEach(function(v,n){var c='opt';if(sel[i]===v)c+=' sel';if(res){if(it.a===v)c+=' ok';else if(sel[i]===v)c+=' no'}h+='<button class="'+c+'" style="margin:0;text-align:center'+(born?'':';animation:pop .22s ease both;animation-delay:'+((i*2+n)*40)+'ms')+'" data-g="'+i+':'+v+'" '+(res?'disabled':'')+'>'+(v==='pass'?'✓ Pass':'✗ Fail')+'</button>'});h+='</div>'})}
   if(res)h+='<div class="fb '+(res.ok?'ok':'no')+'"><b>'+(res.ok?'Correct. ':'Not quite. ')+'</b>'+q.why+'</div><button class="btn btn-primary" id="nx">Next</button>';
   else h+='<button class="btn btn-primary" id="ck">Check answer</button>';
-  el.innerHTML=h+'</section>'}
+  el.innerHTML=h+'</section>';
+  if(!born){var qb=el.querySelector('.bar>i');if(qb){var bw=qb.style.width;qb.style.width='0%';requestAnimationFrame(function(){qb.style.width=bw})}}
+  born=true}
  draw();
  el.onclick=function(e){
   var b=e.target.closest('button');if(!b)return;
