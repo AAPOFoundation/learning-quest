@@ -68,6 +68,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 58. **A code box eases its edge.** The challenge box and the small example boxes take the same short time as a button to pick up the gold edge. Reduced motion removes it.
 59. **A number box and a menu ease their edge.** The fields in the simulators pick up the same gold edge as a code box, over the same short time. Reduced motion removes it. The word-list search is left alone.
 60. **The home effects button sinks.** It picks up the gold edge, then sinks a pixel while it is held, the same as the other buttons. Reduced motion removes both.
+61. **Review buttons rise, and a wrong card settles.** The deck actions, each choice, Next and Back to deck rise, then let go, so a press can still sink. A wrong choice drops the entrance so the sideways settle can play, and the right one pops. Reduced motion removes all of it.
 
 ## Checked
 
@@ -75,4 +76,4 @@ Headless Edge still opened Python Basics after the later motion edits: the title
 
 ## Not done
 
-No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings still move, but in full effects they move from a shared sprite at about 15 frames a second rather than being redrawn every frame. Headless Edge loaded the two lesson charts: 16 step dots, 60 score dots, the bowl stayed put, and both the step dot and the threshold line moved when the dial changed. That run did not wait for the slide to finish. The review cards, the pause menu and the dialogue box were syntax-checked and not clicked. Nothing was tried on a phone.
+No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings still move, but in full effects they move from a shared sprite at about 15 frames a second rather than being redrawn every frame. Headless Edge loaded the two lesson charts: 16 step dots, 60 score dots, the bowl stayed put, and both the step dot and the threshold line moved when the dial changed. That run did not wait for the slide to finish. The review deck, the pause menu and the dialogue box were syntax-checked and not clicked. Nothing was tried on a phone.
