@@ -487,8 +487,10 @@ function pennantMesh(){
  return pack(b);
 }
 function stoneMesh(){
- var b=new Builder();
- b.box(0,0.04,0,0.28,0.045,0.2,hex('#8a8178'),0);
+ var b=new Builder(), rock=hex('#8a8178'), top=hex('#a39b92');
+ b.box(0,0.05,0,0.36,0.07,0.26,rock,0);
+ b.box(0.05,0.09,0.02,0.18,0.04,0.14,top,0);
+ b.box(-0.08,0.08,-0.03,0.12,0.035,0.1,mix(rock,[0,0,0],0.12),0);
  return pack(b);
 }
 function pebbleMesh(){
