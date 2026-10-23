@@ -166,35 +166,40 @@ function mount(figureEl,opts){
   }
   h.gpu=gpu;
   var shOk=false,shFb=null,shTex=null,shRb=null;
-  shTex=gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D,shTex);
-  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,SH,SH,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
-  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
-  shRb=gl.createRenderbuffer();
-  gl.bindRenderbuffer(gl.RENDERBUFFER,shRb);
-  gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,SH,SH);
-  shFb=gl.createFramebuffer();
-  gl.bindFramebuffer(gl.FRAMEBUFFER,shFb);
-  gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,shTex,0);
-  gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,shRb);
-  shOk=gl.checkFramebufferStatus(gl.FRAMEBUFFER)===gl.FRAMEBUFFER_COMPLETE;
-  gl.bindFramebuffer(gl.FRAMEBUFFER,null);
-  if(!shOk){
-   if(shFb)gl.deleteFramebuffer(shFb);
-   if(shRb)gl.deleteRenderbuffer(shRb);
-   if(shTex)gl.deleteTexture(shTex);
-   shFb=null;shRb=null;
-   shTex=gl.createTexture();
-   gl.bindTexture(gl.TEXTURE_2D,shTex);
-   gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([255,255,255,255]));
+  function texParams(){
    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
   }
+  try{
+   shTex=gl.createTexture();
+   gl.bindTexture(gl.TEXTURE_2D,shTex);
+   gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,SH,SH,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+   texParams();
+   shRb=gl.createRenderbuffer();
+   gl.bindRenderbuffer(gl.RENDERBUFFER,shRb);
+   gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,SH,SH);
+   shFb=gl.createFramebuffer();
+   gl.bindFramebuffer(gl.FRAMEBUFFER,shFb);
+   gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,shTex,0);
+   gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,shRb);
+   shOk=gl.checkFramebufferStatus(gl.FRAMEBUFFER)===gl.FRAMEBUFFER_COMPLETE;
+   gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+   if(!shOk)throw new Error('shadow');
+  }catch(eSh){
+   if(shFb)gl.deleteFramebuffer(shFb);
+   if(shRb)gl.deleteRenderbuffer(shRb);
+   if(shTex)gl.deleteTexture(shTex);
+   shFb=null;shRb=null;shTex=null;shOk=false;
+   try{
+    shTex=gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D,shTex);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([255,255,255,255]));
+    texParams();
+   }catch(eB){shTex=null}
+  }
+  gl.bindTexture(gl.TEXTURE_2D,null);
   h.shFb=shFb;h.shTex=shTex;h.shRb=shRb;
   var fog=tri(scene.fog),fogN=scene.fogNear!=null?scene.fogNear:9,fogF=scene.fogFar!=null?scene.fogFar:20;
   if(fogF<fogN+0.5)fogF=fogN+0.5;
@@ -212,7 +217,7 @@ function mount(figureEl,opts){
    var r=cv.getBoundingClientRect(),w=r.width,hh=r.height;
    if(w<1||hh<1)return false;
    var pw=Math.max(1,Math.round(w*dpr)),ph=Math.max(1,Math.round(hh*dpr));
-   if(cv.width!==pw||cv.height!==ph){cv.width=pw;cv.height=ph}
+   if(cv.width!==pw||cv.height!==ph){cv.width=pw;cv.height=ph;h.dirty=true}
    return true;
   }
   function pose(mesh,st){
@@ -250,6 +255,8 @@ function mount(figureEl,opts){
     lookAt(lview,ld[0]*16,ld[1]*16,ld[2]*16,0,0.6,0);
     ortho(lproj,-6,6,-6,6,0.5,40);
     mul(lproj,lview,lvp);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D,null);
     gl.bindFramebuffer(gl.FRAMEBUFFER,shFb);
     gl.viewport(0,0,SH,SH);
     gl.clearColor(1,1,1,1);
@@ -317,7 +324,7 @@ function mount(figureEl,opts){
    var st=paused();
    if(!fit()){h.timer=setTimeout(function(){h.timer=0;if(!h.dead)kick()},200);return}
    if(st){
-    if(!h.painted||h.dirty){render(true);h.painted=true;h.dirty=false}
+    if(!h.painted||h.dirty){try{render(true)}catch(eR){unmount(h);return}h.painted=true;h.dirty=false}
     h.timer=setTimeout(wake,200);
     return;
    }
@@ -325,7 +332,7 @@ function mount(figureEl,opts){
    h.last=ts;
    if(!h.drag)yaw+=dt*0.12;
    t+=dt;
-   render(false);
+   try{render(false)}catch(eR){unmount(h);return}
    h.painted=true;h.dirty=false;
    h.raf=requestAnimationFrame(loop);
   }
