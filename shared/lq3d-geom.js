@@ -15,6 +15,17 @@ function norm(v){var l=Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2])||1;return [v[0]/
 function cross(a,b){return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]}
 function frameY(dir){var y=norm(dir), hint=Math.abs(y[1])>0.85?[1,0,0]:[0,1,0], x=norm(cross(hint,y)), z=cross(x,y);return {x:x,y:y,z:z}}
 function yawToward(x,z,tx,tz){return Math.atan2(-(tx-x), -(tz-z))}
+/* Screen-space grade after lighting. Evals leans cool. Safety leans warm and a little more gold. */
+function courseGrade(key){
+ var g={
+  'ai-evals':{lift:[0.012,0.018,0.038],gain:[0.90,0.98,1.08],sat:0.90,gold:0.38},
+  'ai-safety':{lift:[0.042,0.018,0.006],gain:[1.08,0.96,0.86],sat:1.02,gold:0.74},
+  'ai-foundations':{lift:[0.016,0.030,0.012],gain:[0.96,1.06,0.94],sat:1.0,gold:0.46},
+  'python-basics':{lift:[0.010,0.034,0.016],gain:[0.94,1.08,0.97],sat:1.06,gold:0.42},
+  'portfolio-guide':{lift:[0.028,0.022,0.010],gain:[1.05,0.98,0.90],sat:0.95,gold:0.58}
+ };
+ return g[key]||{lift:[0.02,0.016,0.01],gain:[1,1,1],sat:1,gold:0.48};
+}
 
 function Builder(){this.p=[];this.n=[];this.c=[];this.e=[];this.idx=[]}
 Builder.prototype._tri=function(a,b,c,col,em){
@@ -275,8 +286,8 @@ function lanternMesh(){
  b.box(0,1.04,0,0.18,0.028,0.18,hex('#8a6528'),0.55);
  return pack(b);
 }
-function shadowMesh(r){
- var b=new Builder(), col=[0.30,0.34,0.22], seg=14, i, a0, a1;
+function shadowMesh(r, person){
+ var b=new Builder(), col=person?[0.20,0.22,0.15]:[0.30,0.34,0.22], seg=14, i, a0, a1;
  var dx=-0.46, dz=-0.24, len=Math.sqrt(dx*dx+dz*dz)||1, px, pz, longR=r*1.25, shortR=r*0.82;
  dx/=len; dz/=len; px=-dz; pz=dx;
  function pt(ang){
@@ -644,7 +655,8 @@ function casts(name){
 function buildCamp(opts){
  opts=opts||{};
  var biome=PAL[opts.biome]?opts.biome:'meadow', P=PAL[biome], items=[], heroLook=opts.hero||{};
- var shade=shadowMesh(0.5);
+ var shade=shadowMesh(0.5, false);
+ var feet=shadowMesh(0.5, true);
  function put(built,x,y,z,ry,s,name){
   items.push({name:name,positions:built.positions,normals:built.normals,colors:built.colors,emissive:built.emissive,indices:built.indices,x:x,y:y||0,z:z,ry:ry||0,s:s||1,cast:casts(name)});
  }
@@ -662,10 +674,10 @@ function buildCamp(opts){
  put(flameMesh(0.3, hex('#ff7a2a')), 0.02,0.18,-1.58, 0.8,1,'flame');
  var hx=0.82, hz=0.2, fx=0.12, fz=-1.5;
  put(person({skin:heroLook.skin||'#e2b48c',hair:heroLook.hair||'#3b2a1d',robe:heroLook.robe||'#274a7a',trim:heroLook.trim||'#d7b56a',cape:heroLook.cape||'#7a2e2a',hat:heroLook.hat||'hood',stick:heroLook.staff!==false,pack:true}), hx,0,hz, yawToward(hx,hz,fx,fz), 1, 'hero');
- put(shade,hx,0,hz,0,0.62,'shadow');
+ put(feet,hx,0,hz,0,0.78,'shadow');
  var fx2=-0.62, fz2=-0.05;
  put(person({skin:'#e8bd94',hair:'#8a4a22',robe:'#4a5f8a',trim:'#c8a86a',cape:null,hat:'cap',stick:false,pack:true,head:1.12}), fx2,0,fz2, yawToward(fx2,fz2,fx,fz), 0.84, 'friend');
- put(shade,fx2,0,fz2,0,0.5,'shadow');
+ put(feet,fx2,0,fz2,0,0.62,'shadow');
  put(lanternMesh(), 1.9,0,-1.75, 0,1,'lantern');
  put(logMesh(), 1.25,0,-1.05, 0.55,1,'log');
  put(cupMesh(), 0.72,0,-1.02, 0.8,1.35,'cup');
@@ -680,6 +692,9 @@ function buildCamp(opts){
  var mounds=[[4.5,1.4,0.62],[3.1,4.2,0.48],[-3.4,4.0,0.7],[-4.6,0.3,0.55],[4.7,-1.4,0.5]];
  for(si=0;si<mounds.length;si++)put(moundMesh(rim), mounds[si][0],0,mounds[si][1], si*0.2, mounds[si][2], 'mound');
  dress(biome, P, put, opts.key||'', shade);
+ var mark=(biome==='hills'||biome==='highland')
+  ?{name:'cairn',pos:[2.55,0.95,3.05],col:[0.98,0.78,0.36],radius:2.2,k:0.46}
+  :{name:'pennant',pos:[2.7,1.22,0.85],col:[0.98,0.76,0.34],radius:2.0,k:0.42};
  var air={
   meadow:{fog:[0.16,0.22,0.32],sky:[0.52,0.62,0.74],gnd:[0.28,0.24,0.16],far:20},
   forest:{fog:[0.10,0.16,0.14],sky:[0.32,0.46,0.40],gnd:[0.16,0.18,0.12],far:18},
@@ -692,13 +707,19 @@ function buildCamp(opts){
  return {
   meshes:items,
   fog:air.fog, fogNear:8.5, fogFar:air.far,
-  lightDir:norm([0.46,0.84,0.24]),
+  lightDir:norm([0.62,0.52,0.28]),
   lightColor:[1.0,0.93,0.78],
   skyAmb:air.sky,
   groundAmb:air.gnd,
-  firePos:[0.12,0.55,-1.5],
-  fireColor:[1.0,0.48,0.16],
-  fireRadius:3.6
+  grade:courseGrade(opts.key||''),
+  /* World positions. The viewer does not transform these. pos.w in the shader is the radius. */
+  lights:[
+   {name:'fire',pos:[0.12,0.55,-1.5],col:[1.0,0.48,0.16],radius:3.6,k:1},
+   {name:'lantern',pos:[1.9,1.16,-1.75],col:[1.0,0.72,0.32],radius:2.6,k:0.92},
+   {name:'chest',pos:[-2.25,0.36,-0.64],col:[1.0,0.78,0.32],radius:1.8,k:0.72},
+   {name:'hero',pos:[hx,1.12,hz-0.18],col:[1.0,0.86,0.62],radius:2.2,k:0.40},
+   mark
+  ]
  };
 }
 
@@ -724,6 +745,7 @@ function validateMesh(m, errors, tag){
  }
 }
 function meshBy(camp,name){var i;for(i=0;i<camp.meshes.length;i++)if(camp.meshes[i].name===name)return camp.meshes[i];return null}
+function lampBy(camp,name){var i,L=camp.lights||[];for(i=0;i<L.length;i++)if(L[i].name===name)return L[i];return null}
 function band(arr,lo,hi){var i;for(i=0;i<arr.length;i++)if(arr[i]>=lo&&arr[i]<=hi)return true;return false}
 function boundsY(m){
  var p=m.positions, s=m.s||1, y0=1e9, y1=-1e9, i;
@@ -846,7 +868,32 @@ function selfCheck(){
    var water=meshBy(camp,'water');
    if(!water||!band(water.emissive,0.3,0.4))errors.push('marsh water');
   }
+  if(!camp.lights||camp.lights.length<5)errors.push(biomes[bi]+' lights');
+  else{
+   var need=['fire','lantern','chest','hero'], ni, lamp, markName;
+   for(ni=0;ni<need.length;ni++){
+    lamp=lampBy(camp,need[ni]);
+    if(!lamp||lamp.radius<0.5||!(lamp.k>0)||!lamp.pos||lamp.pos[1]<0.2)errors.push(biomes[bi]+' '+need[ni]+' lamp');
+   }
+   markName=(biomes[bi]==='hills'||biomes[bi]==='highland')?'cairn':'pennant';
+   lamp=lampBy(camp,markName);
+   if(!lamp||lamp.col[0]<lamp.col[2])errors.push(biomes[bi]+' landmark lamp');
+   if(!camp.grade||!camp.grade.gain||camp.grade.gain.length!==3)errors.push(biomes[bi]+' grade');
+   if(camp.lightDir[1]>0.75)errors.push(biomes[bi]+' sun overhead');
+  }
  }
+ var evCamp=buildCamp({biome:'meadow',key:'ai-evals'});
+ var saCamp=buildCamp({biome:'meadow',key:'ai-safety'});
+ if(!(evCamp.grade.gain[2]>evCamp.grade.gain[0]+0.1))errors.push('evals grade');
+ if(!(saCamp.grade.gain[0]>saCamp.grade.gain[2]+0.1))errors.push('safety grade');
+ if(!(saCamp.grade.gold>evCamp.grade.gold+0.2))errors.push('gold glow');
+ var heroLamp=lampBy(evCamp,'hero'), heroMesh=meshBy(evCamp,'hero');
+ if(heroLamp&&heroMesh){
+  var ldx=heroLamp.pos[0]-heroMesh.x, ldz=heroLamp.pos[2]-heroMesh.z;
+  if(ldx*ldx+ldz*ldz>0.5)errors.push('hero lamp far');
+ }
+ var chestLamp=lampBy(evCamp,'chest');
+ if(!chestLamp||chestLamp.col[0]<0.9||chestLamp.col[1]<0.6)errors.push('chest gold');
  var img=raster(buildCamp({biome:'meadow', key:'ai-evals'}));
  var skin=hex('#e2b48c'), tent=hex('#f4ead4'), grass=hex('#5c8a3e'), grass2=hex('#3e6b32'), dirt=hex('#8a6840');
  var nSkin=countNear(img,function(c){return dist2(c,skin)<0.22*0.22}), nTent=countNear(img,function(c){return dist2(c,tent)<0.26*0.26||dist2(c,hex('#e4d2ae'))<0.26*0.26});

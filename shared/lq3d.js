@@ -1,7 +1,9 @@
 /* Expedition camp viewer. A small WebGL diorama, no libraries.
    Y-up, right-handed. Character front is local -Z, and the camera sits on -Z so faces look toward the viewer.
    Full effects: directional shadow map, a slow orbit, and a small idle bob.
-   Low effects or reduced motion: one still frame. Contact shadows are real meshes, so the still frame keeps them. */
+   Five world-space point lights (fire, lantern, chest, hero, landmark) plus a course colour grade.
+   Low effects or reduced motion: one still frame. Contact shadows are real meshes, so the still frame keeps them.
+   The grade and the steady lights stay on in that still frame. The shadow map stays off. */
 (function(){
 'use strict';
 var FOV=34*Math.PI/180, SH=1024;
@@ -83,8 +85,10 @@ var CFS=[
 'precision highp float;',
 'varying vec3 vCol;varying vec3 vN;varying vec3 vW;varying vec4 vS;varying float vE;',
 'uniform vec3 uEye;uniform vec3 uLDir;uniform vec3 uLCol;uniform vec3 uSky;uniform vec3 uGnd;uniform vec3 uFog;',
-'uniform vec3 uFire;uniform vec3 uFireCol;',
-'uniform float uFogN;uniform float uFogF;uniform float uShOn;uniform float uGlow;uniform float uFireR;uniform float uFireK;uniform sampler2D uSh;',
+'uniform float uFogN;uniform float uFogF;uniform float uShOn;uniform float uGlow;uniform sampler2D uSh;',
+'uniform vec4 uL0;uniform vec4 uC0;uniform vec4 uL1;uniform vec4 uC1;uniform vec4 uL2;uniform vec4 uC2;',
+'uniform vec4 uL3;uniform vec4 uC3;uniform vec4 uL4;uniform vec4 uC4;',
+'uniform vec3 uLift;uniform vec3 uGain;uniform float uSat;uniform float uGold;uniform vec2 uRes;',
 'float unpack(vec4 c){return dot(c,vec4(1.0,0.0039215686,0.0000153787,0.00000006035));}',
 'float pcf(vec2 uv,float ref){',
 ' vec2 t=vec2(0.0009765625);float s=0.0;',
@@ -99,6 +103,13 @@ var CFS=[
 ' s+=step(ref,unpack(texture2D(uSh,uv+vec2(t.x,t.y))));',
 ' return s/9.0;',
 '}',
+'vec3 lamp(vec3 N, vec3 base, vec4 p, vec4 c){',
+' if(c.a<0.001||p.a<0.05) return vec3(0.0);',
+' vec3 toL=p.xyz-vW; float fd=length(toL);',
+' float att=clamp(1.0-fd/p.a,0.0,1.0); att=att*att;',
+' float nd=max(dot(N,toL/max(fd,0.001)),0.0);',
+' return base*c.rgb*att*(0.30+0.70*nd)*c.a;',
+'}',
 'void main(){',
 ' vec3 N=normalize(vN);vec3 L=normalize(uLDir);vec3 col;',
 ' if(vE>0.95){col=vCol*uGlow;}',
@@ -108,9 +119,9 @@ var CFS=[
 '  if(uShOn>0.5){',
 '   vec3 sp=vS.xyz/vS.w;vec2 uv=sp.xy*0.5+0.5;',
 '   if(uv.x>0.0&&uv.x<1.0&&uv.y>0.0&&uv.y<1.0){',
-'    float bias=0.0012+0.0016*(1.0-max(dot(N,L),0.0));',
+'    float bias=0.0016+0.0024*(1.0-max(dot(N,L),0.0));',
 '    float ref=sp.z*0.5+0.5-bias;',
-'    shade=mix(pcf(uv,ref),1.0,0.5);',
+'    shade=mix(pcf(uv,ref),1.0,0.38);',
 '   }',
 '  }',
 '  vec3 hemi=mix(uGnd,uSky,N.y*0.5+0.5);',
@@ -121,13 +132,11 @@ var CFS=[
 '  float spec=pow(max(dot(N,H),0.0),spow)*sstr*shade;',
 '  col=vCol*(hemi+uLCol*wrap*shade)+uLCol*spec;',
 '  if(vE>0.20&&vE<=0.45)col+=uSky*0.08;',
+'  if(vE>0.48&&vE<0.75)col+=vec3(0.86,0.62,0.22)*0.18;',
 '  vec3 fillL=normalize(vec3(-0.35,0.42,-0.62));',
 '  col+=vCol*vec3(0.40,0.52,0.68)*max(dot(N,fillL),0.0)*0.22;',
-'  vec3 toF=uFire-vW;',
-'  float fd=length(toF);',
-'  float att=clamp(1.0-fd/uFireR,0.0,1.0);att=att*att;',
-'  float fl=max(dot(N,toF/max(fd,0.001)),0.0);',
-'  col+=vCol*uFireCol*att*(0.28+0.72*fl)*uFireK;',
+'  col+=lamp(N,vCol,uL0,uC0)+lamp(N,vCol,uL1,uC1)+lamp(N,vCol,uL2,uC2);',
+'  col+=lamp(N,vCol,uL3,uC3)+lamp(N,vCol,uL4,uC4);',
 '  float rim=pow(1.0-max(dot(N,V),0.0),2.2);',
 '  col+=uSky*rim*0.16;',
 ' }',
@@ -135,7 +144,15 @@ var CFS=[
 ' float dist=length(vW-uEye);',
 ' float fog=clamp((dist-uFogN)/(uFogF-uFogN),0.0,1.0);',
 ' fog=fog*fog*(3.0-2.0*fog);',
-' gl_FragColor=vec4(mix(col,uFog,fog),1.0);',
+' col=mix(col,uFog,fog);',
+' float luma=dot(col,vec3(0.299,0.587,0.114));',
+' col=mix(vec3(luma),col,uSat);',
+' col=uLift+col*uGain;',
+' col+=vec3(0.10,0.064,0.018)*smoothstep(0.42,0.90,luma)*uGold;',
+' vec2 suv=gl_FragCoord.xy/max(uRes,vec2(1.0));',
+' float vig=smoothstep(0.40,0.95,length((suv-0.5)*vec2(1.05,0.92)));',
+' col*=mix(1.0,0.80,vig);',
+' gl_FragColor=vec4(clamp(col,0.0,1.0),1.0);',
 '}'
 ].join('\n');
 var DVS=[
@@ -170,8 +187,11 @@ function mount(figureEl,opts){
   col.uEye=loc(col,'uEye');col.uLDir=loc(col,'uLDir');col.uLCol=loc(col,'uLCol');
   col.uSky=loc(col,'uSky');col.uGnd=loc(col,'uGnd');col.uFog=loc(col,'uFog');
   col.uFogN=loc(col,'uFogN');col.uFogF=loc(col,'uFogF');col.uShOn=loc(col,'uShOn');col.uSh=loc(col,'uSh');
-  col.uGlow=loc(col,'uGlow');col.uFire=loc(col,'uFire');col.uFireCol=loc(col,'uFireCol');
-  col.uFireR=loc(col,'uFireR');col.uFireK=loc(col,'uFireK');
+  col.uGlow=loc(col,'uGlow');
+  col.uL0=loc(col,'uL0');col.uC0=loc(col,'uC0');col.uL1=loc(col,'uL1');col.uC1=loc(col,'uC1');
+  col.uL2=loc(col,'uL2');col.uC2=loc(col,'uC2');col.uL3=loc(col,'uL3');col.uC3=loc(col,'uC3');
+  col.uL4=loc(col,'uL4');col.uC4=loc(col,'uC4');
+  col.uLift=loc(col,'uLift');col.uGain=loc(col,'uGain');col.uSat=loc(col,'uSat');col.uGold=loc(col,'uGold');col.uRes=loc(col,'uRes');
   dep.uMVP=loc(dep,'uMVP');
   var gpu=[],i,src,m;
   function buf(type,data){var b=gl.createBuffer();gl.bindBuffer(type,b);gl.bufferData(type,data,gl.STATIC_DRAW);return b}
@@ -226,9 +246,10 @@ function mount(figureEl,opts){
   var fog=tri(scene.fog),fogN=scene.fogNear!=null?scene.fogNear:9,fogF=scene.fogFar!=null?scene.fogFar:20;
   if(fogF<fogN+0.5)fogF=fogN+0.5;
   var ld=tri(scene.lightDir),lc=tri(scene.lightColor),sky=tri(scene.skyAmb),gnd=tri(scene.groundAmb);
-  var fire=scene.firePos&&scene.firePos.length>=3?scene.firePos:[0.12,0.55,-1.5];
-  var fireC=scene.fireColor&&scene.fireColor.length>=3?scene.fireColor:[1,0.48,0.16];
-  var fireR=scene.fireRadius!=null?scene.fireRadius:3.6;
+  var lights=scene.lights&&scene.lights.length?scene.lights:[];
+  var grade=scene.grade||{lift:[0.02,0.016,0.01],gain:[1,1,1],sat:1,gold:0.48};
+  var gLift=tri(grade.lift), gGain=tri(grade.gain);
+  var gSat=grade.sat!=null?grade.sat:1, gGold=grade.gold!=null?grade.gold:0.48;
   var proj=new Float32Array(16),view=new Float32Array(16),vp=new Float32Array(16);
   var model=new Float32Array(16),mvp=new Float32Array(16);
   var lproj=new Float32Array(16),lview=new Float32Array(16),lvp=new Float32Array(16);
@@ -270,6 +291,15 @@ function mount(figureEl,opts){
    gl.vertexAttribPointer(3,1,gl.FLOAT,false,0,0);
    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,mesh.bIdx);
   }
+  function gradedFog(){
+   var r=fog[0],g=fog[1],b=fog[2],l=r*0.299+g*0.587+b*0.114,s=gSat,t;
+   r=l+(r-l)*s; g=l+(g-l)*s; b=l+(b-l)*s;
+   r=gLift[0]+r*gGain[0]; g=gLift[1]+g*gGain[1]; b=gLift[2]+b*gGain[2];
+   t=l<0.42?0:l>0.9?1:(l-0.42)/0.48; t=t*t*(3-2*t);
+   r+=0.10*t*gGold; g+=0.064*t*gGold; b+=0.018*t*gGold;
+   if(r<0)r=0; if(g<0)g=0; if(b<0)b=0; if(r>1)r=1; if(g>1)g=1; if(b>1)b=1;
+   return [r,g,b];
+  }
   function render(st){
    var w=cv.width,hh=cv.height,k,cp,sp;
    if(w<1||hh<1)return;
@@ -300,7 +330,8 @@ function mount(figureEl,opts){
     gl.bindFramebuffer(gl.FRAMEBUFFER,null);
    }
    gl.viewport(0,0,w,hh);
-   gl.clearColor(fog[0],fog[1],fog[2],1);
+   var bg=gradedFog();
+   gl.clearColor(bg[0],bg[1],bg[2],1);
    gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
    gl.useProgram(col);
    gl.activeTexture(gl.TEXTURE0);
@@ -308,11 +339,9 @@ function mount(figureEl,opts){
    gl.uniformMatrix4fv(col.uLVP,false,lvp);
    gl.uniform3f(col.uEye,ex,ey,ez);
    gl.uniform1f(col.uShOn,(!st&&shOk)?1:0);
-   gl.uniform3f(col.uFire,fire[0],fire[1],fire[2]);
-   gl.uniform3f(col.uFireCol,fireC[0],fireC[1],fireC[2]);
-   gl.uniform1f(col.uFireR,fireR);
    gl.uniform1f(col.uGlow,st?1.25:(1.15+0.22*Math.sin(t*6.0)));
-   gl.uniform1f(col.uFireK,st?0.85:(0.72+0.28*Math.sin(t*7.0)));
+   gl.uniform2f(col.uRes,w,hh);
+   uploadLamps(st);
    for(k=0;k<gpu.length;k++){
     pose(gpu[k],st);
     mul(vp,model,mvp);
@@ -331,6 +360,24 @@ function mount(figureEl,opts){
   gl.uniform1f(col.uFogN,fogN);
   gl.uniform1f(col.uFogF,fogF);
   gl.uniform1i(col.uSh,0);
+  gl.uniform3f(col.uLift,gLift[0],gLift[1],gLift[2]);
+  gl.uniform3f(col.uGain,gGain[0],gGain[1],gGain[2]);
+  gl.uniform1f(col.uSat,gSat);
+  gl.uniform1f(col.uGold,gGold);
+  var lampP=[col.uL0,col.uL1,col.uL2,col.uL3,col.uL4];
+  var lampC=[col.uC0,col.uC1,col.uC2,col.uC3,col.uC4];
+  function uploadLamps(st){
+   var i,L,k;
+   for(i=0;i<5;i++){
+    L=lights[i];
+    if(!L||!L.pos||!L.col){gl.uniform4f(lampP[i],0,1,0,1);gl.uniform4f(lampC[i],0,0,0,0);continue}
+    k=L.k==null?1:L.k;
+    if(!st&&L.name==='fire')k=0.70+0.30*Math.sin(t*7.0);
+    else if(!st&&L.name==='lantern')k=(L.k==null?0.9:L.k)*(0.78+0.22*Math.sin(t*5.1+1.4));
+    gl.uniform4f(lampP[i],L.pos[0],L.pos[1],L.pos[2],L.radius==null?2:L.radius);
+    gl.uniform4f(lampC[i],L.col[0],L.col[1],L.col[2],k);
+   }
+  }
   gl.enableVertexAttribArray(0);gl.enableVertexAttribArray(1);gl.enableVertexAttribArray(2);gl.enableVertexAttribArray(3);
   gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);
   gl.enable(gl.CULL_FACE);gl.cullFace(gl.BACK);gl.frontFace(gl.CCW);

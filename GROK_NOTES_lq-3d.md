@@ -66,3 +66,13 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 - Each log seat has a dark strip along the top so the bark is not one flat face. A meadow frame still calls both seats logs, one with the rose blanket. That same frame still shows the cape, the book, the flag, the tied door roll, the crate, the bedroll, the woodpile and the cup together.
 - A later tundra frame still reads as snow: pale pines, blue ice, grey rocks, and the same camp (cape, book, bedroll, crate, woodpile, cup). Not tried on a phone.
 - Ice was two upright boxes. It is now three leaned shards. A tundra frame calls them jagged ice. The snow pines are unchanged.
+
+## Pass 4 (same day)
+
+- Merged origin/main (PRs through the phone layout and the celebrate VFX) into this branch. world.css auto-merged. The camp canvas rules stayed. No push.
+- The camp had one fire lamp. It now has five world-space lamps: fire, lantern, chest (gold), hero, and a landmark. The landmark is the pennant, except hills and highland, where it is the cairn. Positions are world space. The viewer does not transform them. The hero lamp sits just in front of the chest, on the face side (local -Z, toward the camera).
+- Brass (material id 0.55) adds a small gold glow on top of the chest lamp, so the clasp and the lantern frame read as metal even where the lamp falls off.
+- The key light was nearly overhead (y about 0.85). It is now about 0.61, so the people throw a longer shadow. Shadow mix is darker (a fully shadowed texel is 0.38 of the lit colour, was 0.5). Slope bias went up a little so the lower sun does not speckle the ground. Hero and friend foot contacts are a darker olive and a bit wider. Other contacts stay light. Low effects still has no shadow map, so those foot discs are the character shadow in that mode.
+- Course grade runs after fog. ai-evals gain is cooler (blue 1.08, red 0.90, gold 0.38). ai-safety gain is warmer (red 1.08, blue 0.86, gold 0.74). Foundations, Basics and the portfolio guide have their own grades if a camp is ever mounted there. The clear colour uses the same grade, without the vignette, so empty sky matches a fully fogged pixel. A headless frame showed evals grass at about (118, 194, 119) and safety grass at about (147, 196, 83). Both shaders linked. Both camps stayed alive.
+- The default camera is still the near-front view (yaw 0.2). A three-quarter view is the next pass. Phone layout and the 2D celebrate hook belong to other sessions. The hex map stays 2D.
+- Did not spawn a second editor on these two files. A parallel edit would have raced the shader and the mesh list.
