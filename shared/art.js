@@ -163,7 +163,7 @@ function figure(g,x,y,look,o){var u=S/34,mv=!!o.moving,still=quiet()&&!mv,t=stil
   blink=!still&&((t+x*.017)%3.7)<.12,robeD=mix(look.robe,'#000000',.32),robeL=mix(look.robe,'#ffffff',.22),skinD=mix(look.skin,'#5a2a1a',.22);
  g.save();g.translate(x,y+S*.38);
  /* shadow sits on the ground plane (sheared with the camera) and shrinks while hopping */
- var sh=1-Math.min(1,bob/(12*u));groundBlob(g,o.flat,function(){ell(g,5.5*u*sh,2.4*u,13*u*sh,3.5*u*sh,'rgba(8,10,16,.42)');ell(g,2.4*u*sh,1.1*u,6.5*u*sh,2*u*sh,'rgba(8,10,16,.24)')});
+ var sh=1-Math.min(1,bob/(12*u));groundBlob(g,o.flat,function(){ell(g,7*u*sh,2.8*u,16*u*sh,4.2*u*sh,'rgba(8,10,16,.55)');ell(g,2.8*u*sh,1.3*u,7*u*sh,2.2*u*sh,'rgba(8,10,16,.3)')});
  g.translate(0,-bob);
  /* legs + boots */
  var sw=mv?Math.sin(ph)*3.4*u:0;limb(g,-2.6*u,-9*u,-2.6*u+sw*.6,-1.6*u,3.4*u,robeD,lw);limb(g,2.6*u,-9*u,2.6*u-sw*.6,-1.6*u,3.4*u,robeD,lw);

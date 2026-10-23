@@ -155,7 +155,7 @@ function lessonOf(i){var T=C.regions[i].teacher;openOv(function(){E.lessonDone=f
 function gateTalk(i){var R=C.regions[i],G=R.gate,done=levelDone(i);
  if(!done)say(G,['Halt, traveller. I am '+G.name+', '+G.title.toLowerCase()+'.','Answer the questions in the '+R.hall+' and score at least 60% to pass. There is no penalty for trying again.'],function(){ask(G,'Will you take the trial?',[{t:'Take the trial',fn:function(){trial(i)}},{t:'Not yet'}])});
  else say(G,['You have passed, traveller. The way onward is open, and a chest awaits you in this town.'],function(){ask(G,'Replay the trial for a better score?',[{t:'Replay the trial',fn:function(){trial(i)}},{t:'No, thanks'}])})}
-function trial(i){var G=C.regions[i].gate,was=levelDone(i);openOv(function(){E.level(i,'quiz')},function(){var now=levelDone(i);if(now&&!was){chime();var hp=scr(st.hero.x,st.hero.y-S*.5);cele({msg:'The way is open!',vfx:'shockwave',x:hp[0],y:hp[1],confetti:false});var nx=i<NR-1?'The fog lifts from '+C.regions[i+1].name+'.':'The gates of the '+C.castle.name+' now stand open.';say(G,['Well fought. You may pass. '+nx,'Open the chest in this town, then take the south gate back to the map.'])}else if(!now)say(G,['Not this time. Re-read the lesson with the teacher and try again; there is no penalty.'])})}
+function trial(i){var G=C.regions[i].gate,was=levelDone(i);openOv(function(){E.level(i,'quiz')},function(){var now=levelDone(i);if(now&&!was){chime();var wx=st.hero.x,wy=st.hero.y-S*.45;flare(wx,wy,220,[0.95,0.7,0.26],1.8);var hp=scr(wx,wy);cele({msg:'The way is open!',vfx:'shockwave',x:hp[0],y:hp[1],confetti:false});var nx=i<NR-1?'The fog lifts from '+C.regions[i+1].name+'.':'The gates of the '+C.castle.name+' now stand open.';say(G,['Well fought. You may pass. '+nx,'Open the chest in this town, then take the south gate back to the map.'])}else if(!now)say(G,['Not this time. Re-read the lesson with the teacher and try again; there is no penalty.'])})}
 function simTalk(i){var R=C.regions[i],s=R.sim,sp={name:s.name,icon:({vault:'🏦',guild:'📏',smithy:'🔨',tower:'🗼',lab:'🧪',observatory:'🔭'})[s.building]||'📜'};
  say(sp,[s.blurb+(s.render?' (A toy example with made-up numbers, not real model data.)':' (Example data, not advice. Nothing is ordered or connected.)')],function(){ask(sp,s.kind==='lesson'?'Climb the tower?':'Step inside?',[{t:'Enter',fn:function(){openSim(i)}},{t:'Not now'}])})}
 function openSim(i){var s=C.regions[i].sim,w=PW();w.sim[i]=1;
@@ -167,9 +167,13 @@ function openSim(i){var s=C.regions[i].sim,w=PW();w.sim[i]=1;
   ['#s1','#s2','#s3'].forEach(function(id){if(id!==map[s.kind]){var e=$(id,host);if(e)e.style.display='none'}})
   host.insertAdjacentHTML('beforeend','<button class="btn btn-primary" id="simx">Leave</button>');$('#simx').onclick=function(){closeOv()}})}
 /* round 2 fx: world point -> screen px (for lighting a chest or the hero), and fire the shared lq:celebrate event */
-function scr(x,y){try{var r=cv.getBoundingClientRect(),z=zoom();return [r.left+(x-st.cam.x)*z,r.top+(y-st.cam.y)*z]}catch(e){return [innerWidth/2,innerHeight/2]}}
+function scr(x,y){try{var r=cv.getBoundingClientRect(),z=zoom(),v=viewOf(z);v.pivot=st.hero.y;var p=g2s(x,y,st.cam.x,st.cam.y,v);return [r.left+p[0]*z,r.top+p[1]*z]}catch(e){return [innerWidth/2,innerHeight/2]}}
 function cele(d){try{document.dispatchEvent(new CustomEvent('lq:celebrate',{detail:d}))}catch(e){}}
-function chestFx(o,msg){var p=scr(hx(o.c,o.r),hy(o.r)-S*.25);cele({msg:msg,vfx:'beam',x:p[0],y:p[1]})}
+/* a short world light under a beam or shockwave, so the grade brightens the ground and not only the DOM overlay */
+var flares=[];
+function flare(x,y,r,col,dur){if(FX.low||!st)return;dur=dur||2.1;flares.push({x:x,y:y,r:r,c:col,until:st.time+dur,dur:dur});if(flares.length>4)flares.shift()}
+function liveFlares(){var i,t=st.time,f,k;for(i=flares.length-1;i>=0;i--){f=flares[i];if(f.until<=t){flares.splice(i,1);continue}k=Math.max(0,(f.until-t)/f.dur);addLight(f.x,f.y,f.r,[f.c[0]*k,f.c[1]*k,f.c[2]*k])}}
+function chestFx(o,msg){var x=hx(o.c,o.r),y=hy(o.r)-S*.2;flare(x,y,200,[0.92,0.64,0.16],2.2);var p=scr(x,y);cele({msg:msg,vfx:'beam',x:p[0],y:p[1]})}
 function chestOpen(o){var i=o.i,w=PW(),sp={name:'Treasure chest',icon:'🎁'};
  if(i>=NR){if(!bossDone())return say(sp,['The chest is sealed. Only the Council can open it: finish the final challenge first.']);
   if(w.chests[i])return say(sp,['Empty now. You already took the '+C.castle.chest+'.']);w.chests[i]=1;P().xp+=50;E.award('crown');chime();chestFx(o,'Treasure found!');E.save();hud();return say(sp,['You found the '+C.castle.chest+'! +50 XP and a badge.','The realm is yours to explore. Revisit any trial to earn three stars.'])}
@@ -179,7 +183,7 @@ function chestOpen(o){var i=o.i,w=PW(),sp={name:'Treasure chest',icon:'🎁'};
  w.chests[i]=1;P().xp+=25;E.award('seal_'+A.levels[i].id);chime();chestFx(o,'Seal found!');E.save();hud();say(sp,['You found the Seal of '+R.name+'! +25 XP and a badge.'])}
 function bossTalk(){var B=C.castle.boss;
  if(!allDone())return say(B,['You are not ready. Clear all '+NR+' regions first.']);
- say(B,bossDone()?['You have faced us already, and did well. Care to try for a higher score?']:['So you have crossed the whole realm. I am '+B.name+'.',B.title+'. Make your five choices wisely.'],function(){ask(B,bossDone()?'Face the challenge again?':'Begin the final challenge?',[{t:'Begin',fn:function(){openOv(function(){E.boss()},function(){if(bossDone()){chime('Challenge complete!');say(B,['A fine piece of work. Open the chest by the wall, and take your crown.'])}})}},{t:'Not yet'}])})}
+ say(B,bossDone()?['You have faced us already, and did well. Care to try for a higher score?']:['So you have crossed the whole realm. I am '+B.name+'.',B.title+'. Make your five choices wisely.'],function(){ask(B,bossDone()?'Face the challenge again?':'Begin the final challenge?',[{t:'Begin',fn:function(){openOv(function(){E.boss()},function(){if(bossDone()){chime();var bx=st.hero.x,by=st.hero.y-S*.45;flare(bx,by,240,[0.95,0.72,0.28],2);var hp=scr(bx,by);cele({msg:'Challenge complete!',vfx:'shockwave',x:hp[0],y:hp[1]});say(B,['A fine piece of work. Open the chest by the wall, and take your crown.'])}})}},{t:'Not yet'}])})}
 function interact(o){
  if(o.role==='teacher')teacherTalk(region());
  else if(o.role==='gate'||o.role==='hall'&&region()<NR)gateTalk(region());
@@ -299,18 +303,27 @@ function terrainXform(g,cx,cy,v){g.setTransform(dpr*v.z,0,dpr*v.z*v.s,dpr*v.z*v.
 function upright(g,x,y,cx,cy,v){var p=g2s(x,y,cx,cy,v);g.setTransform(dpr*v.z,0,0,dpr*v.z,dpr*v.z*(p[0]-x),dpr*v.z*(p[1]-y))}
 var lights=[];
 function addLight(x,y,r,col){lights.push([x,y,r,col])}
+/* Full effects draws each course's own landmark (scaled 1.25, feet at hex y + S/2). The light sits on that painted lamp.
+   Guild and town lights sit on the shared windows. A ready chest gets a gold pool. Low effects skips this pass. */
 function lamp(o,x,y,op){if(FX.low)return;
- if(o.type==='chest'){if(op.glow)addLight(x,y-S*.25,90,[0.5,0.36,0.1]);else if(op.open)addLight(x,y-S*.15,34,[0.22,0.16,0.06]);return}
- var k=o.kind;
+ if(o.type==='chest'){if(op.glow)addLight(x,y-S*.2,118,[0.78,0.52,0.12]);else if(op.open)addLight(x,y-S*.12,40,[0.28,0.2,0.08]);return}
+ var k=o.kind,u=S/34,feet=y+S*.5,sc=1.25;
  if(k==='smithy')addLight(x-S*.12,y-S*.4,74,[0.55,0.22,0.05]);
- else if(k==='tower')addLight(x,y-S*1.15,50,[0.4,0.32,0.12]);
- else if(k==='hall'&&op.lit)addLight(x,y-S*.5,70,[0.4,0.3,0.1]);
- else if(k==='great'&&op.lit)addLight(x,y-S*.75,84,[0.42,0.3,0.1]);
- else if(k==='castle')addLight(x,y-S*.85,104,[0.4,0.3,0.1]);
- else if(k==='vault')addLight(x,y-S*.4,46,[0.32,0.26,0.1]);
- else if(o.landmark)addLight(x,y-S*.65,82,[0.42,0.34,0.12]);
- else if(k==='town'||o.type==='node')addLight(x,y-S*.45,42,[0.28,0.2,0.07])}
-function packLights(cx,cy,v){var out=[],i,L,p,rr,dx,dy,cxp=cv.width*.5,cyp=cv.height*.5;
+ else if(k==='tower')addLight(x,y-S*1.15,56,[0.58,0.44,0.14]);
+ else if(k==='hall'&&op.lit)addLight(x,y-S*.45,82,[0.66,0.46,0.12]);
+ else if(k==='great'&&op.lit)addLight(x,y-S*.7,100,[0.66,0.46,0.12]);
+ else if(k==='castle')addLight(x,y-S*.85,112,[0.6,0.44,0.12]);
+ else if(k==='vault')addLight(x,y-S*.35,56,[0.55,0.4,0.12]);
+ else if(k==='guild')addLight(x+10*u,feet-14*u,46,[0.74,0.52,0.14]);
+ else if(o.landmark){var key=C.key,ly=-36,col=[0.85,0.64,0.22];
+  if(key==='python-basics'){ly=-16;col=[0.9,0.68,0.16]}
+  else if(key==='ai-foundations'){ly=-22;col=[0.32,0.52,0.86]}
+  else if(key==='ai-safety'){ly=-41;col=[0.92,0.7,0.26]}
+  else if(key==='portfolio-guide'){ly=-38;col=[0.92,0.68,0.2]}
+  else if(key==='ai-evals'){ly=-41;col=[0.86,0.68,0.26]}
+  addLight(x,feet+ly*u*sc,72,col)}
+ else if(k==='town'||o.type==='node'){addLight(x-8*u,y-S*.32,40,[0.72,0.5,0.12]);addLight(x+8*u,y-S*.28,30,[0.42,0.28,0.08])}}
+function packLights(cx,cy,v){liveFlares();var out=[],i,L,p,rr,dx,dy,cxp=cv.width*.5,cyp=cv.height*.5;
  for(i=0;i<lights.length;i++){L=lights[i];p=g2s(L[0],L[1],cx,cy,v);p[0]*=v.z*dpr;p[1]*=v.z*dpr;rr=L[2]*v.z*dpr;
   if(p[0]<-rr||p[1]<-rr||p[0]>cv.width+rr||p[1]>cv.height+rr)continue;
   dx=p[0]-cxp;dy=p[1]-cyp;out.push({x:p[0],y:p[1],r:rr,c:L[3],d:dx*dx+dy*dy})}
@@ -336,7 +349,7 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),v=viewOf(z),vw=v.vw
  sc.objs.forEach(function(o){if(world&&!zoneOpen(sc.zone[o.c][o.r])&&st.fog[sc.zone[o.c][o.r]]>.8)return;list.push({y:hy(o.r),o:o})});
  if(st.mode!=='title')list.push({y:h.y,hero:true});list.sort(function(a,b){return a.y-b.y});
  var w=P().w||{chests:{},caches:{}};
- list.forEach(function(it){if(it.hero){upright(g,h.x,h.y,cx,cy,v);Art.figure(g,h.x,h.y,C.hero,{t:T,moving:!!h.mv,face:h.face,celebrate:!h.mv&&st.celUntil>T});if(!FX.low)addLight(h.x,h.y-S*.35,128,[0.32,0.22,0.08]);return}
+ list.forEach(function(it){if(it.hero){upright(g,h.x,h.y,cx,cy,v);Art.figure(g,h.x,h.y,C.hero,{t:T,moving:!!h.mv,face:h.face,celebrate:!h.mv&&st.celUntil>T});if(!FX.low){addLight(h.x,h.y-S*.35,120,[0.34,0.24,0.08]);if(C.hero&&C.hero.staff)addLight(h.x+(h.face||1)*S*.2,h.y-S*.85,48,[0.9,0.72,0.28])}return}
   var o=it.o,x=hx(o.c,o.r),y=hy(o.r),padX=260+Math.ceil(Math.abs(v.s)*vh);if(x<cx-padX||x>cx+vw+padX||y<cy-280||y>cy+vh+200)return;
   upright(g,x,y,cx,cy,v);
   if(o.type==='npc'){var fc=h.x<x?-1:1;Art.figure(g,x,y,o.sp.look,{t:T+o.c,face:fc});
