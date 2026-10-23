@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+html,body{margin:0;background:#0a0f15}
+figure{margin:0;width:960px;height:600px}
+canvas{width:960px;height:600px;display:block}
+</style></head>
+<body>
+<figure id="f"><canvas></canvas></figure>
+<script src="shared/lq3d-geom.js"></script>
+<script src="shared/lq3d.js"></script>
+<script>
+var q=location.search||'';
+window.LQFx={low:q.indexOf('full')<0};
+var hero={skin:'#e2b48c',hair:'#3b2a1d',robe:'#274a7a',trim:'#d7b56a',cape:'#7a2e2a',hat:'hood',staff:true};
+var biome='meadow';
+if(q.indexOf('highland')>=0)biome='highland';
+if(q.indexOf('forest')>=0)biome='forest';
+LQ3D.mount(document.getElementById('f'),{biome:biome,key:q.indexOf('safety')>=0?'ai-safety':'ai-evals',hero:hero});
+</script>
+</body></html>

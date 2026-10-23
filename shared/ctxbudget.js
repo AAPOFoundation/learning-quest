@@ -20,10 +20,10 @@ function bench(host){
    keptTurns=impossible?0:Math.min(s.turns,Math.floor(avail/TURN)),kept=keptTurns*TURN,droppedTurns=s.turns-keptTurns;
   var parts=[['Instructions',SYS,'#6a8a3a'],['Tools',TOOLS,'#3f5f8f'],['Document',s.doc,'#8a5a2a'],['Conversation',kept,'#6a4a8f'],['Your question',Q,'#2f6a62'],['Answer room',s.room,'#7a2f3a']];
   var used=parts.reduce(function(a,p){return a+p[1]},0),free=Math.max(0,s.win-used);
-  var h='<div style="display:flex;height:26px;border:1px solid #6b4a0e;border-radius:8px;overflow:hidden;background:#0b1118">';
-  parts.forEach(function(p){var w=Math.min(100,p[1]/Math.max(s.win,used)*100);if(w>0)h+='<span title="'+esc(p[0])+': '+p[1]+' tokens" style="width:'+w+'%;background:'+p[2]+'"></span>'});
-  h+='</div><p class="small" style="margin:6px 0">'+parts.map(function(p){return '<span style="color:'+p[2]+'">&#9632;</span> '+esc(p[0])+' '+k(p[1])}).join(' &nbsp; ')+'</p>';
-  $('#cb-bar').innerHTML=h;
+  var box=$('#cb-bar'),row=box.querySelector('.segs');
+  if(!row){box.innerHTML='<div class="segs" style="display:flex;height:26px;border:1px solid #6b4a0e;border-radius:8px;overflow:hidden;background:#0a0f15">'+parts.map(function(p){return '<span style="width:0;background:'+p[2]+'"></span>'}).join('')+'</div><p class="small" id="cb-key" style="margin:6px 0"></p>';row=box.querySelector('.segs')}
+  [].forEach.call(row.children,function(el,i){var w=Math.min(100,parts[i][1]/Math.max(s.win,used)*100);el.title=parts[i][0]+': '+parts[i][1]+' tokens';if(!el.dataset.set){el.dataset.set='1';el.style.width='0%';requestAnimationFrame(function(){el.style.width=w+'%'})}else el.style.width=w+'%'});
+  box.querySelector('#cb-key').innerHTML=parts.map(function(p){return '<span style="color:'+p[2]+'">&#9632;</span> '+esc(p[0])+' '+k(p[1])}).join(' &nbsp; ');
   var msg;
   if(impossible)msg='<p class="small" style="color:#e0a0a0"><b>Does not fit.</b> The instructions, tools, document, your question and the answer room already need '+k(used)+' tokens, more than the '+k(s.win)+' window, even with no conversation. Shrink the document, or use a bigger window.</p>';
   else if(droppedTurns>0)msg='<p class="small" style="color:#e8c070"><b>The oldest '+droppedTurns+' turn'+(droppedTurns>1?'s have':' has')+' dropped out.</b> The model can see the newest '+keptTurns+' of '+s.turns+'. Anything said in the dropped turns is invisible to it now.</p>';

@@ -40,8 +40,8 @@ var CREW=[
   ok:function(){return done('ai-safety','l3')||done('ai-evals','l6')},
   tips:{'python-basics':['Try to break your own function with an odd input. That is testing, and it is the same habit.'],'ai-foundations':['Ask what the model was never shown. That is where it will surprise you.'],'ai-evals':['Agree the scope first, log everything, rank by severity, and retest a fix with reworded attacks.','A clean run proves little. State how hard you tried.'],'ai-safety':['Keep every test harmless and within scope. If you find a real weakness, report it privately first.','A defence is only as good as the attack you tried against it. Say which attacks you did not try.']}}];
 function joined(){return CREW.filter(function(c){return c.ok()})}
-var Party={crew:CREW,joined:joined,
- hud:function(el){var j=joined();el.innerHTML=j.map(function(c){return '<img alt="'+esc(c.name)+'" title="'+esc(c.name+', '+c.role)+'" src="'+Art.portrait(c.look,26)+'">'}).join('')},
+var seenCrew=null,Party={crew:CREW,joined:joined,
+ hud:function(el){var j=joined(),grew=seenCrew!=null&&j.length>seenCrew;seenCrew=j.length;el.innerHTML=j.map(function(c,i){return '<img'+(grew&&i===j.length-1?' class="just"':'')+' alt="'+esc(c.name)+'" title="'+esc(c.name+', '+c.role)+'" src="'+Art.portrait((Art.npcLook?Art.npcLook(c.look,c.name):c.look),26)+'">'}).join('')},
  cameo:function(add,i,castle,mir){
   if(castle){if(A.capstone)add({type:'npc',role:'workshop',c:mir(4,i),r:7,block:true,name:'Artificer Wren',sp:{name:'Artificer Wren',title:'Keeper of the Citadel Workshop',look:CREW[1].look},crew:'wren'});return}
   var j=joined();if(!j.length)return;var c=j[i%j.length];
@@ -57,13 +57,13 @@ var Party={crew:CREW,joined:joined,
    H.ask(sp,'Enter the Workshop?',[{t:'Begin',fn:function(){Party.openCapstone(H)}},{t:'Not yet'}])})},
  build:function(){var cap=A.capstone,need=cap.needs,pre=[],rows='',borrowed=0;
   need.forEach(function(n){var m=Satchel.get(n.id),ref=refSolution(n.id);
-   if(m){pre.push(m.code);rows+='<li>✅ <code>'+esc(n.fn)+'</code> <span class="small dim">your version ('+esc(m.title)+')</span></li>'}
-   else if(ref){pre.push(ref);borrowed++;rows+='<li>🔶 <code>'+esc(n.fn)+'</code> <span class="small dim">borrowed reference (solve "'+esc(n.title)+'" yourself to use your own)</span></li>'}
-   else rows+='<li>❌ <code>'+esc(n.fn)+'</code> missing</li>'});
+   if(m){pre.push(m.code);rows+='<li class="sat">'+(window.LQMark?LQMark('ok',16):'')+' <code>'+esc(n.fn)+'</code> <span class="small dim">your version ('+esc(m.title)+')</span></li>'}
+   else if(ref){pre.push(ref);borrowed++;rows+='<li class="sat">'+(window.LQMark?LQMark('borrow',16):'')+' <code>'+esc(n.fn)+'</code> <span class="small dim">borrowed reference (solve "'+esc(n.title)+'" yourself to use your own)</span></li>'}
+   else rows+='<li class="sat">'+(window.LQMark?LQMark('no',16):'')+' <code>'+esc(n.fn)+'</code> missing</li>'});
   return {rows:rows,borrowed:borrowed,q:{t:'code',id:'cap-'+A.key,capstone:true,title:cap.title,q:cap.q,starter:cap.starter,tests:cap.tests,hints:cap.hints,solution:cap.solution,why:cap.why,prelude:pre.join('\n\n')}}},
  openCapstone:function(H){var cap=A.capstone;
   H.openOv(function(){var b=Party.build(),q=b.q;
-   H.wrap('<section class="panel"><p class="kicker">Citadel Workshop</p><h2>'+esc(cap.title)+'</h2><p>'+cap.intro+'</p><p class="small dim"><b>Your satchel is loaded</b> before your code runs, so you can call these functions directly:</p><ul>'+b.rows+'</ul>'+(b.borrowed?'<p class="small dim">A borrowed piece is the game\'s reference version. It works, but the point is using your own.</p>':'')+'<details><summary class="small">Show the loaded satchel code</summary><pre class="ex" style="white-space:pre-wrap;max-height:260px;overflow:auto">'+esc(q.prelude)+'</pre></details></section><div id="capq"></div><button class="btn btn-ghost" id="capx" style="margin-top:12px">Leave the Workshop</button>');
+   H.wrap('<section class="panel"><p class="kicker">Citadel Workshop</p><h2>'+esc(cap.title)+'</h2><p>'+cap.intro+'</p><p class="small dim"><b>Your satchel is loaded</b> before your code runs, so you can call these functions directly:</p><ul>'+b.rows+'</ul>'+(b.borrowed?'<p class="small dim">A borrowed piece is the game\'s reference version. It works, but the point is using your own.</p>':'')+'<details><summary class="small">Show the loaded satchel code</summary><pre class="ex" style="white-space:pre-wrap;max-height:260px;overflow:auto">'+esc(q.prelude)+'</pre></details></section><div id="capq"></div><button class="btn btn-ghost rise" id="capx" style="margin-top:12px">Leave the Workshop</button>');
    document.getElementById('capx').onclick=H.closeOv;
    window.CodeQ.mount(q,document.getElementById('capq'),{idx:0,total:1,title:'Citadel Workshop',done:function(ok){if(ok){var P=window.Engine.P();if(P.badges.indexOf('capstone')<0){window.Engine.award('capstone');P.xp+=60;window.Engine.save()}H.chime();H.closeOv()}}})})}};
 window.Party=Party;
@@ -73,12 +73,12 @@ if(A.capstone)A.badges.push({id:'capstone',icon:'🏛️',name:'Citadel Artifice
 A.tabs=A.tabs||[];
 A.tabs.push({id:'party',label:'Party',render:function(el){var j=joined().map(function(c){return c.id});
  var h='<div class="panel lesson"><p class="kicker">Party</p><p>Companions travel across all four worlds. They join as you progress anywhere, and they wait in the towns with advice for whichever world you are in.</p></div>';
- CREW.forEach(function(c){var on=j.indexOf(c.id)>=0,tips=c.tips[A.key]||c.tips['ai-evals'];
-  h+='<div class="panel lesson" style="display:flex;gap:14px;align-items:flex-start"><img alt="" src="'+Art.portrait(c.look,64)+'" style="width:64px;height:64px;border-radius:10px;border:1px solid var(--gold);'+(on?'':'filter:grayscale(1) brightness(.5)')+'"><div><h3 style="margin:0">'+esc(c.name)+'</h3><p class="small dim" style="margin:2px 0 8px">'+esc(c.role)+'</p>'+(on?'<p>'+esc(tips[0])+'</p>':'<p class="small dim">Not yet met. Joins when you: '+esc(c.when)+'.</p>')+'</div></div>'});
+ CREW.forEach(function(c,i){var on=j.indexOf(c.id)>=0,tips=c.tips[A.key]||c.tips['ai-evals'];
+  h+='<div class="panel lesson" style="display:flex;gap:14px;align-items:flex-start;animation:pop .22s ease both;animation-delay:'+(Math.min(i,10)*40)+'ms"><img alt="" src="'+Art.portrait((Art.npcLook?Art.npcLook(c.look,c.name):c.look),64)+'" style="width:64px;height:64px;border-radius:10px;border:1px solid var(--gold);'+(on?'':'filter:grayscale(1) brightness(.5)')+'"><div><h3 style="margin:0">'+esc(c.name)+'</h3><p class="small dim" style="margin:2px 0 8px">'+esc(c.role)+'</p>'+(on?'<p>'+esc(tips[0])+'</p>':'<p class="small dim">Not yet met. Joins when you: '+esc(c.when)+'.</p>')+'</div></div>'});
  el.innerHTML=h}});
 A.tabs.push({id:'satchel',label:'Satchel',render:function(el){var s=sload(),ids=Object.keys(s).sort(function(a,b){return s[a].t-s[b].t});
  var h='<div class="panel lesson"><p class="kicker">Satchel</p><p>Every Python challenge you solve puts <b>your own working function</b> here. The Citadel Workshop at the end of a world loads them so you build on what you wrote. Nothing leaves this browser.</p><p class="small dim">'+ids.length+' function set'+(ids.length===1?'':'s')+' collected.</p></div>';
- if(!ids.length)h+='<div class="panel lesson"><p class="dim">Empty so far. Solve a Python challenge in any world and it appears here.</p></div>';
- ids.forEach(function(id){var m=s[id];h+='<div class="panel lesson"><h3 style="margin:0 0 4px">'+esc(m.title)+'</h3><p class="small dim">'+m.fns.map(function(f){return '<code>'+esc(f)+'</code>'}).join(', ')+' · from '+esc(m.world)+'</p><details><summary class="small">Show code</summary><pre class="ex" style="white-space:pre-wrap">'+esc(m.code)+'</pre></details></div>'});
+ if(!ids.length)h+='<div class="panel lesson" style="animation:pop .22s ease both"><p class="dim">Empty so far. Solve a Python challenge in any world and it appears here.</p></div>';
+ ids.forEach(function(id,i){var m=s[id];h+='<div class="panel lesson" style="animation:pop .22s ease both;animation-delay:'+(Math.min(i,10)*40)+'ms"><h3 style="margin:0 0 4px">'+esc(m.title)+'</h3><p class="small dim">'+m.fns.map(function(f){return '<code>'+esc(f)+'</code>'}).join(', ')+' · from '+esc(m.world)+'</p><details><summary class="small">Show code</summary><pre class="ex" style="white-space:pre-wrap">'+esc(m.code)+'</pre></details></div>'});
  el.innerHTML=h}});
 })();
