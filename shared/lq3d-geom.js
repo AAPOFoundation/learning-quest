@@ -604,7 +604,7 @@ function dress(biome,P,put,key,shade){
   put(pineMesh(false), 3.55,0,2.15,0,0.95,'pine'); put(pineMesh(false), -3.3,0,-1.55,0,0.8,'pine'); put(pineMesh(false), 3.15,0,-1.7,0,0.72,'pine');
   put(mushroomMesh(), -2.15,0,2.55,0,1,'mushroom'); put(mushroomMesh(), 1.95,0,3.15,0,0.85,'mushroom');
   put(stumpMesh(trunk), 2.35,0,0.15,0.4,1.15,'stump'); put(rockMesh(rock), 2.35,0,3.25,0,0.65,'rock');
-  put(fernMesh(), -1.7,0,2.65,0.8,1,'fern'); put(fernMesh(), 1.35,0,2.15,0.2,0.85,'fern');
+  put(fernMesh(), -1.7,0,2.65,0.8,1.1,'fern'); put(fernMesh(), 1.55,0,0.45,0.5,1.45,'fern');
   return;
  }
  if(biome==='hills'||biome==='highland'){
