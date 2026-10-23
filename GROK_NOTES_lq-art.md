@@ -35,7 +35,8 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - Five safety plates were nudged after that redraw. The second boat sits lower, the lantern glow is tighter, the dune marker sits nearer the brass threshold, the ledger has a spine, and the marsh reflection is a darker oval. The mirror stays above the water.
 - The AI Evals plates were checked as one set. The balance shows two pans. The shield is a night circle with a brass rim and a gold tick. The snake has a smile and a brass hat. The pennant is a plain round flag. The padlock, ruler, bars, scroll, stamp, stacked blocks, and keep stay in the same frame.
 - The tab icon is `assets/art/mark.svg`: a night circle, a brass ring, short ticks inside the ring, and a diamond needle. Home and each world point at it.
-- The Portfolio watermark compass sits higher in the tile, beside the jar, so both motifs show in the repeat. The safety shield and the evals balance sit higher in their tiles too, clear of the bottom edge.
+- The Portfolio watermark compass sits higher in the tile, beside the jar, so both motifs show in the repeat. The safety shield, the evals balance, and the foundations network sit higher in their tiles too, clear of the bottom edge.
+- The Portfolio anvil plate has a brass hammer lying on the anvil face, beside the round shield. The hammer is a tool.
 - A later pass nudged three plates. The Foundations anchor is a little larger. The Portfolio keep's door and ledger sit a little lower. The anvil keeps a hammer handle on its head. The hourglass bulbs are a smoother shape.
 
 ## Not done
