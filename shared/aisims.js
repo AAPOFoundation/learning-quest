@@ -75,7 +75,7 @@ function lr(host){
 function softmax(host){
  var toks=['the','a','this','one','banana'],logits=[2.4,1.6,1.0,.2,-1.6],T=1,sampleTxt='';
  host.innerHTML='<section class="panel sim"><p class="kicker">Simulator</p><h3>Temperature</h3><p class="dim small">A language model gives every possible next word a score (a <b>logit</b>). Softmax turns the scores into probabilities: <code>p = exp(score / T) / sum of exp(score / T)</code>. The temperature T controls how sharply the top word dominates. These five words and scores are made up.</p>'
- +'<div class="sim-row"><label>Temperature T: <b id="sm-v">1.00</b><input type="range" id="sm-t" min="0.1" max="3" step="0.05" value="1"></label></div><div id="sm-bars"></div><div id="sm-out"></div><p><button class="btn btn-ghost btn-sm" id="sm-draw">Draw 30 words</button></p><p class="small" id="sm-s"></p></section>';
+ +'<div class="sim-row"><label>Temperature T: <b id="sm-v">1.00</b><input type="range" id="sm-t" min="0.1" max="3" step="0.05" value="1"></label></div><div id="sm-bars"></div><div id="sm-out"></div><p><button class="btn btn-ghost btn-sm" id="sm-draw" style="animation:pop .22s ease backwards">Draw 30 words</button></p><p class="small" id="sm-s"></p></section>';
  var $=function(s){return host.querySelector(s)};
  function probs(){var z=logits.map(function(x){return x/T}),m=Math.max.apply(null,z),e=z.map(function(x){return Math.exp(x-m)}),s=e.reduce(function(a,b){return a+b},0);return e.map(function(x){return x/s})}
  function draw(){var p=probs(),h=0,box=$('#sm-bars');p.forEach(function(x){if(x>0)h-=x*Math.log2(x)});
