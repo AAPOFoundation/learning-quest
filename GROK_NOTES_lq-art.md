@@ -32,6 +32,7 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - Compass ticks stay inside the ring. Plates use no letters, weapons, crosses, or church shapes. The forge hammer is a tool on an anvil.
 - The plate set was drawn to one frame in this session. The safety plates were then redrawn with fuller scenes in that same frame. Compass ticks stay inside the ring. The shield is a brass circle and a tick, with no red ring. The marsh mirror sits above the water.
 - Python Basics, AI Foundations, and Portfolio Guide plates were redrawn fuller in that same frame. Python keeps the sprout, books, loop trail, anvil and hammer, key, beetle under glass, and keep. Foundations keeps the data field, five-node net, gradient hills, two diverging curves, token cards, forge, speech bubbles with an anchor, four leaves with a book, and the keep. Portfolio stays a keeper's desk: map and compass, three jars, a ruler, a shield on an anvil, two paths that do not meet, a signal tower, an hourglass, and a keep with a ledger.
+- Five safety plates were nudged after that redraw. The second boat sits lower, the lantern glow is tighter, the dune marker sits nearer the brass threshold, the ledger has a spine, and the marsh reflection is a darker oval. The mirror stays above the water.
 
 ## Not done
 
