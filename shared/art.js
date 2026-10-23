@@ -345,7 +345,7 @@ function landmark(g,b,u,ac,t){g.save();
 /* Painted treatment for the Citadel, towers, halls and town landmarks (full effects only): the building is drawn to an offscreen canvas at the
    current screen scale, given a soft ink outline (8-way silhouette), a warm-left / cool-right light glaze and a faint brush texture, then
    composited. Animation is kept because it is redrawn every frame; ground shadows stay on the map so they are not outlined. Low effects: unchanged. */
-var PAINTED={castle:[-56,56,-124,14],great:[-48,48,-100,12],tower:[-24,24,-100,10],hall:[-34,34,-56,10]},LMBOX=[-26,26,-56,10],pcv=null,pol=null,ptex=null;
+var psil=null,PAINTED={castle:[-56,56,-124,14],great:[-48,48,-100,12],tower:[-24,24,-100,10],hall:[-34,34,-56,10]},LMBOX=[-26,26,-56,10],pcv=null,pol=null,ptex=null;
 function brushTex(){if(ptex)return ptex;var c=document.createElement('canvas');c.width=c.height=64;var x=c.getContext('2d');for(var i=0;i<140;i++){x.fillStyle=i%2?'rgba(255,240,210,.5)':'rgba(30,20,10,.5)';x.save();x.translate(hash(i,1,77)*64,hash(i,2,77)*64);x.rotate(hash(i,3,77)*PI);x.fillRect(-4,-.6,8,1.2);x.restore()}ptex=c;return c}
 function building(g,kind,x,y,o){var box=PAINTED[kind]||(kind==='tree'&&o.landmark?LMBOX:null);
  if(FX.low||!box||o.raw)return buildingRaw(g,kind,x,y,o);
@@ -356,18 +356,25 @@ function building(g,kind,x,y,o){var box=PAINTED[kind]||(kind==='tree'&&o.landmar
 /* painted(g, x, y, box, draw): draw(c) paints in map coordinates onto an offscreen canvas at the current screen scale; the result gets the
    ink outline, light glaze and brush texture and is composited at the same place. box=[left,right,top,bottom] in tile units (u) relative to
    (x, y+S/2). Returns false (draws nothing) when it cannot help: Low effects, rotated transforms, or a sprite that would be too big. */
-function painted(g,x,y,box,draw){if(FX.low||!g.getTransform)return false;var m=g.getTransform();if(Math.abs(m.b)>1e-6||Math.abs(m.c)>1e-6)return false;
+function painted(g,x,y,box,draw,opt){if(FX.low||!g.getTransform)return false;var m=g.getTransform();if(Math.abs(m.b)>1e-6||Math.abs(m.c)>1e-6)return false;
  var u=S/34,sc=m.a,bx=x+box[0]*u,by=y+S*.5+box[2]*u,bw=(box[1]-box[0])*u,bh=(box[3]-box[2])*u,W=Math.ceil(bw*sc)+8,H=Math.ceil(bh*sc)+8;
  if(W>2048||H>2048||W<8)return false;
  if(!pcv){pcv=document.createElement('canvas');pol=document.createElement('canvas')}
  if(pcv.width<W||pcv.height<H){pcv.width=pol.width=Math.max(W,pcv.width);pcv.height=pol.height=Math.max(H,pcv.height)}
  var c=pcv.getContext('2d'),q=pol.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,W+2,H+2);q.setTransform(1,0,0,1,0,0);q.clearRect(0,0,W+2,H+2);
- c.setTransform(sc,0,0,sc,(-bx)*sc+4,(-by)*sc+4);draw(c);
+ c.setTransform(sc,0,0,sc,(-bx)*sc+4,(-by)*sc+4);
+ /* opt.dropShadows: skip the drawing's own translucent black ground shadows (they would be outlined and darkened) and lay one soft shadow on the map instead */
+ if(opt&&opt.dropShadows){ell(g,x+1.5*S/34,y+S*.5+1*S/34,(opt.shadowW||16)*S/34,(opt.shadowW||16)*.38*S/34,'rgba(10,16,8,.26)');var f0=c.fill;c.fill=function(){var fs=c.fillStyle;if(typeof fs==='string'&&/^rgba\(0, 0, 0, 0?\.[0-3]\d*\)$/.test(fs))return;return f0.apply(c,arguments)};try{draw(c)}finally{delete c.fill}}
+ else draw(c);
  c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-atop';
  var lg=c.createLinearGradient(0,0,W,0);lg.addColorStop(0,'rgba(255,226,170,.22)');lg.addColorStop(.45,'rgba(255,226,170,0)');lg.addColorStop(.62,'rgba(30,40,90,0)');lg.addColorStop(1,'rgba(30,40,90,.26)');c.fillStyle=lg;c.fillRect(0,0,W,H);
  var tg=c.createLinearGradient(0,0,0,H);tg.addColorStop(0,'rgba(255,240,200,.12)');tg.addColorStop(.7,'rgba(0,0,0,0)');tg.addColorStop(1,'rgba(20,10,0,.18)');c.fillStyle=tg;c.fillRect(0,0,W,H);
  c.globalAlpha=.07;c.fillStyle=c.createPattern(brushTex(),'repeat');c.fillRect(0,0,W,H);c.globalAlpha=1;c.globalCompositeOperation='source-over';
- var d=Math.max(1,Math.round(sc*.55));[[d,0],[-d,0],[0,d],[0,-d],[d,d],[-d,d],[d,-d],[-d,-d]].forEach(function(v){q.drawImage(pcv,0,0,W,H,v[0],v[1],W,H)});
+ /* silhouette with alpha cubed, so soft see-through bits (ground shadows, glows) barely count and only solid shapes get the ink line */
+ if(!psil)psil=document.createElement('canvas');if(psil.width<pcv.width||psil.height<pcv.height){psil.width=pcv.width;psil.height=pcv.height}
+ var sl=psil.getContext('2d');sl.setTransform(1,0,0,1,0,0);sl.globalCompositeOperation='source-over';sl.clearRect(0,0,W+2,H+2);sl.drawImage(pcv,0,0);sl.globalCompositeOperation='destination-in';sl.drawImage(pcv,0,0);sl.drawImage(pcv,0,0);sl.globalCompositeOperation='source-over';
+ var d=Math.max(1,Math.round(sc*.55));[[d,0],[-d,0],[0,d],[0,-d],[d,d],[-d,d],[d,-d],[-d,-d]].forEach(function(v){q.drawImage(psil,0,0,W,H,v[0],v[1],W,H)});
+ q.globalCompositeOperation='destination-out';q.drawImage(pcv,0,0);q.globalCompositeOperation='source-over';
  q.globalCompositeOperation='source-in';q.fillStyle='rgba(30,20,14,.78)';q.fillRect(0,0,W,H);q.globalCompositeOperation='source-over';
  var dx=Math.round(m.a*bx+m.e-4),dy=Math.round(m.d*by+m.f-4);g.save();g.setTransform(1,0,0,1,0,0);g.drawImage(pol,0,0,W,H,dx,dy,W,H);g.drawImage(pcv,0,0,W,H,dx,dy,W,H);g.restore();return true}
 function buildingRaw(g,kind,x,y,o){var u=S/34,ac=o.accent||'#b5532f',t=o.t||0;g.save();g.translate(x,y+S*.5);if(!o.noShadow){ell(g,4*u,1*u,29*u,8*u,'rgba(10,16,8,.22)');ell(g,0,0,24*u,6*u,'rgba(10,16,8,.22)')}

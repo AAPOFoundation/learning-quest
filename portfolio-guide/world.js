@@ -74,7 +74,7 @@ function mapProp(g,u,ac,t,kind){E(g,0,0,8*u,2.6*u,'rgba(0,0,0,.25)');coins(g,u,-
 
 function install(){var A=window.Art;if(!A||!A.building||A.__courseArt)return;var base=A.building;A.__courseArt=W.key;
  A.building=function(g,kind,x,y,o){var low=!window.LQFx||window.LQFx.low;o=o||{};
-  if(!low&&kind==='tree'&&o.landmark){var u=A.S/34,lmd=function(c){c.save();c.translate(x,y+A.S*.5);c.scale(1.25,1.25);try{landmark(c,u,o.accent||PAL[0],o.t||0,o.landmark)}catch(e){}c.restore()};/* painted outline + light glaze (shared/art.js), plain drawing if unavailable */if(!(A.painted&&A.painted(g,x,y,[-40,40,-84,14],lmd)))lmd(g);return}
+  if(!low&&kind==='tree'&&o.landmark){var u=A.S/34,lmd=function(c){c.save();c.translate(x,y+A.S*.5);c.scale(1.25,1.25);try{landmark(c,u,o.accent||PAL[0],o.t||0,o.landmark)}catch(e){}c.restore()};/* painted outline + light glaze (shared/art.js), plain drawing if unavailable */if(!(A.painted&&A.painted(g,x,y,[-40,40,-84,14],lmd,{dropShadows:true,shadowW:17})))lmd(g);return}
   base.apply(this,arguments);
   if(!low&&(kind==='town'||kind==='castle')){var u2=A.S/34;g.save();g.translate(x-(kind==='castle'?34:26)*u2,y+A.S*.5-2*u2);g.scale(1.7,1.7);try{mapProp(g,u2,o.accent||PAL[0],o.t||0,kind)}catch(e){}g.restore()}};}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else setTimeout(install,0);
