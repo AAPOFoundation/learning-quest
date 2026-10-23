@@ -89,7 +89,7 @@ function burst(x,y){if(FX.low||(FX.rm&&FX.rm.matches))return;var ps=[];for(var i
    pools(): warm lamplight pools on the ground around houses, halls and towns, breathing gently, added with 'lighter' so they light the paint.
    fireflies(): a few soft glowing motes drifting on fixed sine paths near the edges of the view (stateless, cheap). */
 var POOL=null;function poolSprite(){if(POOL)return POOL;var c=document.createElement('canvas'),R=64;c.width=c.height=R*2;var x=c.getContext('2d'),gr=x.createRadialGradient(R,R,0,R,R,R);
- gr.addColorStop(0,'rgba(255,196,110,.55)');gr.addColorStop(.35,'rgba(255,170,80,.22)');gr.addColorStop(1,'rgba(255,150,60,0)');x.fillStyle=gr;x.fillRect(0,0,R*2,R*2);POOL=c;return c}
+ gr.addColorStop(0,'rgba(255,190,100,.85)');gr.addColorStop(.4,'rgba(255,165,75,.35)');gr.addColorStop(1,'rgba(255,150,60,0)');x.fillStyle=gr;x.fillRect(0,0,R*2,R*2);POOL=c;return c}
 var LIT={building:1,node:1};
 function pools(g,sc,T,cx,cy,vw,vh){if(FX.low||(FX.rm&&FX.rm.matches)||!sc||!sc.objs)return;var sp=poolSprite();g.save();g.globalCompositeOperation='lighter';
  for(var i=0;i<sc.objs.length;i++){var o=sc.objs[i];if(!LIT[o.type]&&o.role!=='hall')continue;var x=hx(o.c,o.r),y=hy(o.r);if(x<cx-S*2||x>cx+vw+S*2||y<cy-S*2||y>cy+vh+S*2)continue;
