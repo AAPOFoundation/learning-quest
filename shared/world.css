@@ -59,6 +59,19 @@ body.nopad #pad,body.nopad #acts{display:none!important}
 @keyframes bob{50%{transform:translateY(3px)}}
 #dlg .ch{display:flex;flex-direction:column;gap:6px;margin-top:8px}#dlg .ch .opt{margin:0;min-height:44px}
 #ttl{position:fixed;inset:0;z-index:25;display:none;align-items:center;justify-content:center;padding:14px;background:radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15;overflow:auto;touch-action:pan-y pinch-zoom}
+/* course colour grade on the title wash and the region banner. Same pairs as each world's map palette. Layout is unchanged. */
+body[data-world="python-basics"]{--course:#2f6ab0;--course-warm:#d0a020}
+body[data-world="ai-foundations"]{--course:#6a4ab0;--course-warm:#2a8ab0}
+body[data-world="ai-evals"]{--course:#2a8a7a;--course-warm:#c98a2a}
+body[data-world="ai-safety"]{--course:#2f8a6a;--course-warm:#c9902a}
+body[data-world="portfolio-guide"]{--course:#2f6a4a;--course-warm:#b08a2a}
+body[data-world="python-basics"] #ttl{background:radial-gradient(ellipse at 16% 0,rgba(47,106,176,.46),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(208,160,32,.18),transparent 42%),radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15}
+body[data-world="ai-foundations"] #ttl{background:radial-gradient(ellipse at 16% 0,rgba(106,74,176,.46),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(42,138,176,.2),transparent 42%),radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15}
+body[data-world="ai-evals"] #ttl{background:radial-gradient(ellipse at 16% 0,rgba(42,138,122,.44),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(201,138,42,.18),transparent 42%),radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15}
+body[data-world="ai-safety"] #ttl{background:radial-gradient(ellipse at 16% 0,rgba(47,138,106,.44),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(201,144,42,.18),transparent 42%),radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15}
+body[data-world="portfolio-guide"] #ttl{background:radial-gradient(ellipse at 16% 0,rgba(47,106,74,.42),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(176,138,42,.18),transparent 42%),radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15}
+body[data-world] #area{box-shadow:inset 0 -2px 0 var(--course-warm)}
+body[data-world] .world-cover,body[data-world] .lesson-plate,body[data-world] .qrow .plate{border-color:var(--course)}
 #ttl .panel{max-width:520px;width:100%;margin:auto}
 #ov{background-image:linear-gradient(#060a0ee8,#060a0ee8),var(--world-bg,none);background-size:auto,160px 160px;background-color:#060a0e}
 .kbd{display:inline-block;min-width:22px;padding:0 6px;border:1px solid var(--brass-mid);border-bottom-width:2px;border-radius:5px;background:#070b10;font:800 12px/20px var(--font);text-align:center;color:var(--gold-hi)}

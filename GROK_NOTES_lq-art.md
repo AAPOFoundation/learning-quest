@@ -53,6 +53,16 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - On a phone, the region name sat over the hero. At 390×844 it now sits in the top band, and the XP row starts below it. The guide speech stays at the bottom. Measured in headless Edge: the banner is y 8–58, the objective row ends at y 244, and the speech starts at y 639. A real phone was not used.
 - The pause menu no longer squashes the cover to 112px. It keeps the 16:9 frame. On a 390px screen the cover was 338×190, with Resume still in view.
 
+## Colour grade pass
+
+- Merged `origin/main` (phone HUD and the celebrate light). Building and chest portraits stay brass line icons. The region banner still uses main's `--lq-hud-b` placement, so the guide caption and the banner stay off the hero. A warm course line was added under the banner. It does not move the banner.
+- Each course now uses the same cool and warm pair as its map palette. Python is blue and yellow. Foundations is purple and water blue. Evals is teal and amber. Safety is green and amber. Portfolio is forest green and brass gold.
+- Home cards carry that pair as a wash and a warm bar on the left. The suggested-next card keeps its gold ring. Portfolio's separate card uses the forest wash.
+- The title screen has a cool light at the top left and a warm light at the lower right. Region plates, lesson plates and the cover pick up a course-coloured frame.
+- Covers and watermarks took the same colours. The Python mill sails are yellow and the snake is blue, like the map landmark. The Foundations network is purple with water-blue nodes. The Evals side stars are teal. The Safety shield face is green. The Portfolio compass needle is brass gold. Watermarks stay at 0.26 opacity.
+- Plate ground shadows are a little darker (0.34) so they read at thumbnail size. The brass point light on each plate stays.
+- Checked in headless Edge: a sheet of the five covers and five plates, the home at 390×1700 and 1100×1500, and the Python Basics title at 390×844. The mill, the cabin and the scales stay in frame. Words on the cards stay readable. Begin your journey stays on screen. A real phone was not used.
+
 ## Not done
 
 - Level-path emoji in `homeOld()` is unused by the world UI, so those icons were not redrawn.

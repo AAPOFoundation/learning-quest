@@ -7,8 +7,8 @@
       <stop offset="1" stop-color="#163044" stop-opacity="0.18"/>
     </linearGradient>
     <radialGradient id="lq-tint" cx="0.3" cy="0.2" r="0.9">
-      <stop offset="0" stop-color="#d7b56a" stop-opacity="0.13"/>
-      <stop offset="1" stop-color="#d7b56a" stop-opacity="0"/>
+      <stop offset="0" stop-color="#2a8a7a" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#2a8a7a" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="lq-gold" cx="0.5" cy="0.5" r="0.5">
       <stop offset="0" stop-color="#f3e2b0" stop-opacity="0.5"/>
@@ -97,7 +97,7 @@
     <path d="M598 352 q-4 -20 -12 -28"/>
   </g>
   <circle cx="320" cy="72" r="26" fill="#f3e2b0" opacity="0.14"/>
-  <g fill="none" stroke="#d7b56a" stroke-width="1.6" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+  <g fill="none" stroke="#7ecfc4" stroke-width="1.6" stroke-linejoin="round" vector-effect="non-scaling-stroke">
     <path transform="translate(256 72) scale(2)" d="M0 -9.3 2.95 -3.25 9.6 -2.4 4.7 2.2 5.95 8.8 0 5.5 -5.95 8.8 -4.7 2.2 -9.6 -2.4 -2.95 -3.25 Z"/>
     <path transform="translate(384 72) scale(2)" d="M0 -9.3 2.95 -3.25 9.6 -2.4 4.7 2.2 5.95 8.8 0 5.5 -5.95 8.8 -4.7 2.2 -9.6 -2.4 -2.95 -3.25 Z"/>
   </g>

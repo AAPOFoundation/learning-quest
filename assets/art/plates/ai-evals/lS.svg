@@ -7,8 +7,8 @@
       <stop offset="1" stop-color="#163044" stop-opacity="0.18"/>
     </linearGradient>
     <radialGradient id="lq-tint" cx="0.3" cy="0.2" r="0.9">
-      <stop offset="0" stop-color="#d7b56a" stop-opacity="0.13"/>
-      <stop offset="1" stop-color="#d7b56a" stop-opacity="0"/>
+      <stop offset="0" stop-color="#2a8a7a" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#2a8a7a" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="lq-gold" cx="0.5" cy="0.5" r="0.5">
       <stop offset="0" stop-color="#f3e2b0" stop-opacity="0.5"/>
@@ -23,7 +23,7 @@
   <path d="M0 58 C36 48 70 66 108 54 C132 46 148 56 160 50 V100 H0 Z" fill="#243044"/>
   <path d="M0 72 C40 64 80 80 120 70 C140 66 152 74 160 70 V100 H0 Z" fill="#2a4e66"/>
   <path d="M0 86 C50 80 100 92 160 84 V100 H0 Z" fill="#1c2733"/>
-  <ellipse id="lq-shadow" cx="80" cy="91" rx="46" ry="4" fill="#0a0f15" opacity="0.22"/>
+  <ellipse id="lq-shadow" cx="80" cy="91" rx="46" ry="4" fill="#0a0f15" opacity="0.34"/>
   <path d="M40 34 C52 26 64 40 78 33 C92 26 104 40 118 32" fill="none" stroke="#d7b56a" stroke-width="2.6" stroke-linecap="round"/>
   <rect x="50" y="60" width="16" height="22" rx="4" fill="#c8a86a"/>
   <rect x="72" y="40" width="16" height="42" rx="4" fill="#f3e2b0"/>

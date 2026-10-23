@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
-  <g fill="none" stroke="#d7b56a" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" opacity="0.26">
+  <g fill="none" stroke="#2f6ab0" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" opacity="0.26">
     <path d="M40 118 L48 96 L56 118"/>
     <path d="M36 104 H60"/>
     <path d="M48 118 V132"/>
@@ -15,7 +15,7 @@
     <path d="M119 49.2 Q122 51.4 125.2 49"/>
     <path d="M116 44 Q122 38 128 44"/>
   </g>
-  <g fill="#d7b56a" opacity="0.16">
+  <g fill="#d0a020" opacity="0.16">
     <circle cx="122" cy="48.6" r="1.1"/>
     <circle cx="126.2" cy="49.2" r="1.1"/>
   </g>
