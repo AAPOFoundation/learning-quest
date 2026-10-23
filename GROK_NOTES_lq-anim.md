@@ -84,6 +84,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 74. **Warm-up buttons rise in order.** The five practice buttons on the Python primer arrive one after another. The rise lets go, so a press can still sink. Reduced motion removes it.
 75. **A Python idea card fades in.** The dim page fades, and the lesson card rises. A topic chip picks up the gold edge, then sinks a pixel while it is held. Reduced motion removes all of it. The close button still sinks on its own.
 76. **Example buttons rise.** Run on a small example, the scratchpad Run, and the primer's Run, Check and Fill buttons rise. A second and third button in the same row wait a moment. The rise lets go, so a press can still sink. Reduced motion removes it.
+77. **A guide, a spoken line and a clip fade in.** The lesson guide fades when it is ready. The spoken line fades when it appears. A short clip fades in, and Skip picks up a lighter edge, then sinks a pixel while it is held. Reduced motion removes all of it. The spoken line stays centred.
 
 ## Checked
 

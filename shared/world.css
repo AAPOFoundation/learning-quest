@@ -56,11 +56,11 @@ body.nopad #pad,body.nopad #acts{display:none!important}
 .qrow .qb{flex:1}.qrow .btn{width:auto;min-height:40px;font-size:14px;padding:6px 12px}
 .disc{pointer-events:auto}
 body.indlg #pad,body.indlg #acts{display:none!important}body.indlg #area{opacity:0!important}
-#narrcap{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:30;max-width:min(680px,92vw);padding:10px 16px;border:1px solid #d7b56a99;border-radius:12px;background:#0a0f15ee;color:#f3ead6;font-size:15px;line-height:1.4;pointer-events:none;display:flex;gap:10px;align-items:baseline}
+#narrcap{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:30;max-width:min(680px,92vw);padding:10px 16px;border:1px solid #d7b56a99;border-radius:12px;background:#0a0f15ee;color:#f3ead6;font-size:15px;line-height:1.4;pointer-events:none;display:flex;gap:10px;align-items:baseline}#narrcap:not([hidden]){animation:ovfade .18s ease}
 #narrcap[hidden]{display:none}#narrcap .who{font:700 12px var(--display);letter-spacing:.1em;text-transform:uppercase;color:#d7b56a;flex:none}
 @media (max-width:560px){#narrcap{bottom:auto;top:62px;font-size:13px}}
 
-#cutscene{position:fixed;inset:0;z-index:25;background:#000;display:flex;align-items:center;justify-content:center}#cutscene video{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain}#cutscene .skip{position:absolute;top:14px;right:14px;z-index:2;padding:8px 16px;border:1px solid #d7b56a;border-radius:10px;background:#0a0f15dd;color:#f3ead6;font:700 14px var(--display);cursor:pointer}
+#cutscene{position:fixed;inset:0;z-index:25;background:#000;display:flex;align-items:center;justify-content:center;animation:ovfade .18s ease}#cutscene video{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain}#cutscene .skip{position:absolute;top:14px;right:14px;z-index:2;padding:8px 16px;border:1px solid #d7b56a;border-radius:10px;background:#0a0f15dd;color:#f3ead6;font:700 14px var(--display);cursor:pointer;transition:border-color .14s,transform .1s}#cutscene .skip:hover{border-color:#f3e2b0}#cutscene .skip:active{transform:translateY(1px)}
 /* Python challenges */
 .codeq .cq-prompt{color:var(--ink-dim);margin:0 0 12px}.codeq .cq-prompt code,.cq-hintbox code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;background:#070b10;border:1px solid #2b3643;border-radius:5px;padding:1px 5px;color:var(--ink)}
 .cq-ed{display:block;width:100%;box-sizing:border-box;min-height:220px;margin:4px 0 12px;padding:12px;font:600 14px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#f6efe0;background:#070b10;border:1px solid var(--brass-mid);border-radius:var(--radius);tab-size:4;white-space:pre;overflow:auto;resize:vertical;transition:border-color .14s,box-shadow .14s}
