@@ -171,3 +171,33 @@ Citadel trim stays `#c9a24f`. Safety's citadel roof stays `#6a5830`.
 Walking still steps when motion is reduced. The oblique view stays up in that case, because it does not move. Say if reduced motion should force the flat map too.
 
 On a phone, the south edge of a map can show a band of night under the island so the hero stays above the guide and the banner. Say if the hero should sit lower and let the banner overlap the shore instead.
+
+## Course lamps and win lights, same day
+
+`origin/main` is merged (`2499c11`). That brought the celebration beam and shockwave, and the phone HUD that stacks the objective, the guide caption and the region banner. The leaned camera stayed. The phone pad is divided by the ground scale, so a flat map and a leaned map use the same screen gap.
+
+### What changed
+
+`shared/world.js`. Each course landmark has one point light on its painted lamp. Python is gold on the code block. Foundations is cool blue on the network. Safety, Portfolio and Evals are gold on the beacon, the lighthouse and the scale. A guild window and two town windows are gold. A ready chest is a wider gold pool. A staff adds a small gold light by the hand. Python's hero has no staff, so that light is absent there. A first clear, a chest and the final challenge still fire `lq:celebrate`, now at the sheared screen point, and they add a world light that fades over about two seconds. Low effects skips the lights. The light does not pulse.
+
+`shared/art.js`. The figure shadow is longer and darker. It still lies on the leaned ground.
+
+`shared/world.css`. The phone stack from main is kept. The overlay fade from this branch is kept.
+
+### Checked
+
+Headless Edge, effects forced full, local static server on port 8891. Home, then Begin on all five worlds. Python Lookup Harbour, Foundations Data Fields and Safety Harbour of Stakes. Python again at 390×844, dialogue closed, then inside Valley of Values with the guide caption up. Shader error empty and the overlay visible on each. No console exceptions. At 390×844 the objective ended at y=199, the guide ran y=205 to 299, and the banner ran y=305 to 359. They did not meet. The hero's feet were at about y=433, below the banner and above the move pad (y=646). Begin wrote a save only in that temporary profile. Mark as done was not clicked. Not tested on a real phone, Safari, or Firefox.
+
+### Open for Jensen
+
+Home `data-n` stays 6, 7, 10 and 7. Portfolio stays off the progress strip.
+
+Low effects still draws cached tile light and seeded grain. It skips the new lights, the lean and the cliff lift. The shared marsh lantern is what low effects draws, so it has no point light.
+
+Citadel trim stays `#c9a24f`. Safety's citadel roof stays `#6a5830`.
+
+Walking still steps when motion is reduced. The oblique view stays up in that case.
+
+Phone icon buttons are 48px in a two-by-two grid, from the merged phone HUD. The old 42px note is out of date.
+
+On a phone overworld the hero can sit just above the move pad, with night beside the island. Say if that band should be smaller.
