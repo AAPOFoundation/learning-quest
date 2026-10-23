@@ -310,11 +310,13 @@ function update(dt){st.time+=dt;stepHov(dt);if(st.shake>0)st.shake=Math.max(0,st
  markAct()}
 function figDraw(g,sp,x,y,o){Art.figure(g,x,y,sp.look||sp,o)}
 /* Dots march along a tapped route. The destination ring and the tap ripple draw later, on top of sprites and under the fog. */
-function drawRoute(g,rings){if(st.mode!=='play')return;if(!rings){var pth=st.path;if(!pth||!pth.length)return;var pts=[[st.hero.x,st.hero.y]],i,dx,dy,len,acc,x,y,n=0,step=14,march=motionOn()?(st.time*34)%step:7;
- for(i=0;i<pth.length;i++)pts.push([hx(pth[i][0],pth[i][1]),hy(pth[i][1])]);
+var routePts=[];function drawRoute(g,rings){if(st.mode!=='play')return;if(!rings){var pth=st.path;if(!pth||!pth.length)return;var i,dx,dy,len,acc,x,y,n=0,step=14,march=motionOn()?(st.time*34)%step:7,p,npts=0;
+ p=routePts[0]||(routePts[0]=[0,0]);p[0]=st.hero.x;p[1]=st.hero.y;npts=1;
+ for(i=0;i<pth.length;i++){p=routePts[npts]||(routePts[npts]=[0,0]);p[0]=hx(pth[i][0],pth[i][1]);p[1]=hy(pth[i][1]);npts++}
+ routePts.length=npts;
  g.save();g.fillStyle='#f3e2b0';acc=-march;
- for(i=1;i<pts.length;i++){dx=pts[i][0]-pts[i-1][0];dy=pts[i][1]-pts[i-1][1];len=Math.sqrt(dx*dx+dy*dy)||1;
-  while(acc+step<=len&&n<48){acc+=step;x=pts[i-1][0]+dx*(acc/len);y=pts[i-1][1]+dy*(acc/len);g.globalAlpha=.5;g.beginPath();g.arc(x,y,2.1,0,6.283185);g.fill();n++}acc-=len}
+ for(i=1;i<npts;i++){dx=routePts[i][0]-routePts[i-1][0];dy=routePts[i][1]-routePts[i-1][1];len=Math.sqrt(dx*dx+dy*dy)||1;
+  while(acc+step<=len&&n<48){acc+=step;x=routePts[i-1][0]+dx*(acc/len);y=routePts[i-1][1]+dy*(acc/len);g.globalAlpha=.5;g.beginPath();g.arc(x,y,2.1,0,6.283185);g.fill();n++}acc-=len}
  g.restore();return}
  if(st.path&&st.path.length){var last=st.path[st.path.length-1],pulse=motionOn()?.5+.5*Math.sin(st.time*5):.55;g.save();g.globalAlpha=.4+.25*pulse;g.strokeStyle='#f3e2b0';g.lineWidth=2;Art.hexPath(g,hx(last[0],last[1]),hy(last[1]),S*(.58+.12*pulse));g.stroke();g.restore()}
  if(st.rip&&motionOn()){var a=1-st.rip.t/.42;g.save();g.globalAlpha=Math.max(0,a)*.65;g.strokeStyle='#f3e2b0';g.lineWidth=2;Art.hexPath(g,hx(st.rip.c,st.rip.r),hy(st.rip.r),S*(.3+st.rip.t*1.6));g.stroke();g.restore()}}
