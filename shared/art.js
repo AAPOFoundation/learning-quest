@@ -17,9 +17,10 @@ function cube(c,r){var x=c-(r-(r&1))/2;return [x,-x-r,r]}
 function hdist(a,b,c,d){var p=cube(a,b),q=cube(c,d);return Math.max(Math.abs(p[0]-q[0]),Math.abs(p[1]-q[1]),Math.abs(p[2]-q[2]))}
 function px2hex(px,py){var x=px-S*SQ3/2,y=py-S,q=(SQ3/3*x-y/3)/S,rr=2/3*y/S,xx=q,zz=rr,yy=-xx-zz,rx=Math.round(xx),ry=Math.round(yy),rz=Math.round(zz),dx=Math.abs(rx-xx),dy=Math.abs(ry-yy),dz=Math.abs(rz-zz);if(dx>dy&&dx>dz)rx=-ry-rz;else if(dy>dz)ry=-rx-rz;else rz=-rx-ry;return [rx+(rz-(rz&1))/2,rz]}
 function hline(a,b,c,d){var p=cube(a,b),q=cube(c,d),n=Math.max(1,hdist(a,b,c,d)),out=[];for(var i=0;i<=n;i++){var t=i/n,x=p[0]+(q[0]-p[0])*t+1e-6,y=p[1]+(q[1]-p[1])*t+2e-6,z=p[2]+(q[2]-p[2])*t-3e-6,rx=Math.round(x),ry=Math.round(y),rz=Math.round(z),dx=Math.abs(rx-x),dy=Math.abs(ry-y),dz=Math.abs(rz-z);if(dx>dy&&dx>dz)rx=-ry-rz;else if(dy>dz)ry=-rx-rz;else rz=-rx-ry;out.push([rx+(rz-(rz&1))/2,rz])}return out}
-function hexPath(g,x,y,s){g.beginPath();for(var k=0;k<6;k++){var a=(60*k-30)*PI/180,px=x+s*Math.cos(a),py=y+s*Math.sin(a);k?g.lineTo(px,py):g.moveTo(px,py)}g.closePath()}
+var HEXC=[],HEXS=[];for(var hk=0;hk<6;hk++){var ha=(60*hk-30)*PI/180;HEXC[hk]=Math.cos(ha);HEXS[hk]=Math.sin(ha)}
+function hexPath(g,x,y,s){g.beginPath();for(var k=0;k<6;k++){var px=x+s*HEXC[k],py=y+s*HEXS[k];k?g.lineTo(px,py):g.moveTo(px,py)}g.closePath()}
 var EDGE=[[0,1],[3,4],[5,0],[4,5],[1,2],[2,3]];
-function corner(x,y,k){var a=(60*k-30)*PI/180;return [x+S*Math.cos(a),y+S*Math.sin(a)]}
+function corner(x,y,k){return [x+S*HEXC[k],y+S*HEXS[k]]}
 var COL={grass:[112,150,78],forest:[82,124,68],hills:[154,150,94],mountain:[124,118,108],sand:[216,188,128],snow:[228,235,238],marsh:[94,128,106],water:[46,96,128],plaza:[190,174,142],road:[168,132,84],crown:[126,162,86],rock:[110,104,98]};
 function rgb(c,f,a){return 'rgba('+Math.min(255,Math.round(c[0]*f))+','+Math.min(255,Math.round(c[1]*f))+','+Math.min(255,Math.round(c[2]*f))+','+(a==null?1:a)+')'}
 function hex2(c){var h=c.replace('#','');if(h.length===3)h=h.replace(/./g,'$&$&');return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)]}

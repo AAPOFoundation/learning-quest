@@ -98,6 +98,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 88. **Route dots reuse their points.** A tapped route used to build a new list of points every frame. One list is kept and filled again. The dots look the same.
 89. **A still cap tips.** The hood, the helm plume, the scholar board and the crown already idle. The cap was the only hat left rigid, so a still cap now tips a little. Walking holds it steady. The tip is smaller than the scholar board, so the brim stays clear of the face. The portrait cap stays still.
 90. **A Python result rises.** When an example, a scratch run or a challenge prints a result, that result rises once. An error line and a short wait line rise the same way. Reduced motion removes the rise. The test rows were already rising on their own.
+91. **Hex corners are worked out once.** Every hex outline and every tile corner used to recompute the same six angles. Those six angles are kept. The outlines look the same.
 
 ## Checked
 
