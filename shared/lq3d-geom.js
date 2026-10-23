@@ -376,7 +376,18 @@ function mushroomMesh(){var b=new Builder(); cyl(b,0,0.08,0,0.028,0.14,5,hex('#e
 function cattailMesh(){var b=new Builder(); cyl(b,0,0.26,0,0.016,0.52,4,hex('#3a5a32'),0); cyl(b,0,0.54,0,0.032,0.14,5,hex('#6a4a32'),0); return pack(b)}
 function stumpMesh(col){var b=new Builder(); cyl(b,0,0.12,0,0.16,0.24,6,col,0); cyl(b,0,0.25,0,0.18,0.05,6,hex('#c4a574'),0); return pack(b)}
 function iceMesh(){var b=new Builder(); b.box(0,0.22,0,0.18,0.44,0.14,hex('#d7eef6'),0); b.box(0.1,0.36,0.04,0.1,0.32,0.1,hex('#f4fbff'),0); return pack(b)}
-function cairnMesh(col){var b=new Builder(); b.box(0,0.1,0,0.36,0.16,0.28,col,0); b.box(0.04,0.24,0.02,0.24,0.14,0.2,mix(col,[1,1,1],0.06),0); b.box(-0.02,0.36,0,0.14,0.12,0.12,mix(col,[0,0,0],0.08),0); return pack(b)}
+function cairnMesh(col){
+ var b=new Builder(), i, d, fr, stone=mix(col,[0.25,0.22,0.2],0.35), lumps=[
+  [0,0.09,0, 0.7,1,0.25, 0.42,0.14,0.28, stone],
+  [0.05,0.22,0.03, -0.85,1,0.4, 0.28,0.13,0.2, mix(stone,[1,1,1],0.1)],
+  [-0.03,0.34,-0.02, 0.45,1,-0.7, 0.16,0.11,0.14, mix(stone,[0,0,0],0.12)]
+ ];
+ for(i=0;i<lumps.length;i++){
+  d=lumps[i]; fr=frameY([d[3],d[4],d[5]]);
+  b.axesBox([d[0],d[1],d[2]], fr.x, fr.y, fr.z, d[6], d[7], d[8], d[9], 0);
+ }
+ return pack(b);
+}
 function flowerMesh(col){
  var b=new Builder(), i, a, dir, fr, leaf=hex('#2f6a32');
  cyl(b,0,0.07,0,0.012,0.14,4,leaf,0);
