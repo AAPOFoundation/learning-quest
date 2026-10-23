@@ -116,3 +116,9 @@ pre.code{margin:10px 0;padding:10px 12px;background:#070b10;border:1px solid #2b
 .cq-chknote{margin:6px 0 0}.cq-walknote{margin:8px 0 0}
 @media (max-width:560px){.cq-btns2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .cq-btns2 #cq-giveup{grid-column:1/-1}.cq-btns2 .btn{min-height:44px;font-size:14px;padding:8px 10px}}
+
+/* Expedition base camp, procedural WebGL diorama */
+.exp-stage{position:relative;margin:0 0 16px;padding:0;border:1px solid var(--brass);border-top-color:var(--gold-hi);border-bottom-color:var(--brass-lo);border-radius:var(--radius);overflow:hidden;background:#0e141c;box-shadow:inset 0 0 0 1px #070b10c7,0 8px 20px #0006}
+.exp-stage canvas{display:block;width:100%;height:min(62vw,340px);min-height:200px;background:#121a22;touch-action:none;cursor:grab}
+.exp-stage canvas:active{cursor:grabbing}
+.exp-stage figcaption{margin:0;padding:8px 12px 10px;color:var(--ink-dim)}
