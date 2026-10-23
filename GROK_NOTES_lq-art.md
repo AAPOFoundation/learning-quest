@@ -22,7 +22,17 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - Badge chest (`shared/engine.js` `badges()`): medallion image, emoji fallback.
 - HUD streak, full-map row, chest and simulator portraits: the existing brass `ic()` set, extended. No new emoji.
 
+## Later decisions
+
+- Each background tile now has two motifs, still at 0.26 opacity, so the repeat reads as a watermark and the words stay clear. Python is a mill and a snake. Foundations is a small network and a book. Evals is a balance and a star. Safety is a round shield with a tick and a lantern. Portfolio is a compass and a jar.
+- The Python mill watermark keeps four sails in an X. An extra upright stroke was removed.
+- The three-day streak medallion sits on two flat logs. An X under the flames read as a cross, so it went.
+- Every region has a 160×100 plate at `assets/art/plates/<world>/<level id>.svg`, and each world has `citadel.svg`. They share one night frame, brass corner ticks, and the Pocket Reserve colours. A missing file hides itself.
+- Plates show on the first screen of a lesson, on the skills map, in the quest log, and on the world-map list.
+- Compass ticks stay inside the ring. Plates use no letters, weapons, crosses, or church shapes. The forge hammer is a tool on an anvil.
+- The plate set was drawn to one frame in this session. Parallel drawing passes were still only reading the tree, so they did not replace these files.
+
 ## Not done
 
 - Level-path emoji in `homeOld()` is unused by the world UI, so those icons were not redrawn.
-- Checked in headless Edge: home cards (wide and narrow) and the Python Basics title. Badge medallions were screenshotted as files. The pause-menu badge chest was not clicked.
+- Checked in headless Edge: home cards, the Python Basics title (cover and watermark), and a grid of region plates. The pause-menu badge chest was not clicked. Quest-log layout was not clicked through in the game.

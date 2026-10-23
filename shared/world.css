@@ -56,6 +56,7 @@ body.nopad #pad,body.nopad #acts{display:none!important}
 .toast{z-index:40}
 .mapfull{width:100%;border:1px solid var(--brass);border-radius:10px;background:#0a0f15;display:block;margin-bottom:10px}
 .qrow{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #2b3643}
+.qrow .plate{width:56px;height:36px;object-fit:cover;object-position:center;border-radius:6px;border:1px solid var(--brass-mid);background:#0a0f15;flex:none}
 .qrow .ic{width:28px;text-align:center;font-size:18px;color:var(--gold)}
 .qrow .ic svg{display:block;margin:0 auto}
 .qrow .qb{flex:1}.qrow .btn{width:auto;min-height:40px;font-size:14px;padding:6px 12px}

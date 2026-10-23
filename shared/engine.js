@@ -49,7 +49,7 @@ function path(tb){
 function skills(tb){
  var h='<div class="panel"><p class="kicker">Skills map</p><p class="dim small">Each bar is your best score on that level\'s questions.</p>';
  A.skills.forEach(function(s){var l=A.levels.filter(function(x){return x.id===s.level})[0],b=P.levels[s.level]?Math.round(100*P.levels[s.level].best):0;
-  h+='<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+esc(s.name)+'</b><span class="dim small">'+b+'%</span></div><div class="bar"><i style="width:'+b+'%"></i></div><div class="small dim">'+esc(s.note)+'</div></div>'});
+  h+='<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="skill-name">'+lessonPlate(s.level)+'<b>'+esc(s.name)+'</b></span><span class="dim small">'+b+'%</span></div><div class="bar"><i style="width:'+b+'%"></i></div><div class="small dim">'+esc(s.note)+'</div></div>'});
  tb.innerHTML=h+'</div>'}
 /* brass medallions in assets/art/badges; seal_* shares seal.svg; missing file keeps the emoji */
 var BADGE_ART={first:1,perfect:1,streak3:1,all:1,boss:1,master:1,coder:1,pythonista:1,camp:1,expedition:1,capstone:1,crown:1,scout:1,seal:1,lab:1};
@@ -98,10 +98,11 @@ function runQs(qs,title,fin){var i=0,right=0,box=document.createElement('div');
   var e=ask(qs[i],i,qs.length,function(ok){if(ok)right++;i++;next()},title);box.innerHTML='';box.appendChild(e);topScroll()})();
  return box}
 
+function lessonPlate(id){var k=String(A.key||''),n=String(id||'');if(!/^[a-z0-9-]+$/.test(k)||!/^[A-Za-z0-9-]+$/.test(n))return '';return '<img class="lesson-plate" alt="" width="160" height="100" src="../assets/art/plates/'+k+'/'+n+'.svg" onerror="this.remove()">'}
 function level(i,mode){
  var L=A.levels[i],step=0;MODE=mode||null;
  function lesson(){
-  var c=L.lesson,h='<section class="panel lesson"><p class="kicker">Level '+(i+1)+' · lesson '+(step+1)+' of '+c.length+'</p><h2>'+(step?esc(c[step].h):esc(L.title))+'</h2>'+(step===0&&window.LQGuide?window.LQGuide.slot(A.key+'-'+L.id):'')+(step===0?'<h3>'+esc(c[0].h)+'</h3>':'')+c[step].b+'<div class="row"><button class="btn btn-ghost" id="bk">'+(step?'Back':'Exit')+'</button><button class="btn btn-primary" id="fw">'+(step<c.length-1?'Next':(MODE==='lesson'?'Done':'Start the questions'))+'</button></div></section>';
+  var c=L.lesson,h='<section class="panel lesson"><p class="kicker">Level '+(i+1)+' · lesson '+(step+1)+' of '+c.length+'</p><h2>'+(step?esc(c[step].h):esc(L.title))+'</h2>'+(step===0?lessonPlate(L.id):'')+(step===0&&window.LQGuide?window.LQGuide.slot(A.key+'-'+L.id):'')+(step===0?'<h3>'+esc(c[0].h)+'</h3>':'')+c[step].b+'<div class="row"><button class="btn btn-ghost" id="bk">'+(step?'Back':'Exit')+'</button><button class="btn btn-primary" id="fw">'+(step<c.length-1?'Next':(MODE==='lesson'?'Done':'Start the questions'))+'</button></div></section>';
   shell(h);if(window.LQGuide)window.LQGuide.scan();
   $('#bk').onclick=function(){step?(step--,lesson()):home()};
   $('#fw').onclick=function(){if(step<c.length-1){step++;lesson()}else if(MODE==='lesson'){E_.lessonDone=true;EXIT()}else quiz()}}
