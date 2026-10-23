@@ -106,9 +106,9 @@ function paintScene(sc){
    for(i=0;i<ids.length;i++){p=corner(x0,y0-e,ids[i]);i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])}
    for(j=ids.length-1;j>=0;j--){p=corner(x0,y0,ids[j]);g.lineTo(p[0],p[1])}
    g.closePath();g.fill()}
-  face([4,3],rgb(bs,Math.min(1.15,ff*.78)));
-  face([3,2],rgb(bs,ff*.55));
-  face([2,1,0],rgb(bs,ff*.38));
+  face([4,3],rgb(bs,Math.min(1.22,ff*.95)));
+  face([3,2],rgb(bs,ff*.48));
+  face([2,1,0],rgb(bs,ff*.26));
   hexPath(g,x0,y0-e,S*1.01);g.fillStyle=rgb(bs,ff);g.fill();if(tn){var col=rgbaHex(tn,.16);if(col){g.fillStyle=col;g.fill()}}g.drawImage(litHex,x0-litW/2,y0-e-litW/2);bevel(g,x0,y0-e)});
  /* shoreline foam */
  for(r=0;r<sc.rows;r++)for(c=0;c<sc.cols;c++){t=sc.t[c][r];if(t==='water')continue;x=hx(c,r);y=hy(r);for(i=0;i<6;i++){var n=neigh(c,r,i),nt=(n[0]>=0&&n[1]>=0&&n[0]<sc.cols&&n[1]<sc.rows)?sc.t[n[0]][n[1]]:null;if(nt==='water'){var p=corner(x,y,EDGE[i][0]),q=corner(x,y,EDGE[i][1]);g.strokeStyle='rgba(245,238,210,.5)';g.lineWidth=3;g.lineCap='round';g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(q[0],q[1]);g.stroke();g.strokeStyle='rgba(120,90,40,.35)';g.lineWidth=1;g.stroke()}}}

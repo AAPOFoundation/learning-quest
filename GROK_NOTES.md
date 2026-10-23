@@ -148,7 +148,7 @@ The map stays painted 2D. WebGL is a post grade on a second canvas, `#lqgl`, not
 
 `shared/world.js`. Lights on the hero, a glowing or open chest, smithy, tower, lit hall, great hall, castle, vault, landmark and town. The ground shear is −0.36 and the vertical scale is 0.62, pivoted on the hero so a lower tile does not slide off the side. People, buildings and labels stay upright. The tap math uses the same pivot. The minimap stays top-down. On a narrow screen the camera holds the hero at 42% of the height and may scroll past the map edge. A first level clear, a chest and the final challenge dispatch `lq:celebrate`. A party chime does not.
 
-`shared/art.js`. Cliff lift is 30, 20, 13 and 9px for mountain, hills, pine and forest. The wall joins the cap to the ground. Figure and building shadows take the ground shear. Portraits pass `flat` so the cached head stays round.
+`shared/art.js`. Cliff lift is 30, 20, 13 and 9px for mountain, hills, pine and forest. The wall joins the cap to the ground. The lit face is brighter and the shaded face is darker, so the three facets read. Figure and building shadows take the ground shear. Portraits pass `flat` so the cached head stays round.
 
 `shared/world.css`. `#lqgl` covers the map and ignores taps. Under 560px the guide caption sits above the region banner (`bottom` offset 310px), and the banner sits above the d-pad. The XP panel stays on top of the map. A dialogue hides the caption.
 
