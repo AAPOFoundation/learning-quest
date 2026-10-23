@@ -79,6 +79,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 69. **Close rises when a page opens.** The close button in the corner rises with the page. The rise lets go, so a press can still sink it. It does not rise again while the page stays open. Reduced motion removes it.
 70. **Pause rows let go after they rise.** Each pause-menu row still arrives just after the one above it. The rise no longer holds the button, so a press can sink it. Reduced motion removes the rise.
 71. **Lesson actions and Check answer rise.** Back or Exit rises, then Next, Done or Start the questions. A quiet setting skips that, the same way it skips the page fade. Check answer rises once with the choices, and a later redraw does not play it again. The rise lets go, so a press can sink. Reduced motion removes it.
+72. **A still crown tips.** When a crowned figure stands, the crown tips a little, then comes back. A walk holds it level. The shape is the same as before.
 
 ## Checked
 
