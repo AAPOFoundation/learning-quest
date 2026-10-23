@@ -302,8 +302,11 @@ function toView(x,y,h,up){var p=Art.project(x,y,h||0);return {x:p.x+st.scene.vie
 function camXform(g,z,cx,cy){g.setTransform(dpr*z,0,0,dpr*z,-cx*dpr*z,-cy*dpr*z)}
 function upright(g,z,cx,cy,vx,vy){g.setTransform(dpr*z,0,0,dpr*z,(vx-cx)*dpr*z,(vy-cy)*dpr*z)}
 /* Click in view-canvas pixels. A cap is tested on its own height plane so a mountain top is not the tile to its north. */
-function pickAt(vx,vy){var sc=st.scene,wx=vx-sc.viewOx,wy=vy-sc.viewOy,guess=Art.unproject(wx,wy),ctr=Art.px2hex(guess.x,guess.y),best=ctr,bestD=1e9,dr,dc,c,r,h,x,y,hit,dx,dy,d;
- for(dr=-3;dr<=3;dr++)for(dc=-3;dc<=3;dc++){c=ctr[0]+dc;r=ctr[1]+dr;if(!inb(sc,c,r))continue;h=Art.groundH(sc.t[c][r]);y=(wy+h)/Art.CAM.v;x=wx-Art.CAM.shear*y;hit=Art.px2hex(x,y);if(hit[0]===c&&hit[1]===r)return [c,r];dx=x-hx(c,r);dy=y-hy(r);d=dx*dx+dy*dy;if(d<bestD){bestD=d;best=[c,r]}}return bestD<S*S?best:[ctr[0],ctr[1]]}
+function pickAt(vx,vy){var sc=st.scene,wx=vx-sc.viewOx,wy=vy-sc.viewOy,guess=Art.unproject(wx,wy),ctr=Art.px2hex(guess.x,guess.y),hits=[],dr,dc,c,r,h,x,y,hit,best=ctr,bestD=1e9,p,dx,dy,d;
+ /* A tall cap can overlap the tile to its north. The southern tile is drawn later, so it wins. */
+ for(dr=-3;dr<=3;dr++)for(dc=-3;dc<=3;dc++){c=ctr[0]+dc;r=ctr[1]+dr;if(!inb(sc,c,r))continue;h=Art.groundH(sc.t[c][r]);y=(wy+h)/Art.CAM.v;x=wx-Art.CAM.shear*y;hit=Art.px2hex(x,y);if(hit[0]===c&&hit[1]===r)hits.push([c,r,hy(r)])}
+ if(hits.length){hits.sort(function(a,b){return b[2]-a[2]});return [hits[0][0],hits[0][1]]}
+ for(dr=-3;dr<=3;dr++)for(dc=-3;dc<=3;dc++){c=ctr[0]+dc;r=ctr[1]+dr;if(!inb(sc,c,r))continue;h=Art.groundH(sc.t[c][r]);p=Art.project(hx(c,r),hy(r),h);dx=p.x-wx;dy=p.y-wy;d=dx*dx+dy*dy;if(d<bestD){bestD=d;best=[c,r]}}return best}
 function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=st.hero,g=ctx,view=useView();g.setTransform(1,0,0,1,0,0);g.fillStyle='#0a0f15';g.fillRect(0,0,cv.width,cv.height);
  var tx,ty,camW,camH;
  if(view){var feet=toView(h.x,h.y+S*.38,heroH(),0),bias=CW>=560?vh*.06:0;tx=feet.x-vw/2;ty=feet.y-vh/2-bias;
@@ -380,6 +383,6 @@ function init(){cv=$('#cv');ctx=cv.getContext('2d');resize();window.addEventList
  document.body.addEventListener('pointerdown',function(){gest=true},{passive:true});
  var w=P().w;if(w&&w.sid){var sc=w.sid==='w'?st.world:null;if(sc){st.hero.c=w.c;st.hero.r=w.r}}
  title();requestAnimationFrame(frame);
- window.__w={interact:interact,st:st,walkTo:function(c,r){return new Promise(function(res){if(!walkTo(c,r))return res(false);var t0=Date.now();(function p(){if(!st.path&&!st.hero.mv||Date.now()-t0>60000)res(true);else setTimeout(p,30)})()})},warp:function(sid,c,r){enter(sid,c,r)},objective:objective,speed:function(n){st.speed=n},NODES:NODES,hud:hud,scene:function(){return st.scene},bfs:bfs,getScene:getScene,zoneOpen:zoneOpen,adv:adv,pick:pick,neigh:neigh,canWalk:canWalk,start:start}}
+ window.__w={interact:interact,st:st,walkTo:function(c,r){return new Promise(function(res){if(!walkTo(c,r))return res(false);var t0=Date.now();(function p(){if(!st.path&&!st.hero.mv||Date.now()-t0>60000)res(true);else setTimeout(p,30)})()})},warp:function(sid,c,r){enter(sid,c,r)},objective:objective,speed:function(n){st.speed=n},NODES:NODES,hud:hud,scene:function(){return st.scene},bfs:bfs,getScene:getScene,zoneOpen:zoneOpen,adv:adv,pick:pick,neigh:neigh,canWalk:canWalk,start:start,pickAt:pickAt,useView:useView,selfTest:function(){return Art.selfTestCam()}}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
