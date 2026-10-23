@@ -75,3 +75,49 @@ Portfolio Guide is not on the home strip. Say if it should join the four.
 Low mode still draws the cached tile light and the seeded grain. Say if low should drop those too and match the older flat fill exactly.
 
 WorldKit citadel accent stays `#c9a24f` even where a castle tint differs. Fine for brass trim. Say if Safety's citadel roof should follow `#8a7040` as well.
+
+## Continuation, same day
+
+Roofs, brass marks, and still frames. Checked again in headless Edge against this folder on port 8877 (an older server was already bound to 8765 and serves a different tree). Home, then Begin on Python, Foundations, Safety, Evals and Portfolio. Effects were full (`learning-apps.fx` was unset and the machine was not in the low default). No console exceptions. The streak renders the flame mark. A second Python load with `prefers-reduced-motion: reduce` showed the whole first line at once and no console exceptions. Begin writes a save only inside that headless profile. Mark as done was not clicked. Not tested on a real phone, Safari, or Firefox.
+
+### What changed
+
+`shared/art.js`. `roof` on a building recolours the main roof. Trim, flags and door light stay `accent`. Halls keep brass when no roof is set. `quiet()` is low effects or reduced motion, and it freezes decorative building motion. Idle blink and idle bob run only when effects are full and motion is allowed. A walking step still plays. Grain is a seeded 128px tile, stamped with a pattern. `LQMark` draws brass line icons for known names and emoji. Unknown icons return an empty string so the caller keeps the text.
+
+`shared/world.js`. Regions and the castle copy `roof` onto map nodes and town objects. Drawing passes it through. A cleared town can still turn its trim brass without changing the roof. Dialogue without a portrait uses a plate. The streak uses the flame mark. Quest and map rows use the existing line icons. The quest marker and the minimap ring do not pulse when effects are low or motion is reduced. The title camera does not drift in that case. The vignette canvas is kept until the view size changes. Reduced motion shows the full dialogue line immediately.
+
+`shared/worldkit.js`. Copies `roof` the same way it copies `tint` and `motif`. Citadel trim stays `#c9a24f`.
+
+`shared/engine.js`, `shared/party.js`, `shared/world.css`, `shared/theme.css`. Badge marks sit in a brass box. Locked badges stay readable (the greyscale fade is gone). Satchel rows use ok, borrow and no marks. Home links use a realm dot: Python `#6d9a4e`, Foundations `#c47a48`, Evaluation `#3f5f8f`, Safety `#8a4a3a`, Portfolio `#8a6530`. The dot is absolutely placed so the label stays centred.
+
+`shared/hero.js`. The four towns and the citadel have their own roofs. The strip already holds a still frame when effects are low or motion is reduced.
+
+`shared/aisims.js`. "flag here and above" and "lowest loss" are 13px `#f6efe0`. The lowest-loss line is `#8fbf6a`. The chart maths is unchanged.
+
+`shared/expedition.js`. A finished stage card uses a brass border. The progress fill transition is included in the reduced-motion stop list. Saves, XP and badge ids are unchanged.
+
+`shared/pyplay.js`. The idea overlay button says Close.
+
+Module roofs, each distinct from that region's ground tint:
+
+- Python: Valley `#7a5a32`, Listwood `#3e4e34`, Loop Heights `#3a4658`, Function Forge `#7a3e2c`, Lookup Harbour `#3a5548`, Bugfix Highland `#4a4038`, citadel `#8a6528`.
+- Foundations: Data Fields `#7a5230`, Neuron Grove `#343e2c`, Gradient Hills `#343e56`, Overfit Marsh `#3a4e48`, Attention Peaks `#3e4a58`, Fine-tune Forge `#7a3a28`, Feedback Harbour `#3a4254`, citadel `#8a6528`. Fluency Fields `#5c6a34`.
+- Safety: Harbour `#6a4034`, Alignment `#343e56`, Redoubt `#5a3038`, Dunes `#7a4a30`, Fells `#3e4c5a`, Depths `#343e2c`, Policy `#3a4254`, citadel roof `#6a5830` (wash stays `#8a7040`). Inserts: Court `#6a4060`, Watchtower `#3a4e62`, Mirror Marsh `#3a4a58`, Control Keep `#5a3838`.
+- Evals: Meadow `#7a5230`, Rubric Wood `#3e4a32`, Judges' Hills `#3a3e5c`, Dunes `#7a4528`, Frost `#3e4c5a`, Redfen `#5a3038`, Synthesis `#3a4254`, citadel `#8a6528`. Primer `#5a6a32`, Variance `#2f554c`, Tribunal `#4a3868`, Proving Grounds `#7a4428`.
+- Portfolio: Harbour `#7a5230`, Cash Vault `#2f4a38`, Trim Guild `#3a3858`, Hedge Smithy `#7a3a28`, Basis `#3e4c5a`, Signal Tower `#5a3038`, Patience `#3a4254`, citadel `#8a6528`.
+
+Each world overlay button says Close.
+
+### Open for Jensen
+
+Phone HUD icon buttons stay 42px under 560px.
+
+Home `data-n` stays 6, 7, 10 and 7. The worlds report more regions once inserts count (the HUD on this check said 6, 8, 11 and 11). Portfolio stays off the progress strip. Its standalone link has a dot.
+
+Low effects still draw cached tile light and seeded grain.
+
+Citadel trim stays `#c9a24f`. Safety's citadel roof is now `#6a5830`, warmer than the brass trim and closer to its wash. Say if the roof should be the wash itself.
+
+Decorative building motion, idle bob, idle blink and the title drift stop together when effects are low or the browser asks for reduced motion. Walking still steps. Say if the walk cycle should stop too.
+
+Expedition camp and trail badge strings stay the tent and the boot. The badge screen draws them as brass marks. Simulator talk icons that `LQMark` knows are drawn the same way when a plate is used. Unknown icons stay text.
