@@ -50,3 +50,32 @@ castle:{name:'Keep of the Risk-Off Scenario',biome:'crown',accent:'#c9a24f',
  herald:{name:'Herald Cael',look:{skin:'#e3b896',hair:'#5a3a22',robe:'#274a7a',trim:'#f3e2b0',hat:'cap'},hint:'The Marshal will put five decisions to you in a weak market. Use the regime, the caps, the hedge and the patience rules.'},
  chest:'Steady Hand\'s Crown',hall:'Great Hall'}
 };
+/* ---- Course scene art (graphics pass): colour identity + themed landmark and map props for portfolio-guide.
+   Uses only window.Art (S, building, ell, mix) and window.LQFx.low from shared/. Full effects only; Low effects keeps the shared art. ---- */
+(function(){
+var W=window.WORLD;if(!W)return;
+var PAL=['#2f6a4a','#b08a2a','#2a5a6a','#4a7a3a','#8a6a2a','#2a6a5a','#3a5a3a','#a07a3a'];
+W.palette=PAL;W.regions.forEach(function(r,i){r.accent=PAL[i%PAL.length]});if(W.castle)W.castle.accent='#e8c45a';
+Object.assign(W.hero,{robe:'#1f4a3a',cape:'#b08a2a',trim:'#f3d77a'});
+var PI=Math.PI;
+function E(g,x,y,rx,ry,c){g.fillStyle=c;g.beginPath();g.ellipse(x,y,Math.max(rx,.1),Math.max(ry,.1),0,0,PI*2);g.fill()}
+function R(g,x,y,w,h,c){g.fillStyle=c;g.fillRect(x,y,w,h)}
+function T(g,a,b,c,d,e,f,col){g.fillStyle=col;g.beginPath();g.moveTo(a,b);g.lineTo(c,d);g.lineTo(e,f);g.fill()}
+function L(g,pts,c,w){g.strokeStyle=c;g.lineWidth=w;g.lineCap='round';g.beginPath();g.moveTo(pts[0],pts[1]);for(var i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);g.stroke()}
+function glow(g,x,y,r,col,a){var gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,col.replace('A',a));gr.addColorStop(1,col.replace('A',0));g.fillStyle=gr;g.fillRect(x-r,y-r,2*r,2*r)}
+function plinth(g,u,w,col){E(g,0,0,w*1.2*u,w*.45*u,'rgba(0,0,0,.28)');R(g,-w*u,-5*u,2*w*u,5*u,col);R(g,-w*u,-5*u,2*w*u,1.4*u,'rgba(255,255,255,.22)');R(g,(w-3)*u,-5*u,3*u,5*u,'rgba(0,0,0,.18)')}
+/* Portfolio Guide: a steady harbour of savings. Landmark = a lighthouse-vault with a steady beam over neat coin stacks (a cash floor); map prop = three coin stacks. */
+function coins(g,u,x,n,ac){for(var i=0;i<n;i++){E(g,x*u,-i*2.2*u-1*u,4*u,1.6*u,'#8a6a1a');E(g,x*u,-i*2.2*u-1.8*u,4*u,1.6*u,i%2?'#e8c45a':'#f3d77a')}}
+function landmark(g,u,ac,t,b){plinth(g,u,15,'#c9bfa4');
+ var gr=g.createLinearGradient(-5*u,0,5*u,0);gr.addColorStop(0,'#f4efe2');gr.addColorStop(1,'#a89f88');g.fillStyle=gr;g.beginPath();g.moveTo(-6*u,-5*u);g.lineTo(-4*u,-36*u);g.lineTo(4*u,-36*u);g.lineTo(6*u,-5*u);g.fill();
+ R(g,-5.4*u,-24*u,10.8*u,3*u,ac);R(g,-4.8*u,-14*u,9.6*u,3*u,ac);R(g,-5.5*u,-41*u,11*u,5*u,'#3a4a4a');var p=.75+.25*Math.sin(t*2);glow(g,0,-38.5*u,12*u,'rgba(255,226,140,A)',.6*p);E(g,0,-38.5*u,2.2*u,1.8*u,'#fff2b8');T(g,-6.5*u,-41*u,0,-47*u,6.5*u,-41*u,'#2f5a4a');
+ coins(g,u,-11,4,ac);coins(g,u,11,5,ac);coins(g,u,15.5,3,ac);R(g,-15*u,-1.2*u,6*u,.9*u,'#2f8a5a')}
+function mapProp(g,u,ac,t,kind){E(g,0,0,8*u,2.6*u,'rgba(0,0,0,.25)');coins(g,u,-4,3,ac);coins(g,u,0,5,ac);coins(g,u,4,4,ac);var s=.5+.5*Math.sin(t*3);E(g,0,-13*u,1.2*u*s+.3,1.2*u*s+.3,'rgba(255,255,255,.9)')}
+
+function install(){var A=window.Art;if(!A||!A.building||A.__courseArt)return;var base=A.building;A.__courseArt=W.key;
+ A.building=function(g,kind,x,y,o){var low=!window.LQFx||window.LQFx.low;o=o||{};
+  if(!low&&kind==='tree'&&o.landmark){var u=A.S/34;g.save();g.translate(x,y+A.S*.5);g.scale(1.25,1.25);try{landmark(g,u,o.accent||PAL[0],o.t||0,o.landmark)}catch(e){}g.restore();return}
+  base.apply(this,arguments);
+  if(!low&&(kind==='town'||kind==='castle')){var u2=A.S/34;g.save();g.translate(x-(kind==='castle'?34:26)*u2,y+A.S*.5-2*u2);g.scale(1.7,1.7);try{mapProp(g,u2,o.accent||PAL[0],o.t||0,kind)}catch(e){}g.restore()}};}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else setTimeout(install,0);
+})();
