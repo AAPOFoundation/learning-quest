@@ -8,9 +8,12 @@ var P=load();
 function save(){try{localStorage.setItem(K,JSON.stringify(P))}catch(e){}}
 function today(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 function touchStreak(){var t=today();if(P.last===t)return;var y=new Date();y.setDate(y.getDate()-1);var ys=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();P.streak=(P.last===ys)?P.streak+1:1;P.last=t;}
-function toast(m){var e=document.createElement('div');e.className='toast';e.textContent=m;document.body.appendChild(e);setTimeout(function(){e.remove()},2600)}
+function toast(m,art){var e=document.createElement('div');e.className='toast'+(art?' toast-art':'');if(art){var img=document.createElement('img');img.className='mk';img.alt='';img.width=40;img.height=40;img.src=art;e.appendChild(img)}e.appendChild(document.createTextNode(m));var n=document.querySelectorAll('.toast').length;if(n)e.style.bottom=(18+n*68)+'px';document.body.appendChild(e);setTimeout(function(){e.remove()},2600)}
 function rank(){var r=A.rank,i=0;for(var k=0;k<r.length;k++)if(P.xp>=r[k][0])i=k;return r[i][1]}
-function award(id){if(P.badges.indexOf(id)<0){P.badges.push(id);var b=A.badges.filter(function(x){return x.id===id})[0];toast('Badge earned: '+(b?b.name:id))}}
+var held=null;
+function award(id){if(P.badges.indexOf(id)<0){P.badges.push(id);var b=A.badges.filter(function(x){return x.id===id})[0],name=b?b.name:id,src=badgeSrc(id);if(held)held.push({name:name,src:src});else toast('Badge earned: '+name,src)}}
+function holdMarks(){held=[]}
+function marksHtml(){var rows=held||[];held=null;return rows.map(function(r){return '<p class="earn">'+(r.src?'<img class="mk" alt="" width="40" height="40" src="'+r.src+'">':'')+'Badge earned: '+esc(r.name)+'</p>'}).join('')}
 function doneCount(){return A.levels.filter(function(l){return P.levels[l.id]&&P.levels[l.id].done}).length}
 function unlocked(i){return i===0||(P.levels[A.levels[i-1].id]&&P.levels[A.levels[i-1].id].done)}
 function stars(n){var s='<span class="stars" aria-label="'+n+' of 3 stars">';for(var i=0;i<3;i++)s+='<span class="star'+(i<n?' on':'')+'"></span>';return s+'</span>'}
@@ -49,11 +52,17 @@ function path(tb){
 function skills(tb){
  var h='<div class="panel"><p class="kicker">Skills map</p><p class="dim small">Each bar is your best score on that level\'s questions.</p>';
  A.skills.forEach(function(s){var l=A.levels.filter(function(x){return x.id===s.level})[0],b=P.levels[s.level]?Math.round(100*P.levels[s.level].best):0;
-  h+='<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+esc(s.name)+'</b><span class="dim small">'+b+'%</span></div><div class="bar"><i style="width:0" data-w="'+b+'"></i></div><div class="small dim">'+esc(s.note)+'</div></div>'});
+  h+='<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="skill-name">'+lessonPlate(s.level)+'<b>'+esc(s.name)+'</b></span><span class="dim small">'+b+'%</span></div><div class="bar"><i style="width:0" data-w="'+b+'"></i></div><div class="small dim">'+esc(s.note)+'</div></div>'});
  tb.innerHTML=h+'</div>';
  [].forEach.call(tb.querySelectorAll('.bar>i'),function(el){var w=el.getAttribute('data-w')+'%';requestAnimationFrame(function(){el.style.width=w})})}
+/* brass medallions in assets/art/badges; a chest seal uses the course file when this world has one */
+var BADGE_ART={first:1,perfect:1,streak3:1,all:1,boss:1,master:1,coder:1,pythonista:1,camp:1,expedition:1,capstone:1,crown:1,scout:1,seal:1,lab:1};
+var SEAL_WORLD={'python-basics':1,'ai-foundations':1,'ai-evals':1,'ai-safety':1,'portfolio-guide':1};
+function badgeName(id){if(/^seal_/.test(id)||id==='seal')return (A.key&&SEAL_WORLD[A.key])?'seal-'+A.key:'seal';return id}
+function badgeSrc(id){var name=badgeName(id);if(name.indexOf('seal-')===0||BADGE_ART[name])return '../assets/art/badges/'+name+'.svg';return ''}
+function badgeMark(id){var src=badgeSrc(id);if(!src)return '';return '<img class="mk" alt="" width="40" height="40" src="'+src+'">'}
 function badges(tb){
- var h='<div class="grid">';A.badges.forEach(function(b,i){var on=P.badges.indexOf(b.id)>=0;h+='<div class="badge '+(on?'':'off')+'" style="animation:rise .22s ease both;animation-delay:'+(Math.min(i,12)*40)+'ms"><span style="font-size:28px">'+b.icon+'</span><div><b>'+esc(b.name)+'</b><div class="small dim">'+esc(b.desc)+'</div></div></div>'});
+ var h='<div class="grid">';A.badges.forEach(function(b,i){var on=P.badges.indexOf(b.id)>=0,art=badgeMark(b.id);h+='<div class="badge '+(on?'':'off')+'" style="animation:rise .22s ease both;animation-delay:'+(Math.min(i,12)*40)+'ms"><span class="mk-slot">'+(art||b.icon)+'</span><div><b>'+esc(b.name)+'</b><div class="small dim">'+esc(b.desc)+'</div></div></div>'});
  tb.innerHTML=h+'</div>'}
 
 /* ---- questions ---- */
@@ -98,10 +107,11 @@ function runQs(qs,title,fin){var i=0,right=0,box=document.createElement('div');
   var e=ask(qs[i],i,qs.length,function(ok){if(ok)right++;i++;next()},title);box.innerHTML='';box.appendChild(e);topScroll()})();
  return box}
 
+function lessonPlate(id,lit){var k=String(A.key||''),n=String(id||'');if(!/^[a-z0-9-]+$/.test(k)||!/^[A-Za-z0-9-]+$/.test(n))return '';return '<img class="lesson-plate'+(lit?' plate-lit':'')+'" alt="" width="160" height="100" src="../assets/art/plates/'+k+'/'+n+'.svg" onerror="this.remove()">'}
 function level(i,mode){
  var L=A.levels[i],step=0;MODE=mode||null;
  function lesson(){
-  var c=L.lesson,quiet=window.LQFx&&(LQFx.low||(LQFx.rm&&LQFx.rm.matches)),h='<section class="panel lesson'+(quiet?'':' stepin')+'"><p class="kicker">Level '+(i+1)+' · lesson '+(step+1)+' of '+c.length+'</p><h2>'+(step?esc(c[step].h):esc(L.title))+'</h2>'+(step===0&&window.LQGuide?window.LQGuide.slot(A.key+'-'+L.id):'')+(step===0?'<h3>'+esc(c[0].h)+'</h3>':'')+c[step].b+'<div class="row"><button class="btn btn-ghost" id="bk"'+(quiet?'':' style="animation:pop .22s ease backwards"')+'>'+(step?'Back':'Exit')+'</button><button class="btn btn-primary" id="fw"'+(quiet?'':' style="animation:pop .22s ease backwards;animation-delay:.06s"')+'>'+(step<c.length-1?'Next':(MODE==='lesson'?'Done':'Start the questions'))+'</button></div></section>';
+  var c=L.lesson,quiet=window.LQFx&&(LQFx.low||(LQFx.rm&&LQFx.rm.matches)),h='<section class="panel lesson'+(quiet?'':' stepin')+'"><p class="kicker">Level '+(i+1)+' · lesson '+(step+1)+' of '+c.length+'</p><h2>'+(step?esc(c[step].h):esc(L.title))+'</h2>'+(step===0?lessonPlate(L.id):'')+(step===0&&window.LQGuide?window.LQGuide.slot(A.key+'-'+L.id):'')+(step===0?'<h3>'+esc(c[0].h)+'</h3>':'')+c[step].b+'<div class="row"><button class="btn btn-ghost" id="bk"'+(quiet?'':' style="animation:pop .22s ease backwards"')+'>'+(step?'Back':'Exit')+'</button><button class="btn btn-primary" id="fw"'+(quiet?'':' style="animation:pop .22s ease backwards;animation-delay:.06s"')+'>'+(step<c.length-1?'Next':(MODE==='lesson'?'Done':'Start the questions'))+'</button></div></section>';
   shell(h);if(window.LQGuide)window.LQGuide.scan();
   $('#bk').onclick=function(){step?(step--,lesson()):home()};
   $('#fw').onclick=function(){if(step<c.length-1){step++;lesson()}else if(MODE==='lesson'){E_.lessonDone=true;EXIT()}else quiz()}}
@@ -112,11 +122,12 @@ function level(i,mode){
    var pass=p>=.6;
    if(pass){gain+=first?20:0;if(p===1&&(!prev||prev.best<1))gain+=10}
    P.xp+=gain;var rec=P.levels[L.id]||{best:0,done:false};rec.best=Math.max(rec.best,p);if(pass)rec.done=true;P.levels[L.id]=rec;
+   holdMarks();
    if(pass&&first&&i===0)award('first');if(p===1)award('perfect');if(P.streak>=3)award('streak3');
    if(doneCount()===A.levels.length)award('all');
    if(A.onLevel)A.onLevel(L.id,p,award);
    save();
-   var h='<section class="panel'+(pass?' cheer':'')+'"><p class="kicker">'+(pass?'Level cleared':'Not cleared yet')+'</p><h2>'+r+' of '+L.qs.length+' correct</h2>'+stars(pass?starsFor(p):0)+'<p class="dim" style="margin-top:10px">+'+gain+' XP. '+(pass?(p<1?'Replay for three stars; you only need 60% to move on.':'A clean sweep.'):'You need 60% to clear a level. Re-read the lesson and try again, there is no penalty.')+'</p><div class="row"><button class="btn btn-ghost" id="rl" style="animation:pop .22s ease backwards">Re-read lesson</button><button class="btn btn-primary" id="nx2" style="animation:pop .22s ease backwards;animation-delay:.08s">'+('Back to the map')+'</button></div></section>';
+   var h='<section class="panel'+(pass?' cheer':'')+'">'+(pass?lessonPlate(L.id,true):'')+'<p class="kicker">'+(pass?'Level cleared':'Not cleared yet')+'</p><h2>'+r+' of '+L.qs.length+' correct</h2>'+stars(pass?starsFor(p):0)+'<p class="dim" style="margin-top:10px">+'+gain+' XP. '+(pass?(p<1?'Replay for three stars; you only need 60% to move on.':'A clean sweep.'):'You need 60% to clear a level. Re-read the lesson and try again, there is no penalty.')+'</p>'+marksHtml()+'<div class="row"><button class="btn btn-ghost" id="rl" style="animation:pop .22s ease backwards">Re-read lesson</button><button class="btn btn-primary" id="nx2" style="animation:pop .22s ease backwards;animation-delay:.08s">'+('Back to the map')+'</button></div></section>';
    shell(h);if(pass){try{document.dispatchEvent(new CustomEvent('lq:celebrate',{detail:{msg:p===1?'Perfect clear!':'Level cleared!',vfx:'shockwave'}}))}catch(e){}}$('#rl').onclick=function(){step=0;MODE=null;lesson()};$('#nx2').onclick=function(){EXIT()}}))}
  if(mode==='quiz')quiz();else lesson()}
 
@@ -124,8 +135,8 @@ function boss(){
  var B=A.boss,i=0,pts=0,picks=[];
  function step(){
   if(i>=B.steps.length){touchStreak();var p=pts/B.steps.reduce(function(a,s){return a+Math.max.apply(null,s.opts.map(function(o){return o.pts}))},0);
-   var first=!(P.boss&&P.boss.done),gain=Math.round(p*60)+(first?40:0);P.xp+=gain;P.boss={done:true,best:Math.max(P.boss?P.boss.best:0,p)};award('boss');if(p>=.9)award('master');save();
-   shell('<section class="panel cheer"><p class="kicker">Final challenge complete</p><h2>'+Math.round(p*100)+'% design score</h2>'+stars(starsFor(p))+'<p class="dim" style="margin-top:10px">+'+gain+' XP.</p>'+picks.map(function(x){return '<p class="small"><b>'+esc(x.t)+':</b> '+x.why+'</p>'}).join('')+'<div class="row"><button class="btn btn-ghost" id="rp" style="animation:pop .22s ease backwards">Replay</button><button class="btn btn-primary" id="hm" style="animation:pop .22s ease backwards;animation-delay:.08s">Back to the map</button></div></section>');
+   var first=!(P.boss&&P.boss.done),gain=Math.round(p*60)+(first?40:0);P.xp+=gain;P.boss={done:true,best:Math.max(P.boss?P.boss.best:0,p)};holdMarks();award('boss');if(p>=.9)award('master');save();
+   shell('<section class="panel cheer">'+lessonPlate('citadel',true)+'<p class="kicker">Final challenge complete</p><h2>'+Math.round(p*100)+'% design score</h2>'+stars(starsFor(p))+'<p class="dim" style="margin-top:10px">+'+gain+' XP.</p>'+picks.map(function(x){return '<p class="small"><b>'+esc(x.t)+':</b> '+x.why+'</p>'}).join('')+marksHtml()+'<div class="row"><button class="btn btn-ghost" id="rp" style="animation:pop .22s ease backwards">Replay</button><button class="btn btn-primary" id="hm" style="animation:pop .22s ease backwards;animation-delay:.08s">Back to the map</button></div></section>');
    try{document.dispatchEvent(new CustomEvent('lq:celebrate',{detail:{msg:'Well done',vfx:'shockwave'}}))}catch(e){}
    $('#rp').onclick=function(){boss()};$('#hm').onclick=home;return}
   var s=B.steps[i],h='<section class="panel"><p class="kicker">'+esc(B.title)+' · step '+(i+1)+' of '+B.steps.length+'</p>'+(i===0?'<p class="dim">'+B.intro+'</p>':'')+'<h3 style="color:var(--ink);font-family:var(--font);font-size:18px">'+s.q+'</h3>';

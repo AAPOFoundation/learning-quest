@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs id="lq-grade-defs">
+    <radialGradient id="lq-medal" cx="0.34" cy="0.28" r="0.68">
+      <stop offset="0" stop-color="#f3e2b0" stop-opacity="0.32"/>
+      <stop offset="0.5" stop-color="#f3e2b0" stop-opacity="0"/>
+      <stop offset="1" stop-color="#0a0f15" stop-opacity="0.32"/>
+    </radialGradient>
+    <radialGradient id="lq-tint" cx="0.5" cy="0.46" r="0.5">
+      <stop offset="0" stop-color="#6a4ab0" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#6a4ab0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lq-gold" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f3e2b0" stop-opacity="0.65"/>
+      <stop offset="0.45" stop-color="#2a8ab0" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#f3e2b0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="29" fill="#121a24" stroke="#c8a86a" stroke-width="2"/>
+  <circle cx="32" cy="32" r="24" fill="none" stroke="#8a6528" stroke-width="1"/>
+  <circle cx="32" cy="32" r="23" fill="url(#lq-medal)"/>
+  <circle cx="32" cy="32" r="20" fill="url(#lq-tint)"/>
+  <path fill="#f3e2b0" d="M50.2 13L50.65 14.05L51.7 14.5L50.65 14.95L50.2 16L49.75 14.95L48.7 14.5L49.75 14.05Z"/>
+  <ellipse id="lq-shadow" cx="34" cy="40" rx="11" ry="2.2" fill="#0a0f15" opacity="0.4"/>
+  <circle id="lq-lamp" cx="32" cy="31" r="13" fill="url(#lq-gold)"/>
+  <path d="M32 18.8L35.9 22.6L41.3 22.7L41.4 28.1L45.2 32L41.4 35.9L41.3 41.3L35.9 41.4L32 45.2L28.1 41.4L22.7 41.3L22.6 35.9L18.8 32L22.6 28.1L22.7 22.7L28.1 22.6Z" fill="none" stroke="#d7b56a" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M32 25.5L33.6 29.7L38 30.2L34.8 33.2L35.6 37.5L32 35.2L28.4 37.5L29.2 33.2L26 30.2L30.4 29.7Z" fill="#f3e2b0" stroke="#d7b56a" stroke-width="1.2" stroke-linejoin="round"/>
+</svg>

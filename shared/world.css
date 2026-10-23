@@ -12,7 +12,10 @@ body.world{height:100vh;height:100dvh;overflow:hidden;position:fixed;inset:0;wid
 #party .nm{font:700 18px/1 var(--display);letter-spacing:.06em;color:var(--gold-hi)}
 #party .rk{font-size:12px;color:var(--ink-dim)}
 #party .bar{height:8px;margin:4px 0}
-#party .st{font-size:12px;color:var(--ink-dim);display:flex;gap:10px;flex-wrap:wrap}#party .st .fl{display:inline-block;transform-origin:50% 80%;animation:flame 1.2s ease-in-out infinite}
+#party .st{font-size:12px;color:var(--ink-dim);display:flex;gap:10px;flex-wrap:wrap}
+#party .st .flame{color:var(--gold);display:inline-flex;align-items:center;gap:3px}
+#party .st .flame svg{display:block}
+#party .st .flame svg{transform-origin:50% 80%;animation:flame 1.2s ease-in-out infinite}
 #pm{display:flex;gap:3px;margin-top:5px}
 #pc{display:flex;gap:4px;margin-top:4px}#pc img{width:26px;height:26px;border-radius:6px;border:1px solid var(--gold);background:#0e141c;animation:idlebreath 3.4s ease-in-out infinite}#pc img:nth-child(2){animation-delay:.35s}#pc img:nth-child(3){animation-delay:.7s}#pc img:nth-child(4){animation-delay:1.05s}#pc img.just{animation:arrive .35s ease both,idlebreath 3.4s ease-in-out infinite}
 #pm img{width:24px;height:24px;border-radius:50%;border:1px solid var(--brass-mid);filter:grayscale(1) brightness(.55);opacity:.7;transition:filter .25s,opacity .25s,border-color .25s}
@@ -50,6 +53,9 @@ body.nopad #pad,body.nopad #acts{display:none!important}
 #dlg{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(760px,96vw);z-index:15}
 #dlg .panel{display:flex;gap:14px;align-items:flex-start;margin:0;min-height:112px;padding:14px 16px;cursor:pointer}#dlg:not([hidden]) .panel{animation:dlgin .22s ease}
 #dlg img{width:84px;height:84px;border-radius:12px;border:2px solid var(--brass);flex:none;box-shadow:0 0 0 1px var(--brass-ink);animation:idlebreath 3.2s ease-in-out infinite}
+#dlg img.spot-art{object-fit:cover;background:#0a0f15;border-color:var(--course,var(--brass));box-shadow:0 0 0 1px var(--brass-ink),0 0 14px color-mix(in srgb,var(--course-warm,#d7b56a) 50%,transparent),0 8px 12px #0007}
+#dlg img.spot-lit{box-shadow:0 0 0 1px var(--course-warm,#d7b56a),0 0 22px #f3e2b0bb,0 8px 12px #0007}
+#dlg img.spot-spent{filter:saturate(.7) brightness(.78)}
 #dlg .tx{flex:1;min-width:0}
 #dlg .nameplate{display:inline-block;margin:0 0 4px;padding:1px 12px 2px;font:700 18px/1.2 var(--display);letter-spacing:.08em;color:#1a1208;background:linear-gradient(180deg,#ecd28a,#c9a24f 52%,#b08a38);border:1px solid var(--brass-lo);border-radius:6px}
 #dlg .ti{font-size:12px;color:var(--ink-dim);margin-left:8px}
@@ -57,13 +63,30 @@ body.nopad #pad,body.nopad #acts{display:none!important}
 #dlg .more{float:right;color:var(--gold);animation:bob 1s infinite}
 @keyframes bob{50%{transform:translateY(3px)}}
 #dlg .ch{display:flex;flex-direction:column;gap:6px;margin-top:8px}#dlg .ch .opt{margin:0;min-height:44px;animation:pop .22s ease backwards}
-#ttl{position:fixed;inset:0;z-index:25;display:none;align-items:center;justify-content:center;padding:14px;background:radial-gradient(ellipse at center,#0a0f1599,#060a0ed9);overflow:auto;touch-action:pan-y pinch-zoom}
+#ttl{position:fixed;inset:0;z-index:25;display:none;align-items:center;justify-content:center;padding:14px;background:radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15;overflow:auto;touch-action:pan-y pinch-zoom}
+/* course colour grade on the title wash and the region banner. Same pairs as each world's map palette. Layout is unchanged. */
+body[data-world="python-basics"]{--course:#2f6ab0;--course-warm:#d0a020}
+body[data-world="ai-foundations"]{--course:#6a4ab0;--course-warm:#2a8ab0}
+body[data-world="ai-evals"]{--course:#2a8a7a;--course-warm:#c98a2a}
+body[data-world="ai-safety"]{--course:#2f8a6a;--course-warm:#c9902a}
+body[data-world="portfolio-guide"]{--course:#2f6a4a;--course-warm:#b08a2a}
+body[data-world="python-basics"] #ttl{background:radial-gradient(ellipse at 16% 0,rgba(47,106,176,.46),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(208,160,32,.18),transparent 42%),radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15}
+body[data-world="ai-foundations"] #ttl{background:radial-gradient(ellipse at 16% 0,rgba(106,74,176,.46),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(42,138,176,.2),transparent 42%),radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15}
+body[data-world="ai-evals"] #ttl{background:radial-gradient(ellipse at 16% 0,rgba(42,138,122,.44),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(201,138,42,.18),transparent 42%),radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15}
+body[data-world="ai-safety"] #ttl{background:radial-gradient(ellipse at 16% 0,rgba(47,138,106,.44),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(201,144,42,.18),transparent 42%),radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15}
+body[data-world="portfolio-guide"] #ttl{background:radial-gradient(ellipse at 16% 0,rgba(47,106,74,.42),transparent 50%),radial-gradient(ellipse at 92% 100%,rgba(176,138,42,.18),transparent 42%),radial-gradient(ellipse at center,#0a0f15cc,#060a0ef2),var(--world-bg,none) center/160px repeat,#0a0f15}
+body[data-world] #area{box-shadow:inset 0 -2px 0 var(--course-warm)}
+body[data-world] .world-cover,body[data-world] .lesson-plate,body[data-world] .qrow .plate{border-color:var(--course)}
 #ttl .panel{max-width:520px;width:100%;margin:auto}
+#ov{background-image:linear-gradient(#060a0ee8,#060a0ee8),var(--world-bg,none);background-size:auto,160px 160px;background-color:#060a0e}
 .kbd{display:inline-block;min-width:22px;padding:0 6px;border:1px solid var(--brass-mid);border-bottom-width:2px;border-radius:5px;background:#070b10;font:800 12px/20px var(--font);text-align:center;color:var(--gold-hi)}
 .toast{z-index:40}
+body.indlg .toast{bottom:calc(max(12px,env(safe-area-inset-bottom)) + var(--lq-dlg-h,150px) + 10px)}
 .mapfull{width:100%;border:1px solid var(--brass);border-radius:10px;background:#0a0f15;display:block;margin-bottom:10px}
 .qrow{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #2b3643}
-.qrow .ic{width:28px;text-align:center;font-size:18px}
+.qrow .plate{width:56px;height:36px;object-fit:cover;object-position:center;border-radius:6px;border:1px solid var(--brass-mid);background:#0a0f15;flex:none}
+.qrow .ic{width:28px;text-align:center;font-size:18px;color:var(--gold)}
+.qrow .ic svg{display:block;margin:0 auto}
 .qrow .qb{flex:1}.qrow .btn{width:auto;min-height:40px;font-size:14px;padding:6px 12px}
 .disc{pointer-events:auto}
 body.indlg #pad,body.indlg #acts{display:none!important}body.indlg #area{opacity:0!important}
