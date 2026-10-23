@@ -76,3 +76,10 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 - Course grade runs after fog. ai-evals gain is cooler (blue 1.08, red 0.90, gold 0.38). ai-safety gain is warmer (red 1.08, blue 0.86, gold 0.74). Foundations, Basics and the portfolio guide have their own grades if a camp is ever mounted there. The clear colour uses the same grade, without the vignette, so empty sky matches a fully fogged pixel. A headless frame showed evals grass at about (118, 194, 119) and safety grass at about (147, 196, 83). Both shaders linked. Both camps stayed alive.
 - The default camera is still the near-front view (yaw 0.2). A three-quarter view is the next pass. Phone layout and the 2D celebrate hook belong to other sessions. The hex map stays 2D.
 - Did not spawn a second editor on these two files. A parallel edit would have raced the shader and the mesh list.
+
+## Pass 5 (same day)
+
+- The default camera was almost straight on (yaw 0.2, pitch 0.46). It now comes from scene.view: yaw 0.78, pitch 0.56, radius 9.1, target (-0.15, 1.05, 0.05). That puts the eye on +X and -Z, above the people. Drag still orbits from there. The software picture keeps its own front camera, so the pixel counts stay a separate check.
+- A cliff of four leaned stones sits on the -X rim, the side the new camera looks toward. The tallest stone is about 2 high. An open thatched shelter stands in front of it, yaw -pi/2, so local -Z points at the camp. No sign on it. The pennant yaw is yawToward the same eye, and the self-check requires that dot above 0.9.
+- Headless Edge showed the meadow and the highland both alive. The cliff sits behind the tent, the shelter roof reads, and the people still cast shadows toward the fire. The leaned stones are still chunky at this size. Left them leaned rather than as a row of crates.
+- Phone layout at 390x844 and the 2D lq:celebrate hook are already on origin/main from other sessions. This pass did not touch them.

@@ -89,3 +89,6 @@ Same two files, still no libraries and no image files. The emissive channel is n
 
 ## v13: camp lights and a course grade (23 Oct 2026)
 The same viewer now keeps five world-space lamps: the fire, the lantern, a gold lamp on the chest, a warm lamp at the hero's chest, and a landmark lamp (the pennant, or the cairn in hills and highland). Brass trim picks up a small gold glow. The key light sits lower, so the people cast a longer shadow, and their foot contacts are a little darker. After the fog, the picture takes a colour grade for the course: Evaluation Skills leans cool, AI Safety leans warm with more gold. The cleared sky uses that same grade, so the tree line does not show a raw fog seam. Low effects still draws one still frame, with the lamps steady and the shadow map off. The hex map stays 2D.
+
+## v14: three-quarter camp camera (23 Oct 2026)
+The camp camera now starts up and to the side (yaw 0.78, pitch 0.56), so the viewer sees the height of the people, the tent and a new ridge. A low cliff of four leaned stones stands on the left rim, with an open thatched shelter in front of it. The shelter has no sign. The pennant turns to face this camera. Drag still orbits the same view. The hex map stays 2D.

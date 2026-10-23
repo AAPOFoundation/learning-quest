@@ -548,14 +548,19 @@ function crateMesh(){
 /* A low ridge. The camp places it on the -X rim, so the three-quarter camera (on +X) sees the face. */
 function cliffMesh(){
  var b=new Builder(), rock=hex('#6e6860'), cap=hex('#8a8174'), moss=hex('#4e6a38');
- var bits=[[-0.12,0.52,-1.7,1.15,1.05,1.15],[0.06,0.78,-0.4,1.35,1.55,1.25],[-0.05,0.95,0.8,1.2,1.9,1.25],[0.1,0.64,1.9,1.05,1.28,1.1]], i, p, top;
+ var bits=[
+  {c:[-0.08,0.72,-1.65],dir:[0.22,1,-0.16],sx:1.0,sy:1.15,sz:0.9},
+  {c:[0.1,0.95,-0.35],dir:[-0.16,1,0.2],sx:1.15,sy:1.6,sz:1.05},
+  {c:[-0.02,1.12,0.85],dir:[0.14,1,0.08],sx:1.05,sy:1.9,sz:1.0},
+  {c:[0.14,0.78,1.9],dir:[-0.2,1,-0.12],sx:0.9,sy:1.25,sz:0.85}
+ ], i, p, f, top;
  for(i=0;i<bits.length;i++){
-  p=bits[i];
-  b.box(p[0],p[1],p[2],p[3],p[4],p[5],rock,0);
-  top=p[1]+p[4]*0.5;
-  b.box(p[0],top-0.04,p[2],p[3]*0.7,0.08,p[5]*0.68,cap,0);
+  p=bits[i]; f=frameY(p.dir);
+  b.axesBox(p.c, f.x, f.y, f.z, p.sx, p.sy, p.sz, rock, 0);
+  top=[p.c[0]+f.y[0]*p.sy*0.46, p.c[1]+f.y[1]*p.sy*0.46, p.c[2]+f.y[2]*p.sy*0.46];
+  b.axesBox(top, f.x, f.y, f.z, p.sx*0.62, 0.1, p.sz*0.6, cap, 0);
  }
- b.box(0.02,1.78,0.8,0.42,0.1,0.36,moss,0);
+ b.box(0.02,2.02,0.85,0.38,0.1,0.3,moss,0);
  return pack(b);
 }
 /* Open trail shelter. Local -Z is the open side. No sign and no door text. */
