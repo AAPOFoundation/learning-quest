@@ -126,6 +126,7 @@ function boss(){
   if(i>=B.steps.length){touchStreak();var p=pts/B.steps.reduce(function(a,s){return a+Math.max.apply(null,s.opts.map(function(o){return o.pts}))},0);
    var first=!(P.boss&&P.boss.done),gain=Math.round(p*60)+(first?40:0);P.xp+=gain;P.boss={done:true,best:Math.max(P.boss?P.boss.best:0,p)};award('boss');if(p>=.9)award('master');save();
    shell('<section class="panel cheer"><p class="kicker">Final challenge complete</p><h2>'+Math.round(p*100)+'% design score</h2>'+stars(starsFor(p))+'<p class="dim" style="margin-top:10px">+'+gain+' XP.</p>'+picks.map(function(x){return '<p class="small"><b>'+esc(x.t)+':</b> '+x.why+'</p>'}).join('')+'<div class="row"><button class="btn btn-ghost" id="rp" style="animation:pop .22s ease backwards">Replay</button><button class="btn btn-primary" id="hm" style="animation:pop .22s ease backwards;animation-delay:.08s">Back to the map</button></div></section>');
+   try{document.dispatchEvent(new CustomEvent('lq:celebrate',{detail:{msg:'Well done',vfx:'shockwave'}}))}catch(e){}
    $('#rp').onclick=function(){boss()};$('#hm').onclick=home;return}
   var s=B.steps[i],h='<section class="panel"><p class="kicker">'+esc(B.title)+' · step '+(i+1)+' of '+B.steps.length+'</p>'+(i===0?'<p class="dim">'+B.intro+'</p>':'')+'<h3 style="color:var(--ink);font-family:var(--font);font-size:18px">'+s.q+'</h3>';
   shuf(s.opts.map(function(_,k){return k})).forEach(function(k,n){var o=s.opts[k];h+='<button class="opt" data-k="'+k+'" style="animation:pop .22s ease backwards;animation-delay:'+(n*40)+'ms">'+o.t+'</button>'});
