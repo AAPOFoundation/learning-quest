@@ -255,14 +255,15 @@ function mapScreen(){if(st.mode!=='play')return;openOv(function(){var wc=st.worl
   $('#mr').innerHTML=NODES.map(function(nd,i){var open=zoneOpen(i),done=i<NR?levelDone(i):bossDone();return '<div class="qrow"><div class="ic">'+(done?IC2('ok'):open?IC2('go'):IC2('lock'))+'</div><div class="qb"><b>'+esc(i<NR?C.regions[i].name:C.castle.name)+'</b></div>'+(open?'<button class="btn btn-ghost" data-tv="'+i+'">Travel</button>':'')+'</div>'}).join('');
   $('#mr').onclick=function(e){var b=e.target.closest('[data-tv]');if(!b)return;var i=+b.dataset.tv;closeOv();st.scene=st.world;st.sid='w';var nd=NODES[i],pos=nd;for(var d=0;d<6;d++){var n=neigh(nd[0],nd[1],d);if(walkable(st.world,n[0],n[1])&&!st.world.omap[n[0]+','+n[1]]){pos=n;break}}enter('w',pos[0],pos[1])};
   $('#bk2').onclick=closeOv})}
-function title(){st.mode='title';var t=$('#ttl'),p=P(),has=!!p.w||p.xp>0||E.doneCount()>0,v1=!p.w&&(p.xp>0||E.doneCount()>0);
+function title(){st.mode='title';document.body.classList.add('intitle');var t=$('#ttl'),p=P(),has=!!p.w||p.xp>0||E.doneCount()>0,v1=!p.w&&(p.xp>0||E.doneCount()>0);
  t.style.display='flex';
- t.innerHTML='<section class="panel"><p class="kicker">'+esc(A.kicker)+' · exploration edition</p><h1>'+esc(A.title)+'</h1><p class="dim">'+esc(A.tagline.split('.')[0])+'. Walk a painted map, meet teachers, face gatekeepers and open chests.</p><div class="rule"></div>'
+ var legend=C.regions.map(function(R){return '<i style="background:'+(hexOk(R.tint)?R.tint:'#d7b56a')+'"></i>'}).join('')+'<i style="background:'+(hexOk(C.castle.tint)?C.castle.tint:'#c9a24f')+'"></i>';
+ t.innerHTML='<section class="panel"><p class="kicker">'+esc(A.kicker)+' · exploration edition</p><h1>'+esc(A.title)+'</h1><p class="dim">'+esc(A.tagline.split('.')[0])+'. Walk a painted map, meet teachers, face gatekeepers and open chests.</p><p class="legend" aria-hidden="true">'+legend+'</p><div class="rule"></div>'
  +(has?'<button class="btn btn-primary" id="tc" style="margin-bottom:10px">Continue'+(v1?' (version 1 progress found: '+E.doneCount()+' of '+NR+' levels cleared, '+p.xp+' XP)':'')+'</button>':'<button class="btn btn-primary" id="tn" style="margin-bottom:10px">Begin your journey</button>')
  +(has?'<button class="btn btn-ghost" id="tn" style="margin-bottom:10px">New journey (erases saved progress)</button>':'')
  +'<a class="btn btn-ghost" href="../index.html" style="margin-bottom:12px">All games</a>'+controls()+'<p class="small dim">Progress saves in this browser only and is never sent anywhere.</p><p class="disc">'+esc(A.disclaimer)+'</p></section>';
  var c=$('#tc');if(c)c.onclick=function(){gest=true;start(false)};$('#tn').onclick=function(){gest=true;if(!has||confirm('Erase all saved progress for this game and start again?'))start(true)}}
-function start(fresh){var t=$('#ttl');if(fresh){E.reset()}var p=P(),w;
+function start(fresh){var t=$('#ttl');document.body.classList.remove('intitle');if(fresh){E.reset()}var p=P(),w;
  if(!p.w){w=PW();var nd=NODES[0],pos=nd;for(var d=0;d<6;d++){var n=neigh(nd[0],nd[1],d);if(walkable(st.world,n[0],n[1])&&!st.world.omap[n[0]+','+n[1]]){pos=n;break}}w.c=pos[0];w.r=pos[1];A.levels.forEach(function(L,i){if(levelDone(i))w.taught[i]=1});if(E.doneCount()>0||p.xp>0)w.intro=1}
  w=PW();t.style.display='none';st.mode='play';
  var sid=w.sid||'w',sc=getScene(sid);if(!inb(sc,w.c,w.r)){w.sid='w';sid='w';sc=st.world;w.c=NODES[0][0]+1;w.r=NODES[0][1]}
