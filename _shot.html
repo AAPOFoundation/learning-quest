@@ -1,0 +1,30 @@
+<!doctype html><html><head><meta charset="utf-8"><title>shot</title>
+<style>html,body{margin:0;height:100%;background:#000}iframe{width:100vw;height:100vh;border:0;display:block}</style>
+</head><body><iframe id="g"></iframe><pre id="grid" style="position:absolute;left:-8000px"></pre>
+<script>
+localStorage.setItem('learning-apps.fx','full');
+try{localStorage.removeItem('learning-apps.python-basics')}catch(e){}
+var fr=document.getElementById('g');
+fr.src='python-basics/index.html';
+fr.onload=function(){
+ setTimeout(function(){
+  var w=fr.contentWindow,d=w.document,btn=d.getElementById('tn')||d.getElementById('tc');
+  if(btn)btn.click();
+  setTimeout(function(){
+   w.__w.warp('t0',7,4);
+   setTimeout(function(){
+    ['dlg','narrcap','ov','ttl','cutscene'].forEach(function(id){var e=d.getElementById(id);if(e){e.hidden=true;e.style.display='none'}});
+    var st=w.__w.st,cv=d.getElementById('cv'),stage=d.getElementById('stage'),rect=stage.getBoundingClientRect();
+    var dpr=Math.min(2,w.devicePixelRatio||1),z=Math.max(.8,Math.min(1.35,Math.min(rect.width,rect.height)/640)),sc=z*dpr,S=34;
+    var lx=w.Art.hx(7,2)+8,ly=w.Art.hy(2)+S*.5-2;
+    function P(wx,wy){return [Math.round((wx-st.cam.x)*sc),Math.round((wy-st.cam.y)*sc)]}
+    var pts=[P(lx,ly),P(lx-50,ly+20),P(st.hero.x,st.hero.y-S*.22)];
+    w.LQLight.watch(pts);w.__w.draw();
+    var s=w.LQLight.sample();
+    document.getElementById('grid').textContent='at '+pts.map(function(p){return p.join(':')}).join(' ')+' px '+(s&&s.pts?s.pts.map(function(p){return p.slice(0,3).join(',')}).join(' | '):'none')+' err='+(w.LQLight.error()||'');
+    document.title='SHOT '+(w.LQLight.error()?'FAIL':'ok');
+   },400);
+  },400);
+ },300);
+};
+</script></body></html>

@@ -99,7 +99,7 @@ var GRADES={
 var cvs,gl,prog,buf,tex,locs,failed=false,err='',nL=0,nS=0,px,pc,hs,watch=null,lastProbe=null;
 function fsSrc(L,S){
  return 'precision mediump float;uniform sampler2D uS;uniform vec3 uLift;uniform vec3 uGain;uniform vec3 uShade;uniform float uSat;uniform float uGlow;uniform float uFar;uniform vec2 uRes;uniform float uN;uniform float uNs;uniform vec3 uP['+L+'];uniform vec3 uC['+L+'];uniform vec3 uH['+S+'];varying vec2 v;'
- +'float gold(vec3 c){float y=dot(c,vec3(0.299,0.587,0.114));float w=smoothstep(0.42,0.82,c.r)*smoothstep(0.28,0.7,c.g);float nb=1.0-smoothstep(0.42,0.78,c.b);return w*nb*smoothstep(0.28,0.72,y);}'
+ +'float gold(vec3 c){float y=dot(c,vec3(0.299,0.587,0.114));float w=smoothstep(0.42,0.82,c.r)*smoothstep(0.28,0.7,c.g);float nb=1.0-smoothstep(0.36,0.52,c.b);return w*nb*smoothstep(0.28,0.72,y);}'
  +'void main(){vec2 uv=vec2(v.x,1.0-v.y);vec3 src=texture2D(uS,uv).rgb;vec3 col=src;float l=dot(col,vec3(0.299,0.587,0.114));col=mix(vec3(l),col,uSat);col=mix(col,col*uShade,smoothstep(0.62,0.08,l)*0.38);col=col*uGain+uLift*(1.0-l);float far=smoothstep(0.2,0.92,1.0-uv.y);col=mix(col,col*vec3(0.8,0.86,1.0),far*uFar);'
  +'vec2 px=vec2(5.0)/uRes;float b=gold(src);b+=gold(texture2D(uS,uv+vec2(px.x,0.0)).rgb);b+=gold(texture2D(uS,uv-vec2(px.x,0.0)).rgb);b+=gold(texture2D(uS,uv+vec2(0.0,px.y)).rgb);b+=gold(texture2D(uS,uv-vec2(0.0,px.y)).rgb);col+=vec3(1.0,0.78,0.34)*(b*0.2)*uGlow;'
  +'vec2 p=uv*uRes;vec3 light=vec3(0.0);for(int i=0;i<'+L+';i++){float on=step(float(i)+0.5,uN);vec2 d=p-uP[i].xy;float nd=length(d)/max(uP[i].z,1.0);float a=clamp(1.0-nd,0.0,1.0);float hot=clamp(1.0-nd*3.4,0.0,1.0);light+=uC[i]*(a*a+hot*hot*0.36)*on;}col+=light;'
