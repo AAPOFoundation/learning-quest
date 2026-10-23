@@ -37,6 +37,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 27. **A cleared region portrait pops once.** The row of small portraits already brightens when a region is cleared. The one that just changed also pops. The first draw after a save only brightens, so old clears do not all pop at once.
 28. **The talk button glows when it will do something.** On a touch pad, A pulses while a person, a hall, or a chest is on a neighbouring tile. It checks again only when the tile, the place, or the motion setting changes. Low effects and reduced motion leave it still.
 29. **A still cape stirs.** While a figure stands, the cape hem shifts by about two pixels. Walking still uses the step drag, and the idle shift is off then. Low effects draws this with the rest of the quiet idle, at about 8 frames a second.
+30. **A still staff stone pulses.** The pale stone on a staff grows and shrinks a little while the figure stands. It holds one size while the figure walks.
 
 ## Checked
 
