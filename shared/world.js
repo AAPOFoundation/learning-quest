@@ -304,7 +304,7 @@ var MARK={
 function addLight(x,y,r,col,pri){lights.push({x:x,y:y,r:r,c:col,p:pri==null?5:pri})}
 function addShadow(x,y,keep){var u=S/34;shadows.push({x:x+9*u,y:y+S*.38+4.2*u,r:15*u,keep:!!keep})}
 function lamp(o,x,y,op){var k=o.kind;
- if(o.type==='chest'){if(op.glow)addLight(x,y-S*.02,70,[0.34,0.24,0.07],1);else if(op.open)addLight(x,y+S*.05,36,[0.22,0.16,0.06],4);return}
+ if(o.type==='chest'){if(op.glow)addLight(x,y+S*.42,42,[0.12,0.08,0.025],1);else if(op.open)addLight(x,y+S*.42,28,[0.1,0.07,0.02],4);return}
  if(o.landmark){var m=MARK[A.key]||{dy:-0.45,r:78,c:[0.42,0.32,0.12]};addLight(x,y+m.dy*S,m.r,m.c,2);return}
  if(k==='smithy')addLight(x-6,y+S*.5-8,70,[0.62,0.24,0.05],2);
  else if(k==='tower'){addLight(x,y+S*.5-46,52,[0.48,0.36,0.12],2);addLight(x,y+S*.5-90,28,[0.5,0.4,0.14],3)}
