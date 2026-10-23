@@ -67,6 +67,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 57. **The home strip reuses one building bag.** Each town and the citadel used to get a new options object every frame. One bag is cleared and filled again. A light or a lid cannot leak, because those fields are wiped first. The picture does not change.
 58. **A code box eases its edge.** The challenge box and the small example boxes take the same short time as a button to pick up the gold edge. Reduced motion removes it.
 59. **A number box and a menu ease their edge.** The fields in the simulators pick up the same gold edge as a code box, over the same short time. Reduced motion removes it. The word-list search is left alone.
+60. **The home effects button sinks.** It picks up the gold edge, then sinks a pixel while it is held, the same as the other buttons. Reduced motion removes both.
 
 ## Checked
 
