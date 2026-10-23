@@ -37,13 +37,15 @@ function vfxLayer(kind,x,y,html,ms){if(!document.getElementById('lq-vfx-css')){v
  st.setProperty('--k',(Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y))/20*1.05).toFixed(1));d.innerHTML=html;document.body.appendChild(d);setTimeout(function(){d.remove()},ms||2400);return d}
 function beam(x,y){return vfxLayer('beam',x,y,'<div class="rays"></div><div class="shaft"></div><div class="core"></div><div class="glow"></div>',2500)}
 function shockwave(x,y){return vfxLayer('shock',x,y,'<div class="wash"></div><div class="glow"></div><div class="ring"></div><div class="ring r2"></div>',2400)}
-window.LQVfx={beam:beam,shockwave:shockwave};
-function celebrate(msg,opts){opts=opts||{};if(opts.vfx==='beam')beam(opts.x,opts.y);else if(opts.vfx==='shockwave')shockwave(opts.x,opts.y);if(opts.confetti!==false)confetti(opts.count);cheer(msg)}
+/* gate(x,y): a soft warm glow that blooms and fades where a gate opens (no ring). Calm mode shows it still. */
+function gate(x,y){return vfxLayer('gate',x,y,'<div class="wash"></div><div class="glow"></div>',2200)}
+window.LQVfx={beam:beam,shockwave:shockwave,gate:gate};
+function celebrate(msg,opts){opts=opts||{};if(opts.vfx==='beam')beam(opts.x,opts.y);else if(opts.vfx==='shockwave')shockwave(opts.x,opts.y);else if(opts.vfx==='gate')gate(opts.x,opts.y);if(opts.confetti!==false)confetti(opts.count);cheer(msg)}
 /* small helper: replay a one-shot CSS animation class on an element */
 function pop(el,cls){if(!el||calm())return;cls=cls||'lq-pop';el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls)}
-window.LQCelebrate={celebrate:celebrate,beam:beam,shockwave:shockwave,confetti:confetti,cheer:cheer,pop:pop,calm:calm};
+window.LQCelebrate={celebrate:celebrate,beam:beam,shockwave:shockwave,gate:gate,confetti:confetti,cheer:cheer,pop:pop,calm:calm};
 /* any script can fire: document.dispatchEvent(new CustomEvent('lq:celebrate',{detail:{msg:'Level cleared!',vfx:'shockwave'}}))
-   detail: msg, vfx ('beam'|'shockwave'), x/y (screen px; default centre), confetti (false to skip), count */
+   detail: msg, vfx ('beam'|'shockwave'|'gate'), x/y (screen px; default centre), confetti (false to skip), count */
 document.addEventListener('lq:celebrate',function(e){var d=e.detail||{};celebrate(d.msg,d)});
 })();
 (function(){
@@ -103,7 +105,23 @@ var glows=[];
 function fillGlows(k){glows.length=0;var K=KIND[k]||KIND.meadow,i,j;
  if(K.glow){for(i=0;i<parts.length&&glows.length<4;i+=4)glows.push([parts[i].x,parts[i].y,26,[0.2,0.26,0.08]])}
  for(j=0;j<bursts.length&&glows.length<6;j++){var b=bursts[j];if(b.t<1.1)glows.push([b.x,b.y,72*(1-b.t/1.3),[0.46,0.32,0.1]])}}
-window.LQAnim={water:water,particles:particles,burst:burst,floatText:floatText,puff:puff,glows:glows};
+/* round 2b ambient light (full effects only; off for Low effects and reduced motion):
+   pools(): warm lamplight pools on the ground around houses, halls and towns, breathing gently, added with 'lighter' so they light the paint.
+   fireflies(): a few soft glowing motes drifting on fixed sine paths near the edges of the view (stateless, cheap). */
+var POOL=null;function poolSprite(){if(POOL)return POOL;var c=document.createElement('canvas'),R=64;c.width=c.height=R*2;var x=c.getContext('2d'),gr=x.createRadialGradient(R,R,0,R,R,R);
+ gr.addColorStop(0,'rgba(255,190,100,.85)');gr.addColorStop(.4,'rgba(255,165,75,.35)');gr.addColorStop(1,'rgba(255,150,60,0)');x.fillStyle=gr;x.fillRect(0,0,R*2,R*2);POOL=c;return c}
+var LIT={building:1,node:1};
+function pools(g,sc,T,cx,cy,vw,vh){if(FX.low||(FX.rm&&FX.rm.matches)||!sc||!sc.objs)return;var sp=poolSprite();g.save();g.globalCompositeOperation='lighter';
+ for(var i=0;i<sc.objs.length;i++){var o=sc.objs[i];if(!LIT[o.type]&&o.role!=='hall')continue;var x=hx(o.c,o.r),y=hy(o.r);if(x<cx-S*2||x>cx+vw+S*2||y<cy-S*2||y>cy+vh+S*2)continue;
+  var big=o.role==='hall'||o.kind==='castle',r=S*(big?1.9:1.45)*(1+.04*Math.sin(T*1.6+o.c*1.3+o.r)),a=.55+.12*Math.sin(T*2.3+o.c*2.1)+.06*Math.sin(T*7.1+o.r);
+  g.globalAlpha=Math.max(0,Math.min(1,a));g.drawImage(sp,x-r,y+S*.15-r*.62,r*2,r*1.24)}
+ g.restore()}
+function fireflies(g,sc,T,cx,cy,vw,vh){if(FX.low||(FX.rm&&FX.rm.matches))return;var n=small?8:14;g.save();g.globalCompositeOperation='lighter';
+ for(var i=0;i<n;i++){var h1=hash(i,7,3),h2=hash(i,9,5),u=(h1+T*.012*(h2+.4))%1,v=(h2+.5*Math.sin(T*.21+i)+.5)%1;
+  var x=cx+u*vw+Math.sin(T*.9+i*2.3)*14,y=cy+(.2+.75*v)*vh+Math.cos(T*1.1+i)*10,on=Math.max(0,Math.sin(T*(1.1+h1)+i*1.7));if(on<.15)continue;
+  g.globalAlpha=.16*on;g.fillStyle='#ffe58a';g.beginPath();g.arc(x,y,6,0,6.3);g.fill();g.globalAlpha=.9*on;g.fillStyle='#fff6c0';g.beginPath();g.arc(x,y,1.5,0,6.3);g.fill()}
+ g.restore()}
+window.LQAnim={water:water,particles:particles,burst:burst,floatText:floatText,puff:puff,glows:glows,pools:pools,fireflies:fireflies};
 })();
 /* WebGL colour grade, gold glow and point lights over the painted world.
    The 2D canvas stays the map. This canvas (#lqgl) covers it and ignores taps.

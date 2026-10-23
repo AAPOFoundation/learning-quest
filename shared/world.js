@@ -159,7 +159,7 @@ function lessonOf(i){var T=C.regions[i].teacher;openOv(function(){E.lessonDone=f
 function gateTalk(i){var R=C.regions[i],G=R.gate,done=levelDone(i);
  if(!done)say(G,['Halt, traveller. I am '+G.name+', '+G.title.toLowerCase()+'.','Answer the questions in the '+R.hall+' and score at least 60% to pass. There is no penalty for trying again.'],function(){ask(G,'Will you take the trial?',[{t:'Take the trial',fn:function(){trial(i)}},{t:'Not yet'}])});
  else say(G,['You have passed, traveller. The way onward is open, and a chest awaits you in this town.'],function(){ask(G,'Replay the trial for a better score?',[{t:'Replay the trial',fn:function(){trial(i)}},{t:'No, thanks'}])})}
-function trial(i){var G=C.regions[i].gate,was=levelDone(i);openOv(function(){E.level(i,'quiz')},function(){var now=levelDone(i);if(now&&!was){chime('Cleared');var hp=scr(st.hero.x,st.hero.y,heroH(),S*.5);cele({msg:'The way is open!',vfx:'shockwave',x:hp[0],y:hp[1],confetti:false});var nx=i<NR-1?'The fog lifts from '+C.regions[i+1].name+'.':'The gates of the '+C.castle.name+' now stand open.';say(G,['Well fought. You may pass. '+nx,'Open the chest in this town, then take the south gate back to the map.'])}else if(!now)say(G,['Not this time. Re-read the lesson with the teacher and try again; there is no penalty.'])})}
+function trial(i){var G=C.regions[i].gate,was=levelDone(i);openOv(function(){E.level(i,'quiz')},function(){var now=levelDone(i);if(now&&!was){chime('Cleared');var hp=scr(st.hero.x,st.hero.y,heroH(),S*.5);cele({msg:'The way is open!',vfx:'gate',x:hp[0],y:hp[1],confetti:false});var nx=i<NR-1?'The fog lifts from '+C.regions[i+1].name+'.':'The gates of the '+C.castle.name+' now stand open.';say(G,['Well fought. You may pass. '+nx,'Open the chest in this town, then take the south gate back to the map.'])}else if(!now)say(G,['Not this time. Re-read the lesson with the teacher and try again; there is no penalty.'])})}
 function simTalk(i){var R=C.regions[i],s=R.sim,sp={name:s.name,mark:({vault:'vault',guild:'ruler',smithy:'hammer',tower:'tower',lab:'flask',observatory:'scope'})[s.building]||'scroll'};
  say(sp,[s.blurb+(s.render?' (A toy example with made-up numbers, not real model data.)':' (Example data, not advice. Nothing is ordered or connected.)')],function(){ask(sp,s.kind==='lesson'?'Climb the tower?':'Step inside?',[{t:'Enter',fn:function(){openSim(i)}},{t:'Not now'}])})}
 function openSim(i){var s=C.regions[i].sim,w=PW();w.sim[i]=1;
@@ -405,7 +405,7 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
  var shx=0,shy=0;if(st.shake>0&&motionOn()){var a=st.shake/.16;shx=Math.sin(st.time*62)*5*a;shy=Math.cos(st.time*48)*2.5*a}
  var cx=st.cam.x+shx,cy=st.cam.y+shy;camXform(g,z,cx,cy);
  if(view){g.drawImage(sc.view,0,0);if(window.LQAnim)LQAnim.water(g,sc,st.time,cx,cy,vw,vh,function(x,y){var p=Art.project(x,y,0);return [p.x+sc.viewOx,p.y+sc.viewOy]})}
- else{g.drawImage(sc.cv,0,0);if(!FX.low&&window.LQAnim)LQAnim.water(g,sc,st.time,cx,cy,vw,vh)}
+ else{g.drawImage(sc.cv,0,0);if(!FX.low&&window.LQAnim){LQAnim.water(g,sc,st.time,cx,cy,vw,vh);if(LQAnim.pools)LQAnim.pools(g,sc,st.time,cx,cy,vw,vh)}}/* lamplight pools: flat map only; the angled view lights buildings with the GL point lights */
  drawRoute(g,false);drawHov(g);
  var n=0,T=st.time,world=sc.id==='w',cur=st.obj&&st.obj.target,objs=sc.objs,i,o,oy,ox,it,cp;
  for(i=0;i<objs.length;i++){o=objs[i];if(world&&!zoneOpen(sc.zone[o.c][o.r])&&st.fog[sc.zone[o.c][o.r]]>.8)continue;oy=hy(o.r);ox=hx(o.c,o.r);
@@ -440,6 +440,7 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
    if(o.type==='node'&&(zoneOpen(o.i)||st.fog[o.i]<.8)){var nm=o.i<NR?C.regions[o.i].name:C.castle.name,cl2=o.i<NR?levelDone(o.i):bossDone(),label=(cl2?'★ ':'')+nm,knd=o.kind==='castle'?2.7:2.15,by=view?-S*(.5+knd):y-S*knd,lx=view?0:x,pl2=placePlate(label,cl2);
     g.drawImage(pl2,lx-pl2._w/2,by-13,pl2._w,pl2._h);g.lineWidth=1.3;g.beginPath();g.rect(lx-pl2._w/2,by-13,pl2._w,21);if(cl2&&motionOn()){g.strokeStyle='#f3e2b0';g.globalAlpha=.55+.45*Math.abs(Math.sin(T*2));g.stroke();g.globalAlpha=1}else{g.strokeStyle='#c8a86a';g.stroke()}}
    if(view)camXform(g,z,cx,cy)}}
+ if(!FX.low&&window.LQAnim&&LQAnim.fireflies)LQAnim.fireflies(g,sc,T,cx,cy,vw,vh);
  if(!FX.low&&window.LQAnim){var zb=world?sc.zone[h.c]&&sc.zone[h.c][h.r]:null;LQAnim.particles(g,world?bio(zb==null||zb<0?0:zb):(sc.biome||'meadow'),st.dtRaw||0,cx,cy,vw,vh,T);if(LQAnim.glows)LQAnim.glows.forEach(function(q){if(view){var gp=toView(q[0],q[1],heroH(),0);lshift(gp.x-q[0],gp.y-q[1])}addLight(q[0],q[1],q[2],q[3],8);lshift(0,0)})}
  drawRoute(g,true);
  if(world){if(view&&sc.fogView)g.drawImage(sc.fogView,0,0);else g.drawImage(sc.fogCv,0,0,sc.W,sc.H)}
