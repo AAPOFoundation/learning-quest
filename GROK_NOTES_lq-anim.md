@@ -58,6 +58,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 48. **A wrong choice settles sideways.** A correct choice still pops in place. A wrong one shifts a few pixels right, then left, then rests. The page itself does not shake. Reduced motion removes it.
 49. **The code-challenge bar grows.** It used to appear at the right width, so the bar transition never ran. It now grows from empty to this question's place, the same way a quiz bar does. The first question is already empty, so it does not flash. Low effects and reduced motion keep the final width.
 50. **The mini-map dot breathes.** The dot that marks you grows and shrinks a little. Low effects and reduced motion keep it one size. The picture behind it still refreshes about six times a second.
+51. **Result buttons rise.** After a level, the re-read button rises, then Back to the map. After a final-challenge step, Continue rises. At the end, Replay rises, then Back to the map. The rise lets go, so a press can still sink the button. Reduced motion removes it.
 
 ## Checked
 
