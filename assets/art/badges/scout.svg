@@ -4,10 +4,11 @@
   <path fill="#f3e2b0" d="M50.2 13L50.65 14.05L51.7 14.5L50.65 14.95L50.2 16L49.75 14.95L48.7 14.5L49.75 14.05Z"/>
   <g fill="none" stroke="#d7b56a" stroke-width="2" stroke-linecap="round">
     <circle cx="32" cy="32" r="14"/>
-    <path d="M32 21.5V24"/>
-    <path d="M32 40V42.5"/>
-    <path d="M21.5 32H24"/>
-    <path d="M40 32H42.5"/>
+    <path d="M32 21V23"/>
+    <path d="M32 41V43"/>
+    <path d="M21 32H23"/>
+    <path d="M41 32H43"/>
   </g>
-  <path d="M32 26L33.6 32L32 38L30.4 32Z" fill="#f3e2b0" stroke="#d7b56a" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M32 26L36 33.5H28Z" fill="#f3e2b0" stroke="#d7b56a" stroke-width="1.3" stroke-linejoin="round"/>
+  <path d="M30.2 34.6H33.8L32 38.6Z" fill="none" stroke="#d7b56a" stroke-width="1.3" stroke-linejoin="round"/>
 </svg>

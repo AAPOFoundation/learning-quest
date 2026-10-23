@@ -25,11 +25,10 @@
   <circle cx="392" cy="92" r="1" fill="#d7b56a" opacity="0.4"/>
   <circle cx="560" cy="48" r="1.4" fill="#f3e2b0" opacity="0.55"/>
   <circle cx="604" cy="96" r="1.1" fill="#d7b56a" opacity="0.45"/>
-  <circle cx="500" cy="148" r="78" fill="url(#py-glow)"/>
-  <circle cx="500" cy="148" r="32" fill="url(#py-moon)"/>
-  <ellipse cx="486" cy="138" rx="7" ry="5" fill="#d7b56a" opacity="0.45"/>
-  <ellipse cx="512" cy="158" rx="5" ry="4" fill="#8a6528" opacity="0.28"/>
-  <ellipse cx="496" cy="164" rx="3" ry="2.4" fill="#d7b56a" opacity="0.35"/>
+  <circle cx="478" cy="172" r="70" fill="url(#py-glow)"/>
+  <circle cx="478" cy="172" r="30" fill="url(#py-moon)"/>
+  <ellipse cx="466" cy="178" rx="8" ry="4" fill="#d7b56a" opacity="0.32"/>
+  <ellipse cx="474" cy="174" rx="3.2" ry="2.2" fill="#8a6528" opacity="0.2"/>
   <path d="M0 196C90 168 150 214 240 190C330 166 390 154 470 176C540 194 590 162 640 174V360H0Z" fill="#2a4e66"/>
   <path d="M0 214C110 188 180 236 280 210C370 186 430 206 520 188C580 176 610 198 640 190V360H0Z" fill="#243044"/>
   <path d="M0 246C80 228 150 268 250 248C340 230 410 252 500 236C570 224 610 250 640 238V360H0Z" fill="#2f4a28"/>

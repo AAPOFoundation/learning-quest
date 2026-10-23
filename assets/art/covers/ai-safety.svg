@@ -49,16 +49,16 @@
   <ellipse cx="374" cy="126" rx="34" ry="8" fill="none" stroke="#c8a86a" stroke-width="2"/>
   <path d="M356 274V230Q374 214 392 230V274Z" fill="#0a0f15"/>
   <ellipse cx="374" cy="276" rx="22" ry="5" fill="#8a6528"/>
-  <rect x="370" y="96" width="8" height="32" rx="2" fill="#6b4a0e"/>
+  <rect x="370" y="76" width="8" height="52" rx="2" fill="#6b4a0e"/>
   <ellipse cx="374" cy="78" rx="46" ry="28" fill="url(#as-lamp)"/>
   <path d="M352 70H396L390 78H358Z" fill="#c8a86a"/>
   <rect x="358" y="52" width="32" height="22" rx="3" fill="#8a6528"/>
   <rect x="362" y="56" width="24" height="14" rx="2" fill="#f3e2b0"/>
   <path d="M350 52L374 36L398 52Z" fill="#6b4a0e"/>
   <path d="M356 52H392L388 56H360Z" fill="#c8a86a"/>
+  <path d="M0 292C160 274 280 300 420 276C520 258 580 286 640 270V360H0Z" fill="#4f7a3a"/>
   <path d="M0 300C140 286 230 292 310 278C350 270 368 266 390 270C360 290 300 312 210 318C120 326 60 332 0 336Z" fill="#6b4a0e"/>
   <path d="M0 312C130 300 220 306 300 292C332 286 352 284 368 286C348 300 280 314 190 318C110 322 50 326 0 328Z" fill="#8a6528"/>
-  <path d="M0 292C160 274 280 300 420 276C520 258 580 286 640 270V360H0Z" fill="#4f7a3a"/>
   <g transform="translate(292 232) rotate(15)">
     <ellipse cx="8" cy="48" rx="30" ry="7" fill="#0a0f15" opacity="0.3"/>
     <circle r="42" fill="#c8a86a"/>

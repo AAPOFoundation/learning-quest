@@ -11,7 +11,7 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - Kids 7–10. Covers use rounded shapes, a friendly snake with no fangs, a round shield with a tick, and no weapons. No crosses, churches, halos, or religious words in anything new.
 - Portfolio Guide’s cover is a keeper’s desk: map, compass, three jars, a clasped ledger. It is not a trading floor. The lesson text is unchanged.
 - Palette is the Pocket Reserve set in DESIGN.md: ink, gold, brass, panel night-blue, meadow green, water blue.
-- The Python Basics windmill has three sails. Four sails at right angles would read as a cross.
+- The Python Basics mill has four sails set as an X, plus a roof and a door, so it reads as a windmill.
 - Compass ticks stay inside a circle so the mark reads as a compass.
 - Saves, lesson copy, region names, and the canvas renderer were left alone.
 
@@ -25,4 +25,4 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 ## Not done
 
 - Level-path emoji in `homeOld()` is unused by the world UI, so those icons were not redrawn.
-- Not checked in a real browser yet. SVG files are checked as XML.
+- Checked in headless Edge: home cards (wide and narrow) and the Python Basics title. Badge medallions were screenshotted as files. The pause-menu badge chest was not clicked.
