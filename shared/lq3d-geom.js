@@ -381,7 +381,13 @@ function mushroomMesh(){
  sphere(b,-0.03,0.23,0.04,0.02,4,2,hex('#f7f1e6'),0);
  return pack(b);
 }
-function cattailMesh(){var b=new Builder(); cyl(b,0,0.26,0,0.016,0.52,4,hex('#3a5a32'),0); cyl(b,0,0.54,0,0.032,0.14,5,hex('#6a4a32'),0); return pack(b)}
+function cattailMesh(){
+ var b=new Builder(), stem=hex('#3a5a32'), head=hex('#6a4a32'), leaf=hex('#2f6a38');
+ cyl(b,0,0.28,0,0.018,0.56,5,stem,0);
+ cyl(b,0,0.58,0,0.036,0.16,5,head,0);
+ card(b, [[0,0.06,0],[0.18,0.1,0.02],[0.24,0.24,0.05],[0.04,0.22,0.01]], leaf);
+ return pack(b);
+}
 function stumpMesh(col){
  var b=new Builder(), cut=hex('#c4a574'), ring=hex('#a88858');
  cyl(b,0,0.13,0,0.16,0.26,6,col,0);
