@@ -44,6 +44,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 34. **The draw list is reused.** Each frame used to build a new list of everything on screen, and a new empty save when there was none. The same slots are cleared and filled again. The quest arrow finds its town with a short loop. The picture does not change.
 35. **The tile under the pointer lights up.** A soft hex fades in on that tile and fades out when the pointer leaves. It sits under people and buildings. Low effects and reduced motion show it at once, with no fade. A quiet map wakes for one frame so the light is not late.
 36. **A still beard, plume and scholar board stir.** The beard tip swings about a pixel. The helm plume bobs. The flat scholar board tips a few degrees. Walking holds each one still. Low effects draws them with the quiet idle.
+37. **The streak flame flickers.** The small fire by the day count rises and grows a little, on a loop. The number stays still. Reduced motion removes the flicker.
 
 ## Checked
 

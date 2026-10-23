@@ -228,7 +228,7 @@ function toggleSound(){muted=!muted;try{localStorage.setItem('learning-apps.mute
 function hud(){if(st.mode==='title')return;var p=P(),r=A.rank,i=0,k;for(k=0;k<r.length;k++)if(p.xp>=r[k][0])i=k;var lo=r[i][0],hi=r[i+1]?r[i+1][0]:lo+1;
  var xp=p.xp;if(st.xpVis==null||!motionOn()||Math.abs(xp-(st.xpT<1?st.xpTo:st.xpVis))>500){st.xpVis=st.xpFrom=st.xpTo=xp;st.xpT=1}else if(xp!==st.xpTo){st.xpFrom=st.xpVis;st.xpTo=xp;st.xpT=0}
  $('#rk').textContent=E.rank()+(r[i+1]?' · next at '+hi+' XP':' · top rank');$('#xb').style.width=Math.min(100,r[i+1]?100*(p.xp-lo)/(hi-lo):100)+'%';
- $('#stt').innerHTML='<span id="xpn"'+(st.xpT<1?' class="xpup"':'')+'>'+Math.round(st.xpVis)+' XP</span><span>🔥 '+p.streak+'</span><span>'+E.doneCount()+'/'+NR+' regions</span>';
+ $('#stt').innerHTML='<span id="xpn"'+(st.xpT<1?' class="xpup"':'')+'>'+Math.round(st.xpVis)+' XP</span><span><span class="fl">🔥</span> '+p.streak+'</span><span>'+E.doneCount()+'/'+NR+' regions</span>';
  [].forEach.call(document.querySelectorAll('#pm img'),function(im,k2){var on=levelDone(k2),was=im.classList.contains('on');im.classList.toggle('on',on);if(st.pmReady&&on&&!was){im.classList.remove('fresh');void im.offsetWidth;im.classList.add('fresh')}});st.pmReady=true;
  var o=objective(),qt=$('#qt'),prev=qt?qt.textContent:'';if(qt)qt.textContent=o.text;if(qt&&prev&&prev!==o.text){var qe=$('#quest');qe.classList.remove('ping');void qe.offsetWidth;qe.classList.add('ping')}st.obj=o}
 function showBanner(t,s){var a=$('#area');a.querySelector('.kicker').textContent=s||'';a.querySelector('b').textContent=t;a.classList.add('on');clearTimeout(st.bt);st.bt=setTimeout(function(){a.classList.remove('on')},3400)}
