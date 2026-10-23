@@ -58,3 +58,4 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 - The crate was a plain box behind the tent. Two dark slats now sit on the front, and the crate stands at (-1.75, 0, -1.65), scale 1.15, so the camp camera sees the boards. A meadow frame calls it a wooden crate with planks beside the fire.
 - Highland cairns were axis-aligned boxes, so they matched the white rocks. The stack is now three leaned stones, darkened a little from the rock colour. A highland frame calls out a small grey cairn behind the hero. The rest of that frame still shows the cape, the book, the bedroll, the crate and the pines. Not tried on a phone.
 - Highland rock colour was #9a948c, which the frame called white. It is now #6e6860. The same frame calls the rocks grey.
+- The door roll was still easy to read as a post. It is thicker now, with two rope bands and a short cloth tail on the ground. A meadow frame calls it rolled tent fabric secured with rope.
