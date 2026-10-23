@@ -150,7 +150,9 @@ function boot(host){if(gl||failed)return !!gl;var stage=host||document.getElemen
  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
  return true}
-function frame(src,lights,shadows,key,host){var FX=window.LQFx;if(failed)return false;if(!src||(FX&&FX.low)){if(cvs)cvs.style.visibility='hidden';return false}if(!boot(host))return false;
+/* Speed guard: if the GL light pass holds frames above 45 ms for about 1.5 s (software GL, a weak GPU), switch to the 2D light layer for this page. */
+var slow=false,lt=0,ema=0,nf=0;
+function frame(src,lights,shadows,key,host){var FX=window.LQFx;if(failed)return false;if(slow||!src||(FX&&FX.low)){if(cvs)cvs.style.visibility='hidden';return false}var now=performance.now(),d=lt?now-lt:16;lt=now;if(d<250){ema=ema?ema*.94+d*.06:d;nf++}if(nf>40&&ema>45){slow=true;window.LQLightSlow=true;if(cvs)cvs.style.visibility='hidden';return false}if(!boot(host))return false;
  var w=src.width,h=src.height;if(w<2||h<2)return false;if(cvs.width!==w||cvs.height!==h){cvs.width=w;cvs.height=h}
  gl.viewport(0,0,w,h);gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
  try{gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,src)}catch(e){failed=true;err=String(e&&e.message||e);cvs.style.display='none';return false}
