@@ -21,6 +21,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 11. **XP counts, then the bar follows.** The number eases to the new total over about half a second. The existing bar width transition is unchanged. Back on the world map, a region that just opened gets one burst and the word Open.
 12. **Small UI beats.** The place name rises as it fades in. A dialogue portrait breathes. The pad shows a press. The quest card pulses when the next objective changes. Test rows arrive one after another. Each home-page world fills a thin bar to its cleared fraction. The vignette is painted once per window size, and the scene fade no longer builds a colour string each frame.
 13. **Buildings are blitted in full effects.** Each kind is painted into one shared 2× sprite (about 280×320). Flags, smoke, wheels and flames redraw about 15 times a second. A still building is painted once. Fountains share a sprite, since they do not use the region colour. At most 48 sprites, and the least recently shown one is dropped. Low effects still draws live, and turning low effects on frees the sprites. A chest lid mid-swing and the town gate stay live so those stay smooth. Home-page name plaques cache their width. Objects outside the view are left out of the sort.
+14. **A cleared town breathes.** Its name plate edge pulses gold while motion is on. Dialogue choices arrive one after another. The arrow that points to an off-screen objective pulses. The hero portrait and the party faces rise and fall by a pixel. Reduced motion removes those.
 
 ## Checked
 
