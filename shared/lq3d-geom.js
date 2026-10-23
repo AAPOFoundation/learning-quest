@@ -458,6 +458,11 @@ function snowMesh(){
  hemi(b,0,0.08,0,0.28,8,hex('#f4f7fb'));
  return pack(b);
 }
+function moundMesh(col){
+ var b=new Builder();
+ hemi(b,0,0.06,0,0.9,7,col);
+ return pack(b);
+}
 
 var PAL={
  meadow:{g:'#5c8a3e',g2:'#3e6b32',dirt:'#8a6840',leaf:'#2f6a34',leaf2:'#6a9a3c',rock:'#7d7368',trunk:'#6b4428'},
@@ -529,7 +534,7 @@ function dress(biome,P,put,key,shade){
 }
 
 function casts(name){
- if(name==='ground'||name==='shadow'||name==='water'||name==='grass'||name==='fern'||name==='lily')return false;
+ if(name==='ground'||name==='shadow'||name==='water'||name==='grass'||name==='fern'||name==='lily'||name==='mound')return false;
  if(name.indexOf('flame')===0)return false;
  return true;
 }
@@ -564,6 +569,9 @@ function buildCamp(opts){
  put(pennantMesh(), -2.55,0,2.05, 0.9,1,'pennant');
  var stones=[[-1.35,0.15],[-1.05,0.05],[-0.35,-0.45],[0.05,-0.95]];
  for(var si=0;si<stones.length;si++)put(stoneMesh(), stones[si][0],0,stones[si][1], si*0.3, 1, 'stone');
+ var rim=mix(hex(P.g2),[0.12,0.13,0.12],0.4);
+ var mounds=[[4.5,1.4,0.62],[3.1,4.2,0.48],[-3.4,4.0,0.7],[-4.6,0.3,0.55],[4.7,-1.4,0.5]];
+ for(si=0;si<mounds.length;si++)put(moundMesh(rim), mounds[si][0],0,mounds[si][1], si*0.2, mounds[si][2], 'mound');
  dress(biome, P, put, opts.key||'', shade);
  var air={
   meadow:{fog:[0.16,0.22,0.32],sky:[0.52,0.62,0.74],gnd:[0.28,0.24,0.16],far:20},

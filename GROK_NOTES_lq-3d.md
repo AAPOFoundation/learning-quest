@@ -30,6 +30,7 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 - New camp meshes: pot and tripod, two log seats, bedroll, crate, plain gold pennant (no emblem), stepping stones. Biome extras: grass, ferns, a lily with a pale water rim, pebbles, a snow mound, lumpier rocks. Grass and ferns are double-sided cards and do not cast, so they do not speckle the shadow map.
 - Contact shadows were nearly black. With the shadow map as well, the WebGL frame showed pitch-black ovals. They are now a lighter olive and a little less stretched. Low effects still has a visible contact patch.
 - Fog and sky ambient change with the biome. The clear colour stays dark enough that the brass frame still reads. No sky dome: the software picture expects the top rows to stay empty.
+- Five low mounds sit on the rim and do not cast. They stop the ground reading as a coin. Desert fog is warm, so those mounds read as dunes. Meadow mounds read as bushes, which is fine at this size.
 - A geometry subagent stalled after one read, so this pass was written in the session. Lighting landed first, in its own commit, and works if the emissive channel is only 0 or 1.
 
 ## Check, pass 2
