@@ -496,6 +496,7 @@ function woodpileMesh(){
 function logMesh(){
  var b=new Builder(), bark=hex('#5c4030'), cut=hex('#c4a574'), fr=frameY([1,0.04,0]);
  b.axesBox([0,0.14,0], fr.x, fr.y, fr.z, 0.16, 0.86, 0.15, bark, 0);
+ b.box(0,0.22,0.02,0.72,0.035,0.05,mix(bark,[0,0,0],0.22),0);
  b.box(-0.43,0.14,0,0.04,0.13,0.13,cut,0);
  b.box(0.43,0.14,0,0.04,0.13,0.13,cut,0);
  return pack(b);

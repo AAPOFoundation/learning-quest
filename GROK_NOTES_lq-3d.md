@@ -63,5 +63,6 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 - The forest stump was a short dark cylinder behind the camp. It now has a pale cut top and a ring, and it stands at (2.35, 0, 0.15). A forest frame calls it a stump with a light top near the flag.
 - One forest fern sat behind the tent. It now stands at (1.55, 0, 0.45), scale 1.45, on the open grass. A forest frame calls out small ferns on the grass. Ferns still do not cast.
 - Each cattail was only a stem and a brown head. A green leaf card now grows from the base. A marsh frame still calls them reeds around the pond, with the lily and the ripple rings. The leaf does not cast.
+- Each log seat has a dark strip along the top so the bark is not one flat face. A meadow frame still calls both seats logs, one with the rose blanket. That same frame still shows the cape, the book, the flag, the tied door roll, the crate, the bedroll, the woodpile and the cup together.
 - A later tundra frame still reads as snow: pale pines, blue ice, grey rocks, and the same camp (cape, book, bedroll, crate, woodpile, cup). Not tried on a phone.
 - Ice was two upright boxes. It is now three leaned shards. A tundra frame calls them jagged ice. The snow pines are unchanged.
