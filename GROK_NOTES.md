@@ -121,3 +121,9 @@ Citadel trim stays `#c9a24f`. Safety's citadel roof is now `#6a5830`, warmer tha
 Decorative building motion, idle bob, idle blink and the title drift stop together when effects are low or the browser asks for reduced motion. Walking still steps. Say if the walk cycle should stop too.
 
 Expedition camp and trail badge strings stay the tent and the boot. The badge screen draws them as brass marks. Simulator talk icons that `LQMark` knows are drawn the same way when a plate is used. Unknown icons stay text.
+
+## Map chrome, same day
+
+The player mark on the minimap and the full map is parchment with a dark brass stroke. It was white with a red stroke. Open towns on both maps use that region's `tint`, with a dark rim. A cleared town draws a small brass star on the name plaque. The old text star is gone, so the plaque does not depend on an emoji font. Gate portraits in the corner wear a ring in that region's accent (only a `#rrggbb` accent is used). The dialogue continue mark is the same brass line icon, turned to point down. While a line is still typing, the mark is not there yet.
+
+Checked in headless Edge: Python (6 rings) and AI Safety (11 rings) after Begin, full effects, no console exceptions. The 11 Safety rings sit on one row at 1280px wide. A 390px-wide shot did not finish, so the phone wrap is not confirmed on screen. Portraits still shrink to 17px under 560px, and the row may wrap. Mark as done was not clicked.
