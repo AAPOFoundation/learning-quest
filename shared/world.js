@@ -129,7 +129,7 @@ function say(sp,lines,cb){D.lines=(typeof lines==='string'?[lines]:lines).slice(
 function ask(sp,text,opts){D.sp=sp;D.lines=[];D.cb=null;D.choices=opts;D.full=text;st.mode='dlg';st.path=null;draw0()}
 function nextLine(){D.full=D.lines.shift();D.choices=null;draw0()}
 function draw0(){var el=$('#dlg'),sp=D.sp||{};el.hidden=false;D.i=0;D.typing=true;D.shown=0;document.body.classList.add('indlg');
- var pic=sp.look?'<img alt="" src="'+Art.portrait(sp.look,84)+'">':'<div class="spot" style="width:84px;height:84px;border-radius:12px;border:2px solid var(--brass);display:grid;place-items:center;background:var(--panel-lift);flex:none;color:var(--gold)">'+ic(sp.mark||'scroll',44)+'</div>';
+ var pic=sp.look?'<img alt="" src="'+Art.portrait(sp.look,84)+'">':spotPic(sp.mark);
  el.innerHTML='<div class="panel">'+pic+'<div class="tx"><span class="nameplate">'+esc(sp.name||'')+'</span>'+(sp.title?'<span class="ti">'+esc(sp.title)+'</span>':'')+'<div class="body"></div><div class="ch"></div></div></div>';
  el.firstChild.onclick=function(e){if(e.target.closest('.opt'))return;adv()};}
 function typeTick(dt){if(!D.typing)return;D.i+=dt*55;var n=Math.min(D.full.length,Math.floor(D.i)),b=$('#dlg .body');if(!b)return;if(n!==D.shown){if(n%3===0)blip(520+(n%7)*18,.04,.012,'square');D.shown=n;b.textContent=D.full.slice(0,n)}if(n>=D.full.length){D.typing=false;finishType()}}
@@ -165,13 +165,13 @@ function openSim(i){var s=C.regions[i].sim,w=PW();w.sim[i]=1;
 function scr(x,y){try{var r=cv.getBoundingClientRect(),z=zoom();return [r.left+(x-st.cam.x)*z,r.top+(y-st.cam.y)*z]}catch(e){return [innerWidth/2,innerHeight/2]}}
 function cele(d){try{document.dispatchEvent(new CustomEvent('lq:celebrate',{detail:d}))}catch(e){}}
 function chestFx(o,msg){var p=scr(hx(o.c,o.r),hy(o.r)-S*.25);cele({msg:msg,vfx:'beam',x:p[0],y:p[1]})}
-function chestOpen(o){var i=o.i,w=PW(),sp={name:'Treasure chest',mark:'gift'};
+function chestOpen(o){var i=o.i,w=PW(),was=!!w.chests[i],sp={name:'Treasure chest',mark:was?'gift-open':'gift'};
  if(i>=NR){if(!bossDone())return say(sp,['The chest is sealed. Only the Council can open it: finish the final challenge first.']);
-  if(w.chests[i])return say(sp,['Empty now. You already took the '+C.castle.chest+'.']);w.chests[i]=1;P().xp+=50;E.award('crown');chime();chestFx(o,'Treasure found!');E.save();hud();return say(sp,['You found the '+C.castle.chest+'! +50 XP and a badge.','The realm is yours to explore. Revisit any trial to earn three stars.'])}
+  if(was)return say(sp,['Empty now. You already took the '+C.castle.chest+'.']);w.chests[i]=1;P().xp+=50;E.award('crown');chime();chestFx(o,'Treasure found!');E.save();hud();sp.mark='gift-lit';return say(sp,['You found the '+C.castle.chest+'! +50 XP and a badge.','The realm is yours to explore. Revisit any trial to earn three stars.'])}
  var R=C.regions[i];
  if(!levelDone(i))return say(sp,['The chest is locked. '+R.gate.name+' holds the key: pass the trial first.']);
- if(w.chests[i])return say(sp,['Empty now. You already took the Seal of '+R.name+'.']);
- w.chests[i]=1;P().xp+=25;E.award('seal_'+A.levels[i].id);chime();chestFx(o,'Seal found!');E.save();hud();say(sp,['You found the Seal of '+R.name+'! +25 XP and a badge.'])}
+ if(was)return say(sp,['Empty now. You already took the Seal of '+R.name+'.']);
+ w.chests[i]=1;P().xp+=25;E.award('seal_'+A.levels[i].id);chime();chestFx(o,'Seal found!');E.save();hud();sp.mark='gift-lit';say(sp,['You found the Seal of '+R.name+'! +25 XP and a badge.'])}
 function bossTalk(){var B=C.castle.boss;
  if(!allDone())return say(B,['You are not ready. Clear all '+NR+' regions first.']);
  say(B,bossDone()?['You have faced us already, and did well. Care to try for a higher score?']:['So you have crossed the whole realm. I am '+B.name+'.',B.title+'. Make your five choices wisely.'],function(){ask(B,bossDone()?'Face the challenge again?':'Begin the final challenge?',[{t:'Begin',fn:function(){openOv(function(){E.boss()},function(){if(bossDone()){chime();say(B,['A fine piece of work. Open the chest by the wall, and take your crown.'])}})}},{t:'Not yet'}])})}
@@ -207,6 +207,11 @@ function mkLight(){var w=cv.width,h=cv.height,c=document.createElement('canvas')
 /* ---------- brass line icons (inline SVG, no emoji) ---------- */
 var IC={map:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',scroll:'<path d="M7 4h11a2 2 0 0 1 2 2v1H9v11a2 2 0 0 1-4 0V6a2 2 0 0 1 2-2z"/><path d="M9 11h7M9 14h7"/>',snd:'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>',mute:'<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',ok:'<path d="M5 12l5 5 9-10"/>',go:'<path d="M8 5l11 7-11 7z"/>',lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',flame:'<path d="M12 3s4 4 4 8a4 4 0 0 1-8 0c0-1.5.7-2.6 1.4-3.6C10 9 11 10 11 11c0-2 1-5 1-8z"/>',gift:'<rect x="4" y="11" width="16" height="9" rx="1.5"/><path d="M3 8h18v3H3zM12 8v12M12 8c-2-3-6-2-5 .5M12 8c2-3 6-2 5 .5"/>',vault:'<path d="M4 10h16v10H4z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none"/>',ruler:'<path d="M4 16l16-8"/><path d="M7 13.2l1.2 1.2M10 11.2l1.2 1.2M13 9.2l1.2 1.2M16 7.2l1.2 1.2"/>',hammer:'<path d="M14 4l6 6-3 1-7 7-3-3 7-7z"/><path d="M4 20l5-5"/>',tower:'<path d="M8 20V9l4-4 4 4v11"/><path d="M8 20h8M12 13v3"/>',flask:'<path d="M10 3h4M11 4v6L6 19a3 3 0 0 0 2.6 4h6.8A3 3 0 0 0 18 19l-5-9V4"/>',scope:'<circle cx="10" cy="11" r="4"/><path d="M13 14l7 7M16 4v3M16 15v2"/>'};
 function ic(n,z){z=z||22;return '<svg class="ico" viewBox="0 0 24 24" width="'+z+'" height="'+z+'" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+IC[n]+'</svg>'}
+/* painted spot for a chest or a landmark. HUD buttons stay line icons. gift is shut, gift-lit has just opened, gift-open is already empty. */
+var SPOT={gift:'chest','gift-open':'chest-lit','gift-lit':'chest-lit',scroll:'scroll',vault:'vault',ruler:'ruler',hammer:'hammer',tower:'tower',flask:'flask',scope:'scope'};
+function spotPic(mark){var n=SPOT[mark||'scroll'];if(!n)return '<div class="spot" style="width:84px;height:84px;border-radius:12px;border:2px solid var(--brass);display:grid;place-items:center;background:var(--panel-lift);flex:none;color:var(--gold)">'+ic(mark||'scroll',44)+'</div>';
+ var cls='spot-art'+(mark==='gift-lit'?' spot-lit':'')+(mark==='gift-open'?' spot-lit spot-spent':'');
+ return '<img class="'+cls+'" alt="" width="84" height="84" src="../assets/art/spots/'+n+'.svg">'}
 function IC2(n){return ic(n,18)}
 /* ---------- HUD ---------- */
 function buildHud(){var h=$('#hud');

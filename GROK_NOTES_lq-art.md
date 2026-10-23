@@ -82,6 +82,15 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - On a narrow screen the lesson buttons stack, so "Back to the map" stays fully on screen.
 - Checked in headless Edge at 390×844 with a one-question harness for Python Basics and AI Safety. The sprout, the keep, the medals and both buttons were in view. A real phone was not used.
 
+## Landmark and chest portraits
+
+- `origin/main` was already in this branch. WebGL lights, the angled camera, and the celebrate beam stayed as they are.
+- A chest or a landmark in the speech box used a brass line icon. It now uses a night picture at `assets/art/spots/`. HUD buttons stay line icons.
+- A locked chest is shut, with a thin gold line under the lid. A chest that has just opened shows the seal and a gold point light. A chest that is already empty uses that same picture, dimmed.
+- The tower, vault, bench, anvil, flask, and telescope each have one gold light on the lantern, window, spark, or lens. The light still comes from the top left, and the shadow sits down and to the right.
+- The speech-box frame takes the course's warm colour. The pictures themselves stay night and gold, so one set serves every course.
+- The hammer lies on the anvil. The tower has a shallow dome, not a spire. No crosses, coins, or hazard marks.
+
 ## Not done
 
 - Level-path emoji in `homeOld()` is unused by the world UI, so those icons were not redrawn.

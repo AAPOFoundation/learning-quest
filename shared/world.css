@@ -51,6 +51,9 @@ body.nopad #pad,body.nopad #acts{display:none!important}
 #dlg{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(760px,96vw);z-index:15}
 #dlg .panel{display:flex;gap:14px;align-items:flex-start;margin:0;min-height:112px;padding:14px 16px;cursor:pointer}
 #dlg img{width:84px;height:84px;border-radius:12px;border:2px solid var(--brass);flex:none;box-shadow:0 0 0 1px var(--brass-ink)}
+#dlg img.spot-art{object-fit:cover;background:#0a0f15;border-color:var(--course,var(--brass));box-shadow:0 0 0 1px var(--brass-ink),0 0 14px color-mix(in srgb,var(--course-warm,#d7b56a) 50%,transparent),0 8px 12px #0007}
+#dlg img.spot-lit{box-shadow:0 0 0 1px var(--course-warm,#d7b56a),0 0 22px #f3e2b0bb,0 8px 12px #0007}
+#dlg img.spot-spent{filter:saturate(.7) brightness(.78)}
 #dlg .tx{flex:1;min-width:0}
 #dlg .nameplate{display:inline-block;margin:0 0 4px;padding:1px 12px 2px;font:700 18px/1.2 var(--display);letter-spacing:.08em;color:#1a1208;background:linear-gradient(180deg,#ecd28a,#c9a24f 52%,#b08a38);border:1px solid var(--brass-lo);border-radius:6px}
 #dlg .ti{font-size:12px;color:var(--ink-dim);margin-left:8px}
