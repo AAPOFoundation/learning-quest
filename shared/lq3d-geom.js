@@ -545,27 +545,40 @@ function crateMesh(){
  b.box(0.11,0.16,-0.165,0.08,0.26,0.035,slat,0);
  return pack(b);
 }
-/* A low ridge on the -X rim. Local +X is the face the three-quarter camera sees.
-   Two steps and a slope, then two stones that break the skyline. Not a row of crates. */
+/* A battered ridge on the -X rim. Local +X is the face the three-quarter camera sees.
+   Each course steps back, so the caps read as shelves. Three stones break the skyline. */
 function cliffMesh(){
- var b=new Builder(), rock=hex('#6e6860'), cap=hex('#8a8174'), moss=hex('#4e6a38'), dark=hex('#5c564e');
- b.box(0.05, 0.26, 0, 1.35, 0.52, 3.7, rock, 0);
- b.box(-0.12, 0.62, 0.05, 1.05, 0.42, 2.55, dark, 0);
- b.box(-0.22, 0.92, 0.1, 0.72, 0.32, 1.55, rock, 0);
- card(b, [[0.72,0.04,-1.65],[0.72,0.04,1.65],[0.18,0.55,1.25],[0.18,0.55,-1.25]], cap);
- card(b, [[0.22,0.52,-1.15],[0.22,0.52,1.15],[-0.02,0.95,0.7],[-0.02,0.95,-0.7]], rock);
- var bits=[
-  {c:[-0.08,1.28,-0.45],dir:[0.22,1,-0.18],sx:0.52,sy:1.05,sz:0.46},
-  {c:[-0.2,1.18,0.62],dir:[-0.16,1,0.24],sx:0.46,sy:0.92,sz:0.4},
-  {c:[0.18,0.7,1.55],dir:[0.28,1,0.1],sx:0.4,sy:0.68,sz:0.36}
- ], i, p, f, top;
- for(i=0;i<bits.length;i++){
-  p=bits[i]; f=frameY(p.dir);
-  b.axesBox(p.c, f.x, f.y, f.z, p.sx, p.sy, p.sz, i?rock:dark, 0);
-  top=[p.c[0]+f.y[0]*p.sy*0.42, p.c[1]+f.y[1]*p.sy*0.42, p.c[2]+f.y[2]*p.sy*0.42];
-  b.axesBox(top, f.x, f.y, f.z, p.sx*0.55, 0.08, p.sz*0.55, cap, 0);
+ var b=new Builder(), rock=hex('#6e6860'), dark=hex('#58544e'), cap=hex('#8a8174'), moss=hex('#4e6a38');
+ var tone=[hex('#625c55'),hex('#6e6860'),hex('#7a736a')];
+ var ledges=[
+  {z0:-1.90,z1:1.58,y0:0,y1:0.52,n:[-0.40,0.74,-0.34,0.32],f:[-0.72,0.40,-0.58,0.16]},
+  {z0:-1.52,z1:1.12,y0:0.36,y1:0.98,n:[-0.36,0.08,-0.30,0.02],f:[-0.56,-0.02,-0.44,-0.14]},
+  {z0:-0.20,z1:0.66,y0:0.84,y1:1.30,n:[-0.38,-0.18,-0.34,-0.24],f:[-0.46,-0.22,-0.40,-0.28]}
+ ], i, L, c, p, s, f, top;
+ for(i=0;i<ledges.length;i++){
+  L=ledges[i];
+  c=[(L.n[0]+L.n[1]+L.n[2]+L.n[3]+L.f[0]+L.f[1]+L.f[2]+L.f[3])/8,(L.y0+L.y1)*0.5,(L.z0+L.z1)*0.5];
+  p=[[L.n[1],L.y0,L.z0],[L.n[0],L.y0,L.z0],[L.n[2],L.y1,L.z0],[L.n[3],L.y1,L.z0],[L.f[1],L.y0,L.z1],[L.f[0],L.y0,L.z1],[L.f[2],L.y1,L.z1],[L.f[3],L.y1,L.z1]];
+  b.polyOut([p[0],p[3],p[2],p[1]],c,tone[i],0);
+  b.polyOut([p[4],p[5],p[6],p[7]],c,tone[i],0);
+  b.polyOut([p[0],p[4],p[7],p[3]],c,tone[i],0);
+  b.polyOut([p[1],p[2],p[6],p[5]],c,dark,0);
+  b.polyOut([p[3],p[7],p[6],p[2]],c,cap,0);
+  b.polyOut([p[0],p[1],p[5],p[4]],c,dark,0);
  }
- b.box(-0.16, 1.1, 0.05, 0.34, 0.07, 0.4, moss, 0);
+ var stones=[
+  {c:[-0.28,1.55,0.18],dir:[0.30,1,-0.18],sx:0.38,sy:0.92,sz:0.32},
+  {c:[-0.14,1.22,-0.92],dir:[0.24,1,-0.30],sx:0.32,sy:0.86,sz:0.28},
+  {c:[-0.16,1.08,0.90],dir:[-0.14,1,0.26],sx:0.28,sy:0.72,sz:0.24}
+ ];
+ for(i=0;i<stones.length;i++){
+  s=stones[i]; f=frameY(s.dir);
+  b.axesBox(s.c,f.x,f.y,f.z,s.sx,s.sy,s.sz,i?rock:tone[0],0);
+  top=[s.c[0]+f.y[0]*s.sy*0.46,s.c[1]+f.y[1]*s.sy*0.46,s.c[2]+f.y[2]*s.sy*0.46];
+  b.axesBox(top,f.x,f.y,f.z,s.sx*0.62,0.08,s.sz*0.6,cap,0);
+ }
+ sphere(b,0.18,0.50,-1.68,0.075,5,3,moss,0);
+ sphere(b,-0.08,0.94,-0.58,0.06,5,3,moss,0);
  return pack(b);
 }
 /* Open trail shelter. Local -Z is the open side. No sign and no door text. */

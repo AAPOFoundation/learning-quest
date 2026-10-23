@@ -104,3 +104,12 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 ## Check, pass 7
 
 `node shared/lq3d-geom.js` prints `"ok": true`. Headless Edge, low effects, showed the meadow with a stepped grey ridge behind the shelter, a light slope, and two stones on top. The people, the tent and the fire are unchanged. Not tried on a phone.
+
+## Pass 8 (same day)
+
+- The ridge sketch arrived after pass 7 was committed. Its courses are irregular quads that step back, with a lighter cap on each shelf, so the face is battered rather than a stack of boxes. Three leaned stones sit at different heights. The sketch's tallest stone was about 2.3 high and would have towered over the shelter, so the three stones are a little shorter. Two moss dots sit on the shelves. Winding still matches the outward faces.
+- Kept the shelter, the camera and the reward lamp.
+
+## Check, pass 8
+
+`node shared/lq3d-geom.js` prints `"ok": true`. Headless Edge, low effects, shows three stones of different heights on a grey shelf behind the shelter, with a lighter top course. The camp in front is unchanged. Not tried on a phone.

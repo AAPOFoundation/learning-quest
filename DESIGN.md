@@ -97,4 +97,4 @@ The camp camera now starts up and to the side (yaw 0.78, pitch 0.56), so the vie
 The camp keeps a sixth lamp for a few embers at the fire. Those embers are small glowing coals, and the lamp moves a little so the ground near the fire stays warm. When the page fires `lq:celebrate`, the same lamp jumps to the chest (a beam, as on a chest or a finished expedition stage) or to the hero (a shockwave, as on a level clear) and the gold grade lifts for about two seconds. Low effects and reduced motion hold one brighter still frame, then the next still frame is the quiet camp again. The hex map stays 2D.
 
 ## v16: camp ridge (23 Oct 2026)
-The cliff on the left rim is a stepped ridge: a long base, a pale slope toward the camp, and two taller stones on the skyline. It stays low. The open shelter in front of it is unchanged. The hex map stays 2D.
+The cliff on the left rim is a battered ridge. Each course steps back, the top of a course is a lighter shelf, and three stones of different heights break the skyline. It stays low. The open shelter in front of it is unchanged. The hex map stays 2D.
