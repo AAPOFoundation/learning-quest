@@ -362,10 +362,13 @@ function palmMesh(){
  return pack(b);
 }
 function cactusMesh(){
- var b=new Builder(), col=hex('#3d7a48');
- cyl(b,0,0.36,0,0.12,0.72,6,col,0);
- cyl(b,0.18,0.5,0,0.07,0.28,5,col,0);
- cyl(b,-0.18,0.44,0,0.065,0.24,5,mix(col,[1,1,1],0.08),0);
+ var b=new Builder(), col=hex('#3d7a48'), arm=mix(col,[1,1,1],0.1);
+ cyl(b,0,0.42,0,0.13,0.84,6,col,0);
+ shaft(b, [0.1,0.4,0], [0.3,0.56,0.02], 0.046, arm, 0);
+ shaft(b, [0.3,0.56,0.02], [0.34,0.88,0], 0.04, col, 0);
+ shaft(b, [-0.1,0.34,0], [-0.28,0.48,-0.02], 0.042, col, 0);
+ shaft(b, [-0.28,0.48,-0.02], [-0.3,0.74,0], 0.036, arm, 0);
+ sphere(b, 0.02, 0.86, -0.1, 0.035, 5, 3, hex('#e07a8a'), 0);
  return pack(b);
 }
 function mushroomMesh(){var b=new Builder(); cyl(b,0,0.08,0,0.028,0.14,5,hex('#eadcc4'),0); cone(b,0,0.14,0,0.11,0.09,6,hex('#b5453a'),0); return pack(b)}
