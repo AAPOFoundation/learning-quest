@@ -73,6 +73,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 63. **A talk choice lets go after it rises.** Each reply still arrives on its own beat. The rise no longer holds the button, so a press can sink it. Reduced motion removes the rise.
 64. **Leave the Workshop rises.** The way out of the Citadel Workshop uses the same short rise as the other way-back buttons. The rise lets go, so a press can still sink it. Reduced motion removes it.
 65. **A question choice lets go after it rises.** Lesson choices, grade buttons and final-challenge choices still arrive on their own beat. The rise no longer holds them, so a press can sink. A marked answer is still drawn again, so the right one pops and a wrong one settles. Reduced motion removes the rise.
+66. **Home and title actions let go after they rise.** The four path buttons, Portfolio Guide, Begin your journey, Continue, New journey and All games still arrive in order. The rise no longer holds them, so a press can sink. Reduced motion removes the rise.
 
 ## Checked
 
@@ -80,4 +81,4 @@ Headless Edge still opened Python Basics after the later motion edits: the title
 
 ## Not done
 
-No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings still move, but in full effects they move from a shared sprite at about 15 frames a second rather than being redrawn every frame. Headless Edge loaded the two lesson charts: 16 step dots, 60 score dots, the bowl stayed put, and both the step dot and the threshold line moved when the dial changed. That run did not wait for the slide to finish. The review deck, the pause menu and the dialogue box were syntax-checked and not clicked. Nothing was tried on a phone.
+No phone, Safari or Firefox pass in this session. No change to lesson text. Flags, fountains and town buildings still move, but in full effects they move from a shared sprite at about 15 frames a second rather than being redrawn every frame. Headless Edge loaded the two lesson charts: 16 step dots, 60 score dots, the bowl stayed put, and both the step dot and the threshold line moved when the dial changed. That run did not wait for the slide to finish. The review deck, the pause menu, the dialogue box, the hood sway and the later button rises were syntax-checked and not clicked. Nothing was tried on a phone.
