@@ -46,6 +46,7 @@ The map already bobs the hero, waves flags, shimmers water, and throws a spark b
 36. **A still beard, plume and scholar board stir.** The beard tip swings about a pixel. The helm plume bobs. The flat scholar board tips a few degrees. Walking holds each one still. Low effects draws them with the quiet idle.
 37. **The streak flame flickers.** The small fire by the day count rises and grows a little, on a loop. The number stays still. Reduced motion removes the flicker.
 38. **One options bag for buildings.** Each building on screen used to get a new options object every frame. One bag is cleared and filled again. A lid, a light or a gate lift cannot leak onto the next building, because those fields are wiped first. The picture does not change.
+39. **Next rises after an answer.** The quiz Next button, and the one after a Python challenge, rise just after the reply. The rise does not stay stuck on the button, so a press can still sink it. Reduced motion removes the rise.
 
 ## Checked
 
