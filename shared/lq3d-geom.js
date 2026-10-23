@@ -545,22 +545,27 @@ function crateMesh(){
  b.box(0.11,0.16,-0.165,0.08,0.26,0.035,slat,0);
  return pack(b);
 }
-/* A low ridge. The camp places it on the -X rim, so the three-quarter camera (on +X) sees the face. */
+/* A low ridge on the -X rim. Local +X is the face the three-quarter camera sees.
+   Two steps and a slope, then two stones that break the skyline. Not a row of crates. */
 function cliffMesh(){
- var b=new Builder(), rock=hex('#6e6860'), cap=hex('#8a8174'), moss=hex('#4e6a38');
+ var b=new Builder(), rock=hex('#6e6860'), cap=hex('#8a8174'), moss=hex('#4e6a38'), dark=hex('#5c564e');
+ b.box(0.05, 0.26, 0, 1.35, 0.52, 3.7, rock, 0);
+ b.box(-0.12, 0.62, 0.05, 1.05, 0.42, 2.55, dark, 0);
+ b.box(-0.22, 0.92, 0.1, 0.72, 0.32, 1.55, rock, 0);
+ card(b, [[0.72,0.04,-1.65],[0.72,0.04,1.65],[0.18,0.55,1.25],[0.18,0.55,-1.25]], cap);
+ card(b, [[0.22,0.52,-1.15],[0.22,0.52,1.15],[-0.02,0.95,0.7],[-0.02,0.95,-0.7]], rock);
  var bits=[
-  {c:[-0.08,0.72,-1.65],dir:[0.22,1,-0.16],sx:1.0,sy:1.15,sz:0.9},
-  {c:[0.1,0.95,-0.35],dir:[-0.16,1,0.2],sx:1.15,sy:1.6,sz:1.05},
-  {c:[-0.02,1.12,0.85],dir:[0.14,1,0.08],sx:1.05,sy:1.9,sz:1.0},
-  {c:[0.14,0.78,1.9],dir:[-0.2,1,-0.12],sx:0.9,sy:1.25,sz:0.85}
+  {c:[-0.08,1.28,-0.45],dir:[0.22,1,-0.18],sx:0.52,sy:1.05,sz:0.46},
+  {c:[-0.2,1.18,0.62],dir:[-0.16,1,0.24],sx:0.46,sy:0.92,sz:0.4},
+  {c:[0.18,0.7,1.55],dir:[0.28,1,0.1],sx:0.4,sy:0.68,sz:0.36}
  ], i, p, f, top;
  for(i=0;i<bits.length;i++){
   p=bits[i]; f=frameY(p.dir);
-  b.axesBox(p.c, f.x, f.y, f.z, p.sx, p.sy, p.sz, rock, 0);
-  top=[p.c[0]+f.y[0]*p.sy*0.46, p.c[1]+f.y[1]*p.sy*0.46, p.c[2]+f.y[2]*p.sy*0.46];
-  b.axesBox(top, f.x, f.y, f.z, p.sx*0.62, 0.1, p.sz*0.6, cap, 0);
+  b.axesBox(p.c, f.x, f.y, f.z, p.sx, p.sy, p.sz, i?rock:dark, 0);
+  top=[p.c[0]+f.y[0]*p.sy*0.42, p.c[1]+f.y[1]*p.sy*0.42, p.c[2]+f.y[2]*p.sy*0.42];
+  b.axesBox(top, f.x, f.y, f.z, p.sx*0.55, 0.08, p.sz*0.55, cap, 0);
  }
- b.box(0.02,2.02,0.85,0.38,0.1,0.3,moss,0);
+ b.box(-0.16, 1.1, 0.05, 0.34, 0.07, 0.4, moss, 0);
  return pack(b);
 }
 /* Open trail shelter. Local -Z is the open side. No sign and no door text. */
@@ -958,6 +963,12 @@ function selfCheck(){
    var cliff=meshBy(camp,'cliff'), shelf=meshBy(camp,'shelter');
    if(!cliff||!shelf)errors.push('camp height');
    else if(boundsY(cliff)[1]<1.5)errors.push('cliff low '+boundsY(cliff)[1].toFixed(2));
+   else if(boundsY(cliff)[1]>2.5)errors.push('cliff spire '+boundsY(cliff)[1].toFixed(2));
+   else {
+    var pz=cliff.positions, z0=1e9, z1=-1e9, zi;
+    for(zi=2;zi<pz.length;zi+=3){if(pz[zi]<z0)z0=pz[zi];if(pz[zi]>z1)z1=pz[zi]}
+    if(z1-z0<2.4)errors.push('cliff narrow '+(z1-z0).toFixed(2));
+   }
    if(!camp.view||camp.view.yaw<0.6||camp.view.pitch<0.48)errors.push('camera flat');
    if(hero&&(!band(hero.emissive,0.5,0.6)||!band(hero.emissive,0.85,0.95)))errors.push('hero materials');
   }

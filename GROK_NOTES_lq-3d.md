@@ -90,8 +90,17 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 - The camp listens for `lq:celebrate`. A beam (chest open, or an expedition stage marked done) puts the sixth lamp on the chest and lifts that lamp. A shockwave (level clear) puts it on the hero. Gold in the grade rises with the same fade. Seven coals travel with the lamp. They do not cast, so the shadow map stays as it was.
 - Idle, the sixth lamp is a small ember that wanders at the fire. Full effects moves the coals. Low effects and reduced motion keep one still brighter frame, then about 2.2 seconds later one still frame of the quiet camp. The hex map stays 2D.
 - Marking an expedition stage done fires the same event before the camp is drawn again, so the new frame opens on the chest glow. The existing cheer overlay still runs. No new words on the models.
-- The cliff is still four leaned stones. A helper was asked for a ridge silhouette and had not returned when this was committed. Left the stones.
+- The cliff was still four leaned stones when the reward light was committed. The next pass replaces it. A helper was still reading the file, so the ridge was drawn in session.
 
 ## Check, pass 6
 
 `node shared/lq3d-geom.js` prints `"ok": true`. Burst lamp strength is about 1.84 against an idle ember of 0.48. A beam sits on the chest, a shockwave on the hero, and a steady pose does not move when time changes. Headless Edge, low effects, showed the meadow alive (shader linked, both people, tent, shelter, cliff, fire). A frame during the chest glow was 6.7 mean channel-steps away from the quiet frame, with a bright cluster by the tent and the crate lit. The hero glow was 7.2 away, with gold on the wanderer and the ground at their feet. Three seconds later the still frame matched the quiet camp again, so the light does leave. A full-effects frame still shows the fire pool and the ground shadows. Not tried on a phone.
+
+## Pass 7 (same day)
+
+- The cliff was four leaned boxes, so a frame called them cubes. It is now a long base, two steps, a pale slope on the camera side (local +X), and two leaned stones that break the skyline. A third short stone sits at the end. A moss patch sits on the top step. Nothing is below the ground. The tallest point stays under 2.5. The shelter is unchanged.
+- The self-check now requires the cliff to be at least 2.4 long, so it cannot shrink back into one block.
+
+## Check, pass 7
+
+`node shared/lq3d-geom.js` prints `"ok": true`. Headless Edge, low effects, showed the meadow with a stepped grey ridge behind the shelter, a light slope, and two stones on top. The people, the tent and the fire are unchanged. Not tried on a phone.
