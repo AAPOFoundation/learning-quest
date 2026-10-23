@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">
+  <defs id="lq-grade-defs">
+    <linearGradient id="lq-key" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f3e2b0" stop-opacity="0.16"/>
+      <stop offset="0.46" stop-color="#f3e2b0" stop-opacity="0"/>
+      <stop offset="1" stop-color="#163044" stop-opacity="0.18"/>
+    </linearGradient>
+    <radialGradient id="lq-tint" cx="0.3" cy="0.2" r="0.9">
+      <stop offset="0" stop-color="#6a9a52" stop-opacity="0.13"/>
+      <stop offset="1" stop-color="#6a9a52" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lq-gold" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f3e2b0" stop-opacity="0.5"/>
+      <stop offset="0.42" stop-color="#d7b56a" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#f3e2b0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
   <defs>
     <linearGradient id="py-sky" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#0a0f15"/>
@@ -100,6 +117,12 @@
   <path d="M540 300L532 322L552 306Z" fill="#c8a86a"/>
   <path d="M590 312C592 300 600 298 598 314Z" fill="#6a9a52"/>
   <path d="M602 314C606 298 614 302 608 316Z" fill="#4f7a3a"/>
+  <g id="lq-grade" pointer-events="none">
+    <rect width="640" height="360" fill="url(#lq-key)"/>
+    <rect width="640" height="360" fill="url(#lq-tint)"/>
+    <circle cx="148" cy="252" r="46" fill="url(#lq-gold)"/>
+  </g>
+
   <rect x="8" y="8" width="624" height="344" rx="8" fill="none" stroke="#d7b56a" stroke-opacity="0.35" stroke-width="1"/>
   <g fill="none" stroke="#f3e2b0" stroke-width="2" stroke-linejoin="miter">
     <path d="M14 22V14h8"/>

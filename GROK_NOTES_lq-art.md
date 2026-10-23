@@ -39,6 +39,22 @@ Branch `grok/lq-art-20261023`. Art only. No push.
 - The Portfolio anvil plate has a brass hammer lying on the anvil face, beside the round shield. The hammer is a tool.
 - A later pass nudged three plates. The Foundations anchor is a little larger. The Portfolio keep's door and ledger sit a little lower. The anvil keeps a hammer handle on its head. The hourglass bulbs are a smoother shape.
 
+## This pass
+
+- Merged `origin/main` (the three graphics and UI pulls). The home keeps those quest cards. Each card also shows its cover, and the copy sits on the faint watermark. Suggested next still uses the Next tag.
+- The 2D art now carries the same light as the field guide: warm from the top left, cool shade at the bottom right. WebGL lights, the angled camera, and the celebrate hook were left for the other sessions.
+- Every region plate has that grade, a gold point at the moon, and a soft shadow along the ground. The brass frame stays on top.
+- Covers use the same grade, plus one landmark light: the mill door, the cabin lamp and window, the star over the scales, the lantern on the keep, and a warm pool on the desk.
+- Three plates gained a second light. The watchtower lantern, the forge spark, and the signal lamp.
+- Course tints stay under 0.14 opacity. Python is meadow green, Foundations is water blue, Evals is gold, Safety is lantern gold, and Portfolio is parchment.
+- Badges and the tab mark have a brass highlight from the top left and a shade at the lower right, drawn behind the symbol.
+- Watermark tiles stay at 0.26 opacity so the words stay clear.
+- Checked in headless Edge: a sheet of the covers, badges and plates, and the home at 390×1600 and 1100×1200. The mill, the cabin and the scales all read in the card crop. A real phone was not used.
+
+## Open
+
+- At 390×844 the world HUD still overlaps. `#area` sits 250px above the bottom, over the hero, and a tall guide panel can cover the XP and objective row. That lives in `shared/world.css`. It was left alone so this branch does not fight the UI session.
+
 ## Not done
 
 - Level-path emoji in `homeOld()` is unused by the world UI, so those icons were not redrawn.
