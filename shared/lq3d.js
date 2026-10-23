@@ -2,8 +2,10 @@
    Y-up, right-handed. Character front is local -Z. The default camera is a three-quarter view from scene.view.
    Full effects: directional shadow map, a slow orbit, and a small idle bob.
    Five world-space point lights (fire, lantern, chest, hero, landmark) plus a course colour grade.
+   A sixth lamp is the ember at the fire. On lq:celebrate it flares at the chest (beam) or the hero (shockwave).
    Low effects or reduced motion: one still frame. Contact shadows are real meshes, so the still frame keeps them.
-   The grade and the steady lights stay on in that still frame. The shadow map stays off. */
+   The grade and the steady lights stay on in that still frame. The shadow map stays off.
+   A reward still brightens that frame, then the next still frame returns to the ember. */
 (function(){
 'use strict';
 var FOV=34*Math.PI/180, SH=1024;
@@ -87,7 +89,7 @@ var CFS=[
 'uniform vec3 uEye;uniform vec3 uLDir;uniform vec3 uLCol;uniform vec3 uSky;uniform vec3 uGnd;uniform vec3 uFog;',
 'uniform float uFogN;uniform float uFogF;uniform float uShOn;uniform float uGlow;uniform sampler2D uSh;',
 'uniform vec4 uL0;uniform vec4 uC0;uniform vec4 uL1;uniform vec4 uC1;uniform vec4 uL2;uniform vec4 uC2;',
-'uniform vec4 uL3;uniform vec4 uC3;uniform vec4 uL4;uniform vec4 uC4;',
+'uniform vec4 uL3;uniform vec4 uC3;uniform vec4 uL4;uniform vec4 uC4;uniform vec4 uL5;uniform vec4 uC5;',
 'uniform vec3 uLift;uniform vec3 uGain;uniform float uSat;uniform float uGold;uniform vec2 uRes;',
 'float unpack(vec4 c){return dot(c,vec4(1.0,0.0039215686,0.0000153787,0.00000006035));}',
 'float pcf(vec2 uv,float ref){',
@@ -136,7 +138,7 @@ var CFS=[
 '  vec3 fillL=normalize(vec3(-0.35,0.42,-0.62));',
 '  col+=vCol*vec3(0.40,0.52,0.68)*max(dot(N,fillL),0.0)*0.22;',
 '  col+=lamp(N,vCol,uL0,uC0)+lamp(N,vCol,uL1,uC1)+lamp(N,vCol,uL2,uC2);',
-'  col+=lamp(N,vCol,uL3,uC3)+lamp(N,vCol,uL4,uC4);',
+'  col+=lamp(N,vCol,uL3,uC3)+lamp(N,vCol,uL4,uC4)+lamp(N,vCol,uL5,uC5);',
 '  float rim=pow(1.0-max(dot(N,V),0.0),2.2);',
 '  col+=uSky*rim*0.16;',
 ' }',
@@ -190,7 +192,7 @@ function mount(figureEl,opts){
   col.uGlow=loc(col,'uGlow');
   col.uL0=loc(col,'uL0');col.uC0=loc(col,'uC0');col.uL1=loc(col,'uL1');col.uC1=loc(col,'uC1');
   col.uL2=loc(col,'uL2');col.uC2=loc(col,'uC2');col.uL3=loc(col,'uL3');col.uC3=loc(col,'uC3');
-  col.uL4=loc(col,'uL4');col.uC4=loc(col,'uC4');
+  col.uL4=loc(col,'uL4');col.uC4=loc(col,'uC4');col.uL5=loc(col,'uL5');col.uC5=loc(col,'uC5');
   col.uLift=loc(col,'uLift');col.uGain=loc(col,'uGain');col.uSat=loc(col,'uSat');col.uGold=loc(col,'uGold');col.uRes=loc(col,'uRes');
   dep.uMVP=loc(dep,'uMVP');
   var gpu=[],i,src,m;
@@ -207,6 +209,19 @@ function mount(figureEl,opts){
    gpu.push(m);
   }
   h.gpu=gpu;
+  var spark=null;
+  if(window.LQ3DGeom.sparkMesh){
+   src=window.LQ3DGeom.sparkMesh();
+   if(src&&src.positions&&src.indices&&src.indices.length){
+    spark={count:src.indices.length};
+    spark.bPos=buf(gl.ARRAY_BUFFER,src.positions);
+    spark.bNrm=buf(gl.ARRAY_BUFFER,src.normals);
+    spark.bCol=buf(gl.ARRAY_BUFFER,src.colors);
+    spark.bE=buf(gl.ARRAY_BUFFER,src.emissive);
+    spark.bIdx=buf(gl.ELEMENT_ARRAY_BUFFER,src.indices);
+   }
+  }
+  h.spark=spark;
   var shOk=false,shFb=null,shTex=null,shRb=null;
   function texParams(){
    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
@@ -301,8 +316,11 @@ function mount(figureEl,opts){
    if(r<0)r=0; if(g<0)g=0; if(b<0)b=0; if(r>1)r=1; if(g>1)g=1; if(b>1)b=1;
    return [r,g,b];
   }
-  function render(st){
-   var w=cv.width,hh=cv.height,k,cp,sp;
+  function render(st, note){
+   var w=cv.width,hh=cv.height,k,cp,sp,fx=null;
+   if(window.LQ3DGeom.sparkState){
+    try{fx=window.LQ3DGeom.sparkState(scene, st?0:t, note||null)}catch(eFx){fx=null}
+   }
    if(w<1||hh<1)return;
    cp=Math.cos(pitch);sp=Math.sin(pitch);
    var ex=tx+Math.sin(yaw)*cp*radius,ey=ty+sp*radius,ez=tz-Math.cos(yaw)*cp*radius;
@@ -340,9 +358,17 @@ function mount(figureEl,opts){
    gl.uniformMatrix4fv(col.uLVP,false,lvp);
    gl.uniform3f(col.uEye,ex,ey,ez);
    gl.uniform1f(col.uShOn,(!st&&shOk)?1:0);
-   gl.uniform1f(col.uGlow,st?1.25:(1.15+0.22*Math.sin(t*6.0)));
+   var glow=st?1.25:(1.15+0.22*Math.sin(t*6.0));
+   var goldAdd=0;
+   if(note&&note.dur){
+    var fade=note.steady?1:Math.max(0,1-note.age/note.dur);
+    glow+=note.steady?0.15:0.28*fade;
+    goldAdd=0.22*fade;
+   }
+   gl.uniform1f(col.uGlow,glow);
+   gl.uniform1f(col.uGold,gGold+goldAdd);
    gl.uniform2f(col.uRes,w,hh);
-   uploadLamps(st);
+   uploadLamps(st, fx, note);
    for(k=0;k<gpu.length;k++){
     pose(gpu[k],st);
     mul(vp,model,mvp);
@@ -350,6 +376,17 @@ function mount(figureEl,opts){
     gl.uniformMatrix4fv(col.uM,false,model);
     bindAll(gpu[k]);
     gl.drawElements(gl.TRIANGLES,gpu[k].count,gl.UNSIGNED_SHORT,0);
+   }
+   if(spark&&fx&&fx.sparks){
+    for(k=0;k<fx.sparks.length;k++){
+     var spk=fx.sparks[k];
+     setModel(model,spk.x,spk.y,spk.z,0,spk.s||0.1,1);
+     mul(vp,model,mvp);
+     gl.uniformMatrix4fv(col.uMVP,false,mvp);
+     gl.uniformMatrix4fv(col.uM,false,model);
+     bindAll(spark);
+     gl.drawElements(gl.TRIANGLES,spark.count,gl.UNSIGNED_SHORT,0);
+    }
    }
   }
   gl.useProgram(col);
@@ -365,19 +402,27 @@ function mount(figureEl,opts){
   gl.uniform3f(col.uGain,gGain[0],gGain[1],gGain[2]);
   gl.uniform1f(col.uSat,gSat);
   gl.uniform1f(col.uGold,gGold);
-  var lampP=[col.uL0,col.uL1,col.uL2,col.uL3,col.uL4];
-  var lampC=[col.uC0,col.uC1,col.uC2,col.uC3,col.uC4];
-  function uploadLamps(st){
-   var i,L,k;
+  var lampP=[col.uL0,col.uL1,col.uL2,col.uL3,col.uL4,col.uL5];
+  var lampC=[col.uC0,col.uC1,col.uC2,col.uC3,col.uC4,col.uC5];
+  function uploadLamps(st, fx, note){
+   var i,L,k,fade=0;
+   if(note&&note.dur)fade=note.steady?1:Math.max(0,1-note.age/note.dur);
    for(i=0;i<5;i++){
     L=lights[i];
     if(!L||!L.pos||!L.col){gl.uniform4f(lampP[i],0,1,0,1);gl.uniform4f(lampC[i],0,0,0,0);continue}
     k=L.k==null?1:L.k;
     if(!st&&L.name==='fire')k=0.70+0.30*Math.sin(t*7.0);
     else if(!st&&L.name==='lantern')k=(L.k==null?0.9:L.k)*(0.78+0.22*Math.sin(t*5.1+1.4));
+    if(fade&&note.kind==='shockwave'&&L.name==='hero')k+=0.9*fade;
+    else if(fade&&note.kind!=='shockwave'&&L.name==='chest')k+=0.75*fade;
+    else if(fade&&L.name==='fire')k+=0.22*fade;
     gl.uniform4f(lampP[i],L.pos[0],L.pos[1],L.pos[2],L.radius==null?2:L.radius);
     gl.uniform4f(lampC[i],L.col[0],L.col[1],L.col[2],k);
    }
+   var E=fx&&fx.lamp;
+   if(!E||!E.pos||!E.col){gl.uniform4f(lampP[5],0,1,0,1);gl.uniform4f(lampC[5],0,0,0,0);return}
+   gl.uniform4f(lampP[5],E.pos[0],E.pos[1],E.pos[2],E.radius==null?2:E.radius);
+   gl.uniform4f(lampC[5],E.col[0],E.col[1],E.col[2],E.k==null?0:E.k);
   }
   gl.enableVertexAttribArray(0);gl.enableVertexAttribArray(1);gl.enableVertexAttribArray(2);gl.enableVertexAttribArray(3);
   gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);
@@ -402,17 +447,19 @@ function mount(figureEl,opts){
    h.raf=0;
    if(!cv.isConnected){unmount(h);return}
    var st=paused();
+   var note=takeNote();
    if(!fit()){h.timer=setTimeout(function(){h.timer=0;if(!h.dead)kick()},200);return}
    if(st){
-    if(!h.painted||h.dirty){try{render(true)}catch(eR){unmount(h);return}h.painted=true;h.dirty=false}
-    h.timer=setTimeout(wake,200);
+    if(!h.painted||h.dirty){try{render(true,note)}catch(eR){unmount(h);return}h.painted=true;h.dirty=false}
+    if(note){h.dirty=true;h.timer=setTimeout(wake,Math.max(120,(note.dur-note.age)*1000+80))}
+    else h.timer=setTimeout(wake,200);
     return;
    }
    var dt=h.last?Math.min(0.05,(ts-h.last)/1000):0;
    h.last=ts;
    if(!h.drag)yaw+=dt*0.12;
    t+=dt;
-   try{render(false)}catch(eR){unmount(h);return}
+   try{render(false,note)}catch(eR){unmount(h);return}
    h.painted=true;h.dirty=false;
    h.raf=requestAnimationFrame(loop);
   }
@@ -459,6 +506,8 @@ function mount(figureEl,opts){
    if(rm.addEventListener)rm.addEventListener('change',h.onRm);
    else if(rm.addListener)rm.addListener(h.onRm);
   }
+  h.kick=kick;
+  camps.push(h);
   kick();
   return h;
  }catch(err){
@@ -469,6 +518,8 @@ function mount(figureEl,opts){
 function unmount(h){
  if(!h||h.dead)return;
  h.dead=true;
+ var ix=camps.indexOf(h);
+ if(ix>=0)camps.splice(ix,1);
  if(h.raf)cancelAnimationFrame(h.raf);
  h.raf=0;
  if(h.timer)clearTimeout(h.timer);
@@ -491,6 +542,9 @@ function unmount(h){
   if(g)for(i=0;i<g.length;i++){
    gl.deleteBuffer(g[i].bPos);gl.deleteBuffer(g[i].bNrm);gl.deleteBuffer(g[i].bCol);gl.deleteBuffer(g[i].bE);gl.deleteBuffer(g[i].bIdx);
   }
+  if(h.spark){
+   gl.deleteBuffer(h.spark.bPos);gl.deleteBuffer(h.spark.bNrm);gl.deleteBuffer(h.spark.bCol);gl.deleteBuffer(h.spark.bE);gl.deleteBuffer(h.spark.bIdx);
+  }
   if(h.shTex)gl.deleteTexture(h.shTex);
   if(h.shRb)gl.deleteRenderbuffer(h.shRb);
   if(h.shFb)gl.deleteFramebuffer(h.shFb);
@@ -501,5 +555,22 @@ function unmount(h){
  }
  h.gl=null;
 }
+var camps=[], flash=null;
+function effectsStill(){
+ try{return !!((window.LQFx&&window.LQFx.low)||(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches))}catch(e){return false}
+}
+function takeNote(){
+ if(!flash)return null;
+ var age=(Date.now()-flash.t0)/1000, dur=flash.dur||2.2;
+ if(age>=dur){flash=null;return null}
+ return {kind:flash.kind, age:age, dur:dur, steady:effectsStill()||!!flash.steady};
+}
+function onCelebrate(e){
+ var d=(e&&e.detail)||{};
+ flash={t0:Date.now(), dur:2.2, kind:d.vfx==='shockwave'?'shockwave':'beam', steady:effectsStill()};
+ var i;
+ for(i=0;i<camps.length;i++){if(!camps[i].dead){camps[i].dirty=true;if(camps[i].kick)camps[i].kick()}}
+}
+if(typeof document!=='undefined')document.addEventListener('lq:celebrate', onCelebrate);
 window.LQ3D={mount:mount,unmount:unmount};
 })();

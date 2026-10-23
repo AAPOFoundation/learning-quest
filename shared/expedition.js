@@ -49,7 +49,10 @@ function render(el,ctx){var P=typeof ctx.P==='function'?ctx.P():ctx.P;P.exp=P.ex
    if(note.length<10){msg.textContent='Write a short note first (10+ characters). It is for you.';return}
    P.exp[id]={t:Date.now(),note:note};P.xp=(P.xp||0)+(id==='camp'?10:30);if(id==='camp')ctx.award('camp');
    if(X.stages.every(function(s){return P.exp[s.id]})&&P.exp.camp)ctx.award('expedition');
-   ctx.save();ctx.toast(id==='camp'?'Base camp ready (+10 XP)':'Stage recorded (+30 XP)');render(el,ctx)}};
+   ctx.save();ctx.toast(id==='camp'?'Base camp ready (+10 XP)':'Stage recorded (+30 XP)');
+   var fig=el.querySelector('[data-exp-stage] canvas'), box=fig&&fig.getBoundingClientRect?fig.getBoundingClientRect():null;
+   try{document.dispatchEvent(new CustomEvent('lq:celebrate',{detail:{vfx:'beam',x:box?box.left+box.width/2:null,y:box?box.top+box.height*0.55:null}}))}catch(e){}
+   render(el,ctx)}};
 }
 var tab=(A.tabs||[]).filter(function(t){return t.id==='practice'})[0];
 if(tab){tab.label='Expedition';tab.render=render}else{A.tabs=A.tabs||[];A.tabs.push({id:'practice',label:'Expedition',render:render})}

@@ -609,6 +609,58 @@ function moundMesh(col){
  hemi(b,0,0.06,0,0.9,7,col);
  return pack(b);
 }
+/* A small coal. Scale it in the viewer. Emissive 1 so it glows with the flame. */
+function sparkMesh(){
+ var b=new Builder();
+ sphere(b,0,0,0,1,6,4,hex('#ffe7a0'),1);
+ return pack(b);
+}
+/* World-space embers plus one extra lamp. Idle light wanders at the fire.
+   A beam note lights the chest. A shockwave note lights the hero.
+   steady ignores t, so a still frame does not move the sparks. */
+function sparkState(camp, t, note){
+ var fire=lampBy(camp,'fire')||{pos:[0.12,0.55,-1.5],col:[1,0.48,0.16]};
+ var chest=lampBy(camp,'chest')||fire;
+ var hero=lampBy(camp,'hero')||fire;
+ var dur=note&&note.dur?note.dur:2.2;
+ var live=!!(note&&note.age!=null&&note.age>=0&&note.age<dur);
+ var steady=!!(live&&note.steady);
+ var kind=live?(note.kind==='shockwave'?'shockwave':'beam'):'idle';
+ var origin=kind==='shockwave'?hero.pos:kind==='beam'?chest.pos:fire.pos;
+ var u=live&&!steady?note.age/dur:0;
+ var n=7, sparks=[], i, ang, rad, y, x, z, sc, rise;
+ for(i=0;i<n;i++){
+  ang=i/n*TAU;
+  if(kind==='idle'){
+   rise=((t*0.42+i*0.17)%1+1)%1;
+   rad=0.16+rise*0.38;
+   y=0.22+rise*1.05;
+   ang=ang+t*1.1;
+   x=fire.pos[0]+Math.cos(ang)*rad;
+   z=fire.pos[2]+Math.sin(ang)*rad;
+   sc=0.85*(1-rise*0.45);
+  }else{
+   rad=steady?0.34:(0.1+u*1.05);
+   y=origin[1]+(steady?0.22:Math.sin(Math.PI*u)*0.95);
+   x=origin[0]+Math.cos(ang+u*0.6)*rad;
+   z=origin[2]+Math.sin(ang+u*0.6)*rad;
+   sc=steady?1:(1.2*(1-u)+0.35);
+  }
+  if(y<0.08)y=0.08;
+  sparks.push({x:x,y:y,z:z,s:0.11*sc});
+ }
+ var lampPos, lampK, lampR, lampCol;
+ if(kind==='idle'){
+  lampPos=[fire.pos[0]+Math.cos(t*1.6)*0.28, 0.42, fire.pos[2]+Math.sin(t*1.25)*0.28];
+  lampK=0.48; lampR=2.05; lampCol=[1,0.46,0.14];
+ }else{
+  lampPos=[origin[0], origin[1]+0.2, origin[2]];
+  lampK=steady?0.95:(1.65*(1-u)+0.3);
+  lampR=steady?2.4:(2.3+u*1.5);
+  lampCol=kind==='shockwave'?[1,0.88,0.55]:[1,0.76,0.28];
+ }
+ return {sparks:sparks, lamp:{name:kind==='idle'?'ember':'burst', pos:lampPos, col:lampCol, radius:lampR, k:lampK}, kind:kind};
+}
 
 var PAL={
  meadow:{g:'#5c8a3e',g2:'#3e6b32',dirt:'#8a6840',leaf:'#2f6a34',leaf2:'#6a9a3c',rock:'#7d7368',trunk:'#6b4428'},
@@ -932,6 +984,33 @@ function selfCheck(){
  if(!(evCamp.grade.gain[2]>evCamp.grade.gain[0]+0.1))errors.push('evals grade');
  if(!(saCamp.grade.gain[0]>saCamp.grade.gain[2]+0.1))errors.push('safety grade');
  if(!(saCamp.grade.gold>evCamp.grade.gold+0.2))errors.push('gold glow');
+ var spark=sparkMesh();
+ validateMesh(spark, errors, 'spark');
+ if(!band(spark.emissive,0.95,1))errors.push('spark glow');
+ function near3(a,b){var dx=a[0]-b[0],dy=a[1]-b[1],dz=a[2]-b[2];return Math.sqrt(dx*dx+dy*dy+dz*dz)}
+ var fireLamp=lampBy(evCamp,'fire'), chestAt=lampBy(evCamp,'chest'), heroAt=lampBy(evCamp,'hero');
+ var idleSp=sparkState(evCamp, 0.4, null);
+ var beamSp=sparkState(evCamp, 0.4, {kind:'beam', age:0.15, dur:2.2, steady:false});
+ var shockSp=sparkState(evCamp, 0.4, {kind:'shockwave', age:0.1, dur:2.2, steady:false});
+ var calmA=sparkState(evCamp, 0.2, {kind:'beam', age:0.4, dur:2.2, steady:true});
+ var calmB=sparkState(evCamp, 3.5, {kind:'beam', age:0.4, dur:2.2, steady:true});
+ var goneSp=sparkState(evCamp, 1, {kind:'beam', age:3, dur:2.2, steady:false});
+ if(!idleSp.sparks||idleSp.sparks.length<5||!beamSp.lamp||!shockSp.lamp)errors.push('spark state');
+ else{
+  var si, spk;
+  for(si=0;si<idleSp.sparks.length;si++){
+   spk=idleSp.sparks[si];
+   if(spk.y<0.08)errors.push('ember low');
+   if(near3([spk.x,spk.y,spk.z], fireLamp.pos)>1.5)errors.push('ember far');
+  }
+  if(!(beamSp.lamp.k>idleSp.lamp.k+0.4))errors.push('burst dim '+beamSp.lamp.k.toFixed(2));
+  if(!(near3(beamSp.lamp.pos, chestAt.pos)<near3(beamSp.lamp.pos, heroAt.pos)))errors.push('beam not on chest');
+  if(!(near3(shockSp.lamp.pos, heroAt.pos)<near3(shockSp.lamp.pos, chestAt.pos)))errors.push('shock not on hero');
+  if(near3(idleSp.lamp.pos, fireLamp.pos)>0.9)errors.push('ember lamp far');
+  if(goneSp.kind!=='idle')errors.push('burst stuck');
+  if(calmA.sparks[0].x!==calmB.sparks[0].x||calmA.sparks[3].z!==calmB.sparks[3].z)errors.push('steady sparks moved');
+  stats.burstK=beamSp.lamp.k; stats.emberK=idleSp.lamp.k;
+ }
  var heroLamp=lampBy(evCamp,'hero'), heroMesh=meshBy(evCamp,'hero');
  if(heroLamp&&heroMesh){
   var ldx=heroLamp.pos[0]-heroMesh.x, ldz=heroLamp.pos[2]-heroMesh.z;
@@ -965,7 +1044,7 @@ function selfCheck(){
  return {ok:errors.length===0, errors:errors, stats:stats};
 }
 
-var api={buildCamp:buildCamp, selfCheck:selfCheck};
+var api={buildCamp:buildCamp, sparkMesh:sparkMesh, sparkState:sparkState, selfCheck:selfCheck};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 root.LQ3DGeom=api;
 })(typeof window!=='undefined'?window:global);

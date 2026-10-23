@@ -83,3 +83,15 @@ Headless Edge loaded the meadow camp with full effects. The frame shows both cha
 - A cliff of four leaned stones sits on the -X rim, the side the new camera looks toward. The tallest stone is about 2 high. An open thatched shelter stands in front of it, yaw -pi/2, so local -Z points at the camp. No sign on it. The pennant yaw is yawToward the same eye, and the self-check requires that dot above 0.9.
 - Headless Edge showed the meadow and the highland both alive. The cliff sits behind the tent, the shelter roof reads, and the people still cast shadows toward the fire. The leaned stones are still chunky at this size. Left them leaned rather than as a row of crates.
 - Phone layout at 390x844 and the 2D lq:celebrate hook are already on origin/main from other sessions. This pass did not touch them.
+
+## Pass 6 (same day)
+
+- `origin/main` was already in this branch (37 commits ahead, none behind). No merge.
+- The camp listens for `lq:celebrate`. A beam (chest open, or an expedition stage marked done) puts the sixth lamp on the chest and lifts that lamp. A shockwave (level clear) puts it on the hero. Gold in the grade rises with the same fade. Seven coals travel with the lamp. They do not cast, so the shadow map stays as it was.
+- Idle, the sixth lamp is a small ember that wanders at the fire. Full effects moves the coals. Low effects and reduced motion keep one still brighter frame, then about 2.2 seconds later one still frame of the quiet camp. The hex map stays 2D.
+- Marking an expedition stage done fires the same event before the camp is drawn again, so the new frame opens on the chest glow. The existing cheer overlay still runs. No new words on the models.
+- The cliff is still four leaned stones. A helper was asked for a ridge silhouette and had not returned when this was committed. Left the stones.
+
+## Check, pass 6
+
+`node shared/lq3d-geom.js` prints `"ok": true`. Burst lamp strength is about 1.84 against an idle ember of 0.48. A beam sits on the chest, a shockwave on the hero, and a steady pose does not move when time changes. Headless Edge, low effects, showed the meadow alive (shader linked, both people, tent, shelter, cliff, fire). A frame during the chest glow was 6.7 mean channel-steps away from the quiet frame, with a bright cluster by the tent and the crate lit. The hero glow was 7.2 away, with gold on the wanderer and the ground at their feet. Three seconds later the still frame matched the quiet camp again, so the light does leave. A full-effects frame still shows the fire pool and the ground shadows. Not tried on a phone.

@@ -92,3 +92,6 @@ The same viewer now keeps five world-space lamps: the fire, the lantern, a gold 
 
 ## v14: three-quarter camp camera (23 Oct 2026)
 The camp camera now starts up and to the side (yaw 0.78, pitch 0.56), so the viewer sees the height of the people, the tent and a new ridge. A low cliff of four leaned stones stands on the left rim, with an open thatched shelter in front of it. The shelter has no sign. The pennant turns to face this camera. Drag still orbits the same view. The hex map stays 2D.
+
+## v15: reward light in the camp (23 Oct 2026)
+The camp keeps a sixth lamp for a few embers at the fire. Those embers are small glowing coals, and the lamp moves a little so the ground near the fire stays warm. When the page fires `lq:celebrate`, the same lamp jumps to the chest (a beam, as on a chest or a finished expedition stage) or to the hero (a shockwave, as on a level clear) and the gold grade lifts for about two seconds. Low effects and reduced motion hold one brighter still frame, then the next still frame is the quiet camp again. The hex map stays 2D.
