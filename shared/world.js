@@ -323,7 +323,7 @@ function update(dt){st.time+=dt;
 }
 function figDraw(g,sp,x,y,o){Art.figure(g,x,y,sp.look||sp,o)}
 function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),v=viewOf(z),vw=v.vw,vh=v.vh,h=st.hero,g=ctx;lights.length=0;g.setTransform(1,0,0,1,0,0);g.fillStyle='#0a0f15';g.fillRect(0,0,cv.width,cv.height);
- var phone=st.mode!=='title'&&CW<=440,look=phone?0.36:0.5,pivot=h.y,tx=h.x-vw/2,ty=h.y-vh*look;if(st.mode==='title'&&sc.id==='w'){var drift=(FX.low||(FX.rm&&FX.rm.matches))?0:Math.sin(st.time*.2)*40;pivot=hy(NODES[0][1]);tx=hx(NODES[0][0],NODES[0][1])-vw/2+drift;ty=pivot-vh/2}
+ var phone=st.mode!=='title'&&CW<=440,look=phone?0.42:0.5,pivot=h.y,tx=h.x-vw/2,ty=h.y-vh*look;if(st.mode==='title'&&sc.id==='w'){var drift=(FX.low||(FX.rm&&FX.rm.matches))?0:Math.sin(st.time*.2)*40;pivot=hy(NODES[0][1]);tx=hx(NODES[0][0],NODES[0][1])-vw/2+drift;ty=pivot-vh/2}
  var mx=sc.W-vw,my=sc.H-vh;tx=mx<0?mx/2:Math.max(0,Math.min(mx,tx));if(!phone)ty=my<0?my/2:Math.max(0,Math.min(my,ty));v.pivot=pivot;
  if(st.cam.snap){st.cam.x=tx;st.cam.y=ty;st.cam.snap=false}else{st.cam.x+=(tx-st.cam.x)*.18;st.cam.y+=(ty-st.cam.y)*.18}
  var cx=st.cam.x,cy=st.cam.y;if(Art.camSkew){Art.camSkew.s=v.s;Art.camSkew.y=v.y}terrainXform(g,cx,cy,v);g.drawImage(sc.cv,0,0);if(!FX.low&&window.LQAnim)LQAnim.water(g,sc,st.time,cx,cy,vw,vh);

@@ -135,3 +135,37 @@ Water, snow, sand and marsh now carry a soft shaded side inside the baked tile. 
 ## Title legend, same day
 
 Each world's title card shows a dot for every region and one for the citadel, in that place's tint. Python shows 7, Safety 12, Portfolio 8. The corner HUD is hidden while the title is up, so the painted map frames the card and the panels do not sit underneath it. The HUD returns when the journey starts. Title screens for Python, Safety and Portfolio loaded with no console exceptions. Begin was not clicked on that check.
+
+## Lights and three-quarter ground, same day
+
+`origin/main` was already merged (`e3a6f95`) before this pass. No second merge.
+
+The map stays painted 2D. WebGL is a post grade on a second canvas, `#lqgl`, not a 3D scene. No new dependency. `shared/fx2.js` exports `window.LQLight`. `shared/world.js` feeds it the frame and the lights. Low effects hides the overlay and keeps the flat map. Reduced motion keeps the still grade and the still lean, and still freezes shimmer, particles, confetti and idle bob. The grade does not pulse.
+
+### What changed
+
+`shared/fx2.js`. Course grades: Python green-gold, Foundations warm copper, Evals cool blue, Safety dusk amber, Portfolio ledger green. Up to 12 point lights. Glow motes (forest, marsh, crown) and the reward burst record a few lights. `LQLight.error()` is empty when the shader links.
+
+`shared/world.js`. Lights on the hero, a glowing or open chest, smithy, tower, lit hall, great hall, castle, vault, landmark and town. The ground shear is −0.36 and the vertical scale is 0.62, pivoted on the hero so a lower tile does not slide off the side. People, buildings and labels stay upright. The tap math uses the same pivot. The minimap stays top-down. On a narrow screen the camera holds the hero at 42% of the height and may scroll past the map edge. A first level clear, a chest and the final challenge dispatch `lq:celebrate`. A party chime does not.
+
+`shared/art.js`. Cliff lift is 30, 20, 13 and 9px for mountain, hills, pine and forest. The wall joins the cap to the ground. Figure and building shadows take the ground shear. Portraits pass `flat` so the cached head stays round.
+
+`shared/world.css`. `#lqgl` covers the map and ignores taps. Under 560px the guide caption sits above the region banner (`bottom` offset 310px), and the banner sits above the d-pad. The XP panel stays on top of the map. A dialogue hides the caption.
+
+### Checked
+
+Headless Edge, effects forced full, local static server. Home and all five titles, then Begin on Python and Foundations. Python town at 390×844. No console exceptions. Shader error string empty, overlay visible, WebGL error 0. Tap round-trip error was 0. At 390×844 the guide did not meet the XP panel, the banner did not meet the guide, and the hero feet (about y=354) sat above both. Low effects then hid the overlay and flattened the shear, with no console exception. Begin wrote a save only in that temporary profile. Mark as done was not clicked. Not tested on a real phone, Safari, or Firefox.
+
+### Open for Jensen
+
+Phone HUD icon buttons stay 42px under 560px.
+
+Home `data-n` stays 6, 7, 10 and 7. Portfolio stays off the progress strip.
+
+Low effects still draws cached tile light and seeded grain. It also skips the new lights, the lean and the cliff lift.
+
+Citadel trim stays `#c9a24f`. Safety's citadel roof stays `#6a5830`.
+
+Walking still steps when motion is reduced. The oblique view stays up in that case, because it does not move. Say if reduced motion should force the flat map too.
+
+On a phone, the south edge of a map can show a band of night under the island so the hero stays above the guide and the banner. Say if the hero should sit lower and let the banner overlap the shore instead.

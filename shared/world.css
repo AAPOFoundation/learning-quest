@@ -63,7 +63,7 @@ body.intitle #hud{visibility:hidden}
 body.indlg #pad,body.indlg #acts{display:none!important}body.indlg #area{opacity:0!important}body.indlg #narrcap{visibility:hidden}
 #narrcap{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:30;max-width:min(680px,92vw);padding:10px 16px;border:1px solid #d7b56a99;border-radius:12px;background:#0a0f15ee;color:#f3ead6;font-size:15px;line-height:1.4;pointer-events:none;display:flex;gap:10px;align-items:baseline}
 #narrcap[hidden]{display:none}#narrcap .who{font:700 12px var(--display);letter-spacing:.1em;text-transform:uppercase;color:#d7b56a;flex:none}
-@media (max-width:560px){#narrcap{top:auto;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 258px);max-width:calc(100vw - 20px);z-index:12;font-size:13px}}
+@media (max-width:560px){#narrcap{top:auto;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 310px);max-width:calc(100vw - 20px);z-index:12;font-size:13px}}
 
 #cutscene{position:fixed;inset:0;z-index:25;background:#000;display:flex;align-items:center;justify-content:center}#cutscene video{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain}#cutscene .skip{position:absolute;top:14px;right:14px;z-index:2;padding:8px 16px;border:1px solid #d7b56a;border-radius:10px;background:#0a0f15dd;color:#f3ead6;font:700 14px var(--display);cursor:pointer;min-height:44px}
 /* Python challenges */
