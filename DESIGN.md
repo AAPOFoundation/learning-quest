@@ -1,4 +1,6 @@
-# Pocket Reserve design language (extracted from live CSS, 16 Oct 2026)
+# The Wanderer’s Atlas: design notes
+
+## Pocket Reserve design language (extracted from live CSS, 16 Oct 2026)
 Source: https://aapofoundation.github.io/pocket-reserve/ (index.html, landing CSS). Nothing was changed there; assets were not copied (only tokens/patterns re-implemented).
 
 **Mood:** dark night-blue "field" panels with brass/gold trim, warm parchment text, quiet and unhurried. Calm, craft-like, "field guide" feel.
