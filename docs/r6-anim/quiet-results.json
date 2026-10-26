@@ -1,0 +1,284 @@
+{
+ "chromium-no-preference": {
+  "r6": {
+   "reducedMotion": false,
+   "low": {
+    "poseIgnored": {
+     "run": true,
+     "kneel": true,
+     "reach": true,
+     "read": true,
+     "pump": true,
+     "jump": true,
+     "think": true,
+     "nod": true,
+     "shrug": true,
+     "chat": true,
+     "wave": true,
+     "cheer": true
+    },
+    "crittersStill": true,
+    "heroSMPose": null,
+    "heroSMpose2": null,
+    "runK": 1
+   },
+   "full": {
+    "poseMoves": {
+     "run": true,
+     "kneel": true,
+     "reach": true,
+     "read": true,
+     "pump": true,
+     "jump": true,
+     "think": true,
+     "nod": true,
+     "shrug": true,
+     "chat": true,
+     "wave": true,
+     "cheer": true
+    },
+    "crittersMove": true
+   }
+  },
+  "r5": {
+   "reducedMotion": false,
+   "lowGazeStill": true,
+   "lowBlinkOpen": true,
+   "fullGazeMoves": true,
+   "fullBlinks": true
+  },
+  "r4": {
+   "entrance": true,
+   "habit": true,
+   "landSettlePoke": true,
+   "fullMoves": true
+  },
+  "game-low": {
+   "pose": null,
+   "runK": 1,
+   "state": "idle",
+   "followers": 0,
+   "folkMoved": 0,
+   "joined": 4,
+   "folkMovedLater": 0
+  },
+  "errors": []
+ },
+ "chromium-reduce": {
+  "r6": {
+   "reducedMotion": {
+    "poseIgnored": {
+     "run": true,
+     "kneel": true,
+     "reach": true,
+     "read": true,
+     "pump": true,
+     "jump": true,
+     "think": true,
+     "nod": true,
+     "shrug": true,
+     "chat": true,
+     "wave": true,
+     "cheer": true
+    },
+    "crittersStill": true,
+    "heroSMPose": null,
+    "heroSMpose2": null,
+    "runK": 1
+   },
+   "low": {
+    "poseIgnored": {
+     "run": true,
+     "kneel": true,
+     "reach": true,
+     "read": true,
+     "pump": true,
+     "jump": true,
+     "think": true,
+     "nod": true,
+     "shrug": true,
+     "chat": true,
+     "wave": true,
+     "cheer": true
+    },
+    "crittersStill": true,
+    "heroSMPose": null,
+    "heroSMpose2": null,
+    "runK": 1
+   }
+  },
+  "r5": {
+   "reducedMotion": true,
+   "lowGazeStill": true,
+   "lowBlinkOpen": true,
+   "rmGazeStill": true,
+   "rmBlinkOpen": true
+  },
+  "r4": {
+   "entrance": true,
+   "habit": true,
+   "landSettlePoke": true,
+   "fullMoves": false
+  },
+  "game-low": {
+   "pose": null,
+   "runK": 1,
+   "state": "idle",
+   "followers": 0,
+   "folkMoved": 0,
+   "joined": 4,
+   "folkMovedLater": 0
+  },
+  "game-rm": {
+   "pose": null,
+   "runK": 1,
+   "state": "idle",
+   "followers": 0,
+   "folkMoved": 0,
+   "joined": 4,
+   "folkMovedLater": 0
+  },
+  "errors": []
+ },
+ "webkit-no-preference": {
+  "r6": {
+   "reducedMotion": false,
+   "low": {
+    "poseIgnored": {
+     "run": true,
+     "kneel": true,
+     "reach": true,
+     "read": true,
+     "pump": true,
+     "jump": true,
+     "think": true,
+     "nod": true,
+     "shrug": true,
+     "chat": true,
+     "wave": true,
+     "cheer": true
+    },
+    "crittersStill": true,
+    "heroSMPose": null,
+    "heroSMpose2": null,
+    "runK": 1
+   },
+   "full": {
+    "poseMoves": {
+     "run": true,
+     "kneel": true,
+     "reach": true,
+     "read": true,
+     "pump": true,
+     "jump": true,
+     "think": true,
+     "nod": true,
+     "shrug": true,
+     "chat": true,
+     "wave": true,
+     "cheer": true
+    },
+    "crittersMove": true
+   }
+  },
+  "r5": {
+   "reducedMotion": false,
+   "lowGazeStill": true,
+   "lowBlinkOpen": true,
+   "fullGazeMoves": true,
+   "fullBlinks": true
+  },
+  "r4": {
+   "entrance": true,
+   "habit": true,
+   "landSettlePoke": true,
+   "fullMoves": true
+  },
+  "game-low": {
+   "pose": null,
+   "runK": 1,
+   "state": "idle",
+   "followers": 0,
+   "folkMoved": 0,
+   "joined": 4,
+   "folkMovedLater": 0
+  },
+  "errors": []
+ },
+ "webkit-reduce": {
+  "r6": {
+   "reducedMotion": {
+    "poseIgnored": {
+     "run": true,
+     "kneel": true,
+     "reach": true,
+     "read": true,
+     "pump": true,
+     "jump": true,
+     "think": true,
+     "nod": true,
+     "shrug": true,
+     "chat": true,
+     "wave": true,
+     "cheer": true
+    },
+    "crittersStill": true,
+    "heroSMPose": null,
+    "heroSMpose2": null,
+    "runK": 1
+   },
+   "low": {
+    "poseIgnored": {
+     "run": true,
+     "kneel": true,
+     "reach": true,
+     "read": true,
+     "pump": true,
+     "jump": true,
+     "think": true,
+     "nod": true,
+     "shrug": true,
+     "chat": true,
+     "wave": true,
+     "cheer": true
+    },
+    "crittersStill": true,
+    "heroSMPose": null,
+    "heroSMpose2": null,
+    "runK": 1
+   }
+  },
+  "r5": {
+   "reducedMotion": true,
+   "lowGazeStill": true,
+   "lowBlinkOpen": true,
+   "rmGazeStill": true,
+   "rmBlinkOpen": true
+  },
+  "r4": {
+   "entrance": true,
+   "habit": true,
+   "landSettlePoke": true,
+   "fullMoves": false
+  },
+  "game-low": {
+   "pose": null,
+   "runK": 1,
+   "state": "idle",
+   "followers": 0,
+   "folkMoved": 0,
+   "joined": 4,
+   "folkMovedLater": 0
+  },
+  "game-rm": {
+   "pose": null,
+   "runK": 1,
+   "state": "idle",
+   "followers": 0,
+   "folkMoved": 0,
+   "joined": 4,
+   "folkMovedLater": 0
+  },
+  "errors": []
+ }
+}

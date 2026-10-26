@@ -1,0 +1,4 @@
+(a)=>{const app=a[0],sid=a[1];const mk=(k,lv)=>{let s=null;try{s=JSON.parse(localStorage.getItem('learning-apps.'+k))}catch(e){}s=s||{v:1,xp:0,streak:1,last:'',levels:{},badges:[],boss:null,code:{}};lv.forEach(id=>s.levels[id]={done:true,stars:2,best:4});localStorage.setItem('learning-apps.'+k,JSON.stringify(s))};
+ const w={sid:sid,c:7,r:8,chests:{},caches:{},taught:{'0':1},sim:{},visited:{},intro:1};
+ localStorage.setItem('learning-apps.'+app,JSON.stringify({v:1,xp:120,streak:1,last:'',levels:{},badges:[],boss:null,w:w,code:{}}));
+ mk('ai-evals',['lS']);mk('ai-safety',['l3']);mk('python-basics',[APP.key==='python-basics'?APP.levels[0].id:'l1']);if(APP.key!=='python-basics')mk(app,[APP.levels[0].id]);}
