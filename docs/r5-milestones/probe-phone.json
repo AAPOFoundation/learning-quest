@@ -1,0 +1,44 @@
+{
+ "phone": {
+  "before_errors": [],
+  "noclip_overlay": false,
+  "noclip_requests": [],
+  "noclip_errors": [],
+  "during_card_overlay": false,
+  "overlay": {
+   "muted": true,
+   "paused": false,
+   "src": "http://127.0.0.1:9151/_placeholder/ms-seal-chest.mp4",
+   "card": [
+    10,
+    225,
+    380,
+    619
+   ],
+   "inner": [
+    390,
+    844
+   ],
+   "title": "Your first seal",
+   "pun": "Seal of approval! Your very first seal is shining bright."
+  },
+  "closed": true,
+  "saved": {
+   "python-basics:seal-first": 1793012721891
+  },
+  "repeat_overlay": false,
+  "errors": [],
+  "requests": [
+   "ms-region-meadow.mp4",
+   "ms-region-meadow.vtt",
+   "ms-seal-chest.mp4",
+   "ms-seal-chest.vtt"
+  ],
+  "calm": {
+   "calm": true,
+   "videoInFrame": false,
+   "playBtn": true
+  },
+  "calm_errors": []
+ }
+}

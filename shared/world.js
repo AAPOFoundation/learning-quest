@@ -115,7 +115,7 @@ function finishStep(){var h=st.hero,m=h.mv;h.c=m.c;h.r=m.r;h.x=m.tx;h.y=m.ty;h.m
  if(!o)return;
  if(o.type==='node'){st.path=null;visitNode(o)}
  else if(o.type==='gate'){st.path=null;leaveTown()}
- else if(o.type==='cache'&&!w.caches[o.i]){w.caches[o.i]=1;P().xp+=10;chime('+10 XP');E.toast('Supply cache found: +10 XP');if(Object.keys(w.caches).length>=NR)E.award('scout');E.save();hud()}}
+ else if(o.type==='cache'&&!w.caches[o.i]){w.caches[o.i]=1;P().xp+=10;chime('+10 XP');E.toast('Supply cache found: +10 XP');if(Object.keys(w.caches).length>=NR){E.award('scout');try{document.dispatchEvent(new CustomEvent('lq:milestone',{detail:{ms:{kind:'pathfinder'}}}))}catch(e){}}E.save();hud()}}
 function visitNode(o){var w=PW();w.visited[o.i]=1;enter(o.i<NR?'t'+o.i:'k',7,9)}
 function leaveTown(){var w=world(),i=st.scene.i,nd=NODES[i],sc=st.world,pos=null;for(var d=0;d<6;d++){var n=neigh(nd[0],nd[1],d);if(walkable(sc,n[0],n[1])&&!sc.omap[n[0]+','+n[1]]){pos=n;break}}
  enter('w',pos?pos[0]:nd[0],pos?pos[1]:nd[1])}
@@ -163,7 +163,7 @@ function lessonOf(i){var T=C.regions[i].teacher;openOv(function(){E.lessonDone=f
 function gateTalk(i){var R=C.regions[i],G=R.gate,done=levelDone(i);
  if(!done)say(G,['Halt, traveller. I am '+G.name+', '+G.title.toLowerCase()+'.','Answer the questions in the '+R.hall+' and score at least 60% to pass. There is no penalty for trying again.'],function(){ask(G,'Will you take the trial?',[{t:'Take the trial',fn:function(){trial(i)}},{t:'Not yet'}])});
  else say(G,['You have passed, traveller. The way onward is open, and a chest awaits you in this town.'],function(){ask(G,'Replay the trial for a better score?',[{t:'Replay the trial',fn:function(){trial(i)}},{t:'No, thanks'}])})}
-function trial(i){var G=C.regions[i].gate,was=levelDone(i);openOv(function(){E.level(i,'quiz')},function(){var now=levelDone(i);if(now&&!was){chime('Cleared');var hp=scr(st.hero.x,st.hero.y,heroH(),S*.5);cele({msg:'The way is open!',vfx:'gate',x:hp[0],y:hp[1],confetti:false});var nx=i<NR-1?'The fog lifts from '+C.regions[i+1].name+'.':'The gates of the '+C.castle.name+' now stand open.';say(G,['Well fought. You may pass. '+nx,'Open the chest in this town, then take the south gate back to the map.'])}else if(!now)say(G,['Not this time. Re-read the lesson with the teacher and try again; there is no penalty.'])})}
+function trial(i){var G=C.regions[i].gate,was=levelDone(i);openOv(function(){E.level(i,'quiz')},function(){var now=levelDone(i);if(now&&!was){chime('Cleared');var hp=scr(st.hero.x,st.hero.y,heroH(),S*.5);cele({msg:'The way is open!',vfx:'gate',x:hp[0],y:hp[1],confetti:false,ms:{kind:'region',i:i}});var nx=i<NR-1?'The fog lifts from '+C.regions[i+1].name+'.':'The gates of the '+C.castle.name+' now stand open.';say(G,['Well fought. You may pass. '+nx,'Open the chest in this town, then take the south gate back to the map.'])}else if(!now)say(G,['Not this time. Re-read the lesson with the teacher and try again; there is no penalty.'])})}
 function simTalk(i){var R=C.regions[i],s=R.sim,sp={name:s.name,mark:({vault:'vault',guild:'ruler',smithy:'hammer',tower:'tower',lab:'flask',observatory:'scope'})[s.building]||'scroll'};
  say(sp,[s.blurb+(s.render?' (A toy example with made-up numbers, not real model data.)':' (Example data, not advice. Nothing is ordered or connected.)')],function(){ask(sp,s.kind==='lesson'?'Climb the tower?':'Step inside?',[{t:'Enter',fn:function(){openSim(i)}},{t:'Not now'}])})}
 function openSim(i){var s=C.regions[i].sim,w=PW();w.sim[i]=1;
@@ -179,7 +179,7 @@ function scr(x,y,h,up){try{var r=cv.getBoundingClientRect(),z=zoom(),vx=x,vy=y-(
 /* r4: chest reward card (shared/hud.js draws it) */
 function reward(d){try{document.dispatchEvent(new CustomEvent('lq:reward',{detail:d}))}catch(e){}}
 function cele(d){try{document.dispatchEvent(new CustomEvent('lq:celebrate',{detail:d}))}catch(e){}}
-function chestFx(o,msg){var p=scr(hx(o.c,o.r),hy(o.r),tileH(st.scene,o.c,o.r),S*.25);cele({msg:msg,vfx:'beam',x:p[0],y:p[1]})}
+function chestFx(o,msg){var p=scr(hx(o.c,o.r),hy(o.r),tileH(st.scene,o.c,o.r),S*.25);cele({msg:msg,vfx:'beam',x:p[0],y:p[1],ms:{kind:o.i>=NR?'finale':'seal',i:o.i}})}
 function chestOpen(o){var i=o.i,w=PW(),was=!!w.chests[i],sp={name:'Treasure chest',mark:was?'gift-open':'gift'};
  if(i>=NR){if(!bossDone()){if(motionOn())o._nudge=.28;return say(sp,['The chest is sealed. Only the Council can open it: finish the final challenge first.'])}
   if(was)return say(sp,['Empty now. You already took the '+C.castle.chest+'.']);w.chests[i]=1;P().xp+=50;E.award('crown');chime('+50 XP');chestFx(o,'Treasure found!');reward({title:C.castle.chest,kind:'crown',rarity:'legendary',xp:50,where:C.castle.name,accent:C.castle.tint});E.save();hud();sp.mark='gift-lit';return say(sp,['You found the '+C.castle.chest+'! +50 XP and a badge.','The realm is yours to explore. Revisit any trial to earn three stars.'])}
@@ -189,7 +189,7 @@ function chestOpen(o){var i=o.i,w=PW(),was=!!w.chests[i],sp={name:'Treasure ches
  w.chests[i]=1;P().xp+=25;E.award('seal_'+A.levels[i].id);chime('+25 XP');chestFx(o,'Seal found!');reward({title:'Seal of '+R.name,kind:'seal',rarity:'rare',xp:25,where:R.name,accent:R.accent});E.save();hud();sp.mark='gift-lit';say(sp,['You found the Seal of '+R.name+'! +25 XP and a badge.'])}
 function bossTalk(){var B=C.castle.boss;
  if(!allDone())return say(B,['You are not ready. Clear all '+NR+' regions first.']);
- say(B,bossDone()?['You have faced us already, and did well. Care to try for a higher score?']:['So you have crossed the whole realm. I am '+B.name+'.',B.title+'. Make your five choices wisely.'],function(){var was=bossDone();ask(B,was?'Face the challenge again?':'Begin the final challenge?',[{t:'Begin',fn:function(){openOv(function(){E.boss()},function(){if(bossDone()){chime('Well done');if(!was){var hp=scr(st.hero.x,st.hero.y,heroH(),S*.5);cele({msg:'Well done',vfx:'shockwave',x:hp[0],y:hp[1],confetti:false})}say(B,['A fine piece of work. Open the chest by the wall, and take your crown.'])}})}},{t:'Not yet'}])})}
+ say(B,bossDone()?['You have faced us already, and did well. Care to try for a higher score?']:['So you have crossed the whole realm. I am '+B.name+'.',B.title+'. Make your five choices wisely.'],function(){var was=bossDone();ask(B,was?'Face the challenge again?':'Begin the final challenge?',[{t:'Begin',fn:function(){openOv(function(){E.boss()},function(){if(bossDone()){chime('Well done');if(!was){var hp=scr(st.hero.x,st.hero.y,heroH(),S*.5);cele({msg:'Well done',vfx:'shockwave',x:hp[0],y:hp[1],confetti:false,ms:{kind:'council'}})}say(B,['A fine piece of work. Open the chest by the wall, and take your crown.'])}})}},{t:'Not yet'}])})}
 function interact(o){
  if(motionOn()){st.hero.poke=1;if(o.type==='npc')o._greet=st.time}
  if(o.role==='teacher')teacherTalk(region());
