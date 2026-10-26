@@ -1,4 +1,6 @@
 /* Exploration layer: hex overworld + towns, hero, NPC dialogue, quests, HUD. Lessons/quizzes/sims come from engine.js + content.js. */
+/* r5 lane F: load shared/feel.js (game feel and living world) next to this file, so the page HTML stays untouched. Every LQFeel call is guarded, so play works before it arrives. */
+(function(){try{if(window.LQFeel||document.querySelector('script[data-lq-feel]'))return;var me=document.currentScript,src=me&&me.src?me.src.replace(/world\.js(\?.*)?$/,'feel.js'):'../shared/feel.js',s=document.createElement('script');s.src=src;s.setAttribute('data-lq-feel','1');(me&&me.parentNode||document.head).appendChild(s)}catch(e){}})();
 (function(){
 'use strict';
 var FX=window.LQFx||{low:true,set:function(){}},A=window.APP,E=window.Engine,C=window.WORLD,Art=window.Art,S=Art.S,hx=Art.hx,hy=Art.hy,neigh=Art.neigh;
