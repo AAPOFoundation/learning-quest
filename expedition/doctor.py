@@ -1,4 +1,4 @@
-"""Expedition doctor: checks your set-up for the Learning Quest Expedition. Safe to run: it sends nothing anywhere
+"""Expedition doctor: checks your set-up for The Wanderer’s Atlas Expedition. Safe to run: it sends nothing anywhere
 and never prints API keys. It makes one offline test run with a fake model, so it costs nothing.
 
 Run:   python doctor.py          (Windows: py doctor.py)
