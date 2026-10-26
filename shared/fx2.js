@@ -124,7 +124,14 @@ function fireflies(g,sc,T,cx,cy,vw,vh){if(FX.low||(FX.rm&&FX.rm.matches))return;
   var x=cx+u*vw+Math.sin(T*.9+i*2.3)*14,y=cy+(.2+.75*v)*vh+Math.cos(T*1.1+i)*10,on=Math.max(0,Math.sin(T*(1.1+h1)+i*1.7));if(on<.15)continue;
   g.globalAlpha=.16*on;g.fillStyle='#ffe58a';g.beginPath();g.arc(x,y,6,0,6.3);g.fill();g.globalAlpha=.9*on;g.fillStyle='#fff6c0';g.beginPath();g.arc(x,y,1.5,0,6.3);g.fill()}
  g.restore()}
-window.LQAnim={water:water,particles:particles,burst:burst,floatText:floatText,puff:puff,glows:glows,pools:pools,fireflies:fireflies};
+/* r6: cheap warm lamplight for when the WebGL light pass is off (the speed guard tripped on a slow phone, or no WebGL).
+   lamps2d(g,lights): the same light list world.js packs for the GL pass (canvas px), drawn as soft pool sprites with 'lighter'.
+   At most 10 sprites, no per-pixel work, so a slow phone still gets warm pools under lamps, windows and the hero. Still when calm. */
+function lamps2d(g,L){if(FX.low||!g||!L||!L.length)return;var sp=poolSprite(),n=0,i,l,m,r,yo;g.save();g.setTransform(1,0,0,1,0,0);g.globalCompositeOperation='lighter';
+ for(i=0;i<L.length&&n<10;i++){l=L[i];m=Math.max(l.c[0],l.c[1],l.c[2]);if(m<0.05)continue;r=l.r*(l.k===3?0.7:1.05);yo=l.k===1?l.r*0.55:l.k===2?l.r*0.2:0;
+  g.globalAlpha=Math.min(0.7,m*(l.p===0?1.1:1.5));g.drawImage(sp,l.x-r,l.y+yo-r*0.62,r*2,r*1.24);n++}
+ g.restore()}
+window.LQAnim={water:water,particles:particles,burst:burst,floatText:floatText,puff:puff,glows:glows,pools:pools,fireflies:fireflies,lamps2d:lamps2d};
 })();
 /* WebGL colour grade, gold glow, point lights, contact shadows and region atmosphere over the painted world.
    The 2D canvas stays the map. This canvas (#lqgl) covers it and ignores taps.

@@ -533,7 +533,7 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
  /* The WebGL pass reads this canvas, so the fade veil is drawn first and gets the same grade. If WebGL is not there, the old canvas light layer is used. */
  if(st.veil>0){g.save();g.globalAlpha=st.veil;g.fillStyle='#0a0f15';g.fillRect(0,0,CW,CH);g.restore()}
  var glOk=false;if(window.LQLight){var pk=packLights(cx,cy,z);glOk=LQLight.frame(cv,pk.lights,pk.shadows,A.key,null,atmOpts(world,sc,h,cx,cy,z))}
- if(!FX.low&&!glOk){g.setTransform(1,0,0,1,0,0);if(!fxl||fxl.w!==cv.width||fxl.h!==cv.height)mkLight();g.drawImage(fxl.c,0,0);if(st.veil>0){g.setTransform(dpr,0,0,dpr,0,0);g.save();g.globalAlpha=st.veil;g.fillStyle='#0a0f15';g.fillRect(0,0,CW,CH);g.restore()}}
+ if(!FX.low&&!glOk){g.setTransform(1,0,0,1,0,0);if(!fxl||fxl.w!==cv.width||fxl.h!==cv.height)mkLight();g.drawImage(fxl.c,0,0);if(window.LQAnim&&LQAnim.lamps2d&&pk)LQAnim.lamps2d(g,pk.lights);/* r6: warm pools when the GL pass is off */if(st.veil>0){g.setTransform(dpr,0,0,dpr,0,0);g.save();g.globalAlpha=st.veil;g.fillStyle='#0a0f15';g.fillRect(0,0,CW,CH);g.restore()}}
  st.mmT-=1;var rebake=st.mmT<=0;if(rebake)st.mmT=6;drawMM(rebake)}
 function drawMM(rebake){if(!mm||!st.scene)return;var sc=st.scene,g=mmg,W=mm.width,H=mm.height,k=Math.min(W/sc.W,H/sc.H),ox=(W-sc.W*k)/2,oy=(H-sc.H*k)/2;
  if(!mmBg||mmBg.width!==W||mmBg.height!==H){mmBg=document.createElement('canvas');mmBg.width=W;mmBg.height=H;mmBg._sid=''}
