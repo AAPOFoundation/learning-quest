@@ -2,6 +2,7 @@
 (function(){
 'use strict';
 var FX=window.LQFx||{low:true,set:function(){}},A=window.APP,E=window.Engine,C=window.WORLD,Art=window.Art,S=Art.S,hx=Art.hx,hy=Art.hy,neigh=Art.neigh;
+if(C&&C.hero&&C.hero.gear==null)C.hero.gear=1;/* r4: hero gear layers (mantle, strap, satchel, belt, boots) on the map figure and the HUD portrait */
 var $=function(s,r){return (r||document).querySelector(s)};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function hexOk(c){return typeof c==='string'&&/^#[0-9a-fA-F]{6}$/.test(c)}
@@ -108,7 +109,7 @@ function stepDir(d){var h=st.hero,n=neigh(h.c,h.r,d),c=n[0],r=n[1],face=(d===0||
  if(interactive(o)){st.path=null;interact(o);return 'bump'}
  if(!walkable(st.scene,c,r)||(o&&o.block)){if(st.time-st.bumpAt>.32){if(motionOn())st.shake=.16;st.bumpAt=st.time;blip(98,.05,.02,'square')}return 'blocked'}
  h.mv={fx:h.x,fy:h.y,tx:hx(c,r),ty:hy(r),t:0,c:c,r:r};h.step=0;h.hop=0;return 'moved'}
-function finishStep(){var h=st.hero,m=h.mv;h.c=m.c;h.r=m.r;h.x=m.tx;h.y=m.ty;h.mv=null;h.step=0;h.hop=0;h.foot=-(h.foot||1);var w=PW();w.sid=st.sid;w.c=h.c;w.r=h.r;E.save();
+function finishStep(){var h=st.hero,m=h.mv;h.c=m.c;h.r=m.r;h.x=m.tx;h.y=m.ty;h.mv=null;h.step=0;h.hop=0;h.foot=-(h.foot||1);if(motionOn()){h.land=1;h.settle=1}var w=PW();w.sid=st.sid;w.c=h.c;w.r=h.r;E.save();
  if(Math.random()<.5)blip(180+Math.random()*30,.05,.012,'triangle');
  var o=objAt(h.c,h.r);if(!(o&&(o.type==='node'||o.type==='gate'))&&motionOn()&&window.LQAnim&&LQAnim.puff){var pq=useView()?toView(h.x,h.y+S*.32,tileH(st.scene,h.c,h.r),0):{x:h.x,y:h.y+S*.32};LQAnim.puff(pq.x,pq.y)};
  if(!o)return;
@@ -188,6 +189,7 @@ function bossTalk(){var B=C.castle.boss;
  if(!allDone())return say(B,['You are not ready. Clear all '+NR+' regions first.']);
  say(B,bossDone()?['You have faced us already, and did well. Care to try for a higher score?']:['So you have crossed the whole realm. I am '+B.name+'.',B.title+'. Make your five choices wisely.'],function(){var was=bossDone();ask(B,was?'Face the challenge again?':'Begin the final challenge?',[{t:'Begin',fn:function(){openOv(function(){E.boss()},function(){if(bossDone()){chime('Well done');if(!was){var hp=scr(st.hero.x,st.hero.y,heroH(),S*.5);cele({msg:'Well done',vfx:'shockwave',x:hp[0],y:hp[1],confetti:false})}say(B,['A fine piece of work. Open the chest by the wall, and take your crown.'])}})}},{t:'Not yet'}])})}
 function interact(o){
+ if(motionOn()){st.hero.poke=1;if(o.type==='npc')o._greet=st.time}
  if(o.role==='teacher')teacherTalk(region());
  else if(o.role==='gate'||o.role==='hall'&&region()<NR)gateTalk(region());
  else if(o.role==='hall')bossTalk();
@@ -320,6 +322,8 @@ function stepHov(dt){var want=st.mode==='play'?st.hov:null,on=motionOn(),k=1-Mat
 function drawHov(g){if(!(st.hovA>0.02)||!st.hovTile)return;g.save();g.globalAlpha=.45*st.hovA;g.fillStyle='rgba(243,226,176,.45)';hexAt(g,st.hovTile.c,st.hovTile.r,S*.9);g.fill();g.globalAlpha=.8*st.hovA;g.strokeStyle='#f3e2b0';g.lineWidth=1.6;g.stroke();g.restore()}
 function update(dt){st.time+=dt;stepHov(dt);if(st.shake>0)st.shake=Math.max(0,st.shake-dt);if(st.veil>0)st.veil=Math.max(0,st.veil-dt*2.4);
  if(st.hero.turn>0)st.hero.turn=Math.max(0,st.hero.turn-dt/.14);
+ var hh=st.hero;if(hh.land>0)hh.land=Math.max(0,hh.land-dt/.24);if(hh.settle>0)hh.settle=Math.max(0,hh.settle-dt/.8);if(hh.poke>0)hh.poke=Math.max(0,hh.poke-dt/.32);
+ if(st.scene&&st.scene.id!=='w')stepCritters(st.scene,dt);
  if(st.rip){st.rip.t+=dt;if(st.rip.t>.42)st.rip=null}
  if(st.xpT<1){st.xpT=Math.min(1,st.xpT+dt/.48);var eu=st.xpT*st.xpT*(3-2*st.xpT),en=Math.round(st.xpFrom+(st.xpTo-st.xpFrom)*eu);if(en!==st.xpVis){st.xpVis=en;var xe=$('#xpn');if(xe)xe.textContent=en+' XP'}}
  var ch=false;for(var z=0;z<st.fog.length;z++){var t=st.fogTgt[z]=zoneOpen(z)?0:1;if(st.fog[z]!==t){st.fog[z]+=Math.sign(t-st.fog[z])*Math.min(Math.abs(t-st.fog[z]),dt*.7);ch=true}}if(ch)redrawFog();
@@ -333,6 +337,44 @@ function update(dt){st.time+=dt;stepHov(dt);if(st.shake>0)st.shake=Math.max(0,st
   if(dd){st.path=null;for(var i=0;i<dd.length;i++){var res=stepDir(dd[i]);if(res==='moved'){if(dd.length===2)st.zig=!st.zig;break}if(res==='bump')break}}
   else if(st.path&&st.path.length){var nx=st.path[0],d=dirTo([h.c,h.r],nx);if(d<0){st.path=null}else{var rs=stepDir(d);if(rs==='moved')st.path.shift();else st.path=null}}}
  markAct()}
+/* r4 characters: per-NPC idle habit (from the name), a greeting hop after a talk, and the gatekeeper entrance.
+   The entrance plays once per town visit the first time the hero comes within four tiles. Quiet mode skips all of it. */
+var HABIT={teacher:[4,0,4,1],guide:[0,1,5,3]};
+function npcAnim(o,op,bossy,T){var mo=motionOn();
+ if(o._habit==null){var hh=0,nm=String(o.name||'');for(var i=0;i<nm.length;i++)hh=(hh*31+nm.charCodeAt(i))|0;hh=Math.abs(hh);var pool=HABIT[o.role];o._habit=pool?pool[hh%pool.length]:hh%6}
+ op.habit=o._habit;op.greet=mo&&o._greet!=null?Math.max(0,1-(st.time-o._greet)/.42):0;
+ if(bossy){op.boss=1;var sc=st.scene;op.accent=(sc&&sc.i<NR&&C.regions[sc.i]&&hexOk(C.regions[sc.i].accent))?C.regions[sc.i].accent:'#d7b56a';
+  if(!mo){op.ent=1;return}var h=st.hero;if(o._ent==null&&Art.hdist(h.c,h.r,o.c,o.r)<=4)o._ent=st.time;op.ent=o._ent==null?0:(st.time-o._ent)/1.25}}
+/* r4 critters: a few friendly animals per town (bunnies, birds, butterflies, frogs, snow hares by biome). They nibble, peck and flutter,
+   hop or fly a short way off when the hero comes close, then settle. Positions stay inside the town's open tiles. Quiet mode holds them still. */
+var CRITS={meadow:['bunny','bird','butterfly','butterfly','bird'],forest:['bunny','bird','butterfly','bunny'],hills:['bird','bunny','butterfly','bird'],desert:['bird','butterfly','bird'],tundra:['hare','bird','hare'],marsh:['frog','frog','butterfly','bird'],highland:['bird','bunny','butterfly','hare'],crown:['butterfly','bird','butterfly','bunny']};
+function critSpots(sc){var out=[],seen={},k,c,r;for(k=0;k<400&&out.length<40;k++){c=Math.floor(Art.hash(k,sc.i,71)*sc.cols);r=Math.floor(Art.hash(k,sc.i,73)*sc.rows);var key=c+','+r;if(seen[key])continue;seen[key]=1;
+  if(!sc.pass[c][r]||sc.omap[key])continue;var near=false;for(var d=0;d<6;d++){var nb=neigh(c,r,d);if(sc.omap[nb[0]+','+nb[1]]){var ob=sc.omap[nb[0]+','+nb[1]];if(ob.type==='npc'||ob.type==='building'||ob.type==='gate'){near=true;break}}}if(near)continue;out.push([c,r])}return out}
+function spawnCritters(sc){if(sc.critters||sc.id==='w')return;var b=sc.i<NR?bio(sc.i):'crown',kinds=CRITS[b]||CRITS.meadow,spots=critSpots(sc),list=[];
+ for(var i=0;i<kinds.length&&i<spots.length;i++){var sp=spots[(i*7)%spots.length],x=hx(sp[0],sp[1])+(Art.hash(i,sc.i,5)-.5)*S*.5,y=hy(sp[1])+(Art.hash(i,sc.i,6)-.3)*S*.4;
+  list.push({kind:kinds[i],x:x,y:y,hx:x,hy:y,c:sp[0],r:sp[1],face:Art.hash(i,sc.i,9)<.5?1:-1,seed:i+sc.i*3,mode:'idle',tm:.6+Art.hash(i,sc.i,8)*2.4,hop:0,nib:0,fly:0,mv:null,spots:spots})}
+ sc.critters=list}
+function critGo(cr,tx,ty,dur,arc){cr.mv={fx:cr.x,fy:cr.y,tx:tx,ty:ty,u:0,dur:dur,arc:arc};if(Math.abs(tx-cr.x)>1)cr.face=tx>cr.x?1:-1}
+function critFree(sc,x,y){var p=Art.px2hex(x,y);return inb(sc,p[0],p[1])&&sc.pass[p[0]][p[1]]&&!sc.omap[p[0]+','+p[1]]}
+function stepCritters(sc,dt){spawnCritters(sc);var L=sc.critters;if(!L||!motionOn())return;var h=st.hero,T=st.time;
+ for(var i=0;i<L.length;i++){var cr=L[i],dx=cr.x-h.x,dy=cr.y-h.y,dh=Math.sqrt(dx*dx+dy*dy)||1;
+  if(cr.kind==='butterfly'){var away=dh<S*1.4?S*.5:0;cr.x=cr.hx+Math.sin(T*.8+cr.seed)*S*.55+dx/dh*away;cr.y=cr.hy+Math.sin(T*1.15+cr.seed*2)*S*.28+dy/dh*away*.5;cr.face=Math.cos(T*.8+cr.seed)>0?1:-1;continue}
+  if(cr.mv){var m=cr.mv;m.u=Math.min(1,m.u+dt/m.dur);var e=cr.kind==='bird'?m.u*m.u*(3-2*m.u):m.u;cr.x=m.fx+(m.tx-m.fx)*e;cr.y=m.fy+(m.ty-m.fy)*e;cr.hop=Math.sin(m.u*Math.PI)*m.arc;cr.fly=cr.kind==='bird'?Math.min(1,Math.sin(m.u*Math.PI)*3):0;
+   if(m.u>=1){cr.mv=null;cr.hop=0;cr.fly=0;var pc=Art.px2hex(cr.x,cr.y);cr.c=pc[0];cr.r=pc[1];if(cr.kind==='bird'){cr.hx=cr.x;cr.hy=cr.y}cr.tm=.8+Math.random()*2.2}continue}
+  cr.nib=cr.kind==='bird'?Math.max(0,Math.sin(T*7+cr.seed))*(((T+cr.seed)%3)<1.2?1:0):cr.kind==='frog'?0:Math.max(0,Math.sin(T*3+cr.seed))*.6;
+  var scared=dh<S*(cr.kind==='bird'?1.9:1.45);
+  if(scared){if(cr.kind==='bird'){var sp=cr.spots[Math.floor(Math.random()*cr.spots.length)],tx=hx(sp[0],sp[1]),ty=hy(sp[1]);if(Math.hypot(tx-h.x,ty-h.y)<S*3){tx=cr.x+dx/dh*S*3;ty=cr.y+dy/dh*S*2}critGo(cr,tx,ty,1.1,S*1.3)}
+   else{var fx=cr.x+dx/dh*S*.75,fy=cr.y+dy/dh*S*.5;if(!critFree(sc,fx,fy)){fx=cr.x-dy/dh*S*.6;fy=cr.y+dx/dh*S*.4}if(critFree(sc,fx,fy))critGo(cr,fx,fy,cr.kind==='frog'?.36:.24,cr.kind==='frog'?11:7);else cr.tm=.3}continue}
+  cr.tm-=dt;if(cr.tm>0)continue;
+  if(cr.kind==='bird'){cr.tm=1+Math.random()*2;if(Math.random()<.5){var bx=cr.x+(Math.random()-.5)*S*.5,by=cr.y+(Math.random()-.5)*S*.3;if(critFree(sc,bx,by))critGo(cr,bx,by,.18,3)}continue}
+  var ang=Math.random()*Math.PI*2,rr=S*(.25+Math.random()*.35),tx2=cr.hx+Math.cos(ang)*rr,ty2=cr.hy+Math.sin(ang)*rr*.6;
+  if(Math.hypot(cr.x-cr.hx,cr.y-cr.hy)>S*.9){tx2=cr.x+(cr.hx-cr.x)*.5;ty2=cr.y+(cr.hy-cr.y)*.5}
+  if(critFree(sc,tx2,ty2))critGo(cr,tx2,ty2,cr.kind==='frog'?.42:.3,cr.kind==='frog'?10:6);cr.tm=1.2+Math.random()*2.6}}
+/* the quest arrow over a gatekeeper floats above the taller figure and its name */
+function bossLift(sc,c){var b=sc.omap&&sc.omap[c.c+','+c.r];return b&&(b.role==='gate'||b.role==='boss')?S*.8:0}
+var crOp={};
+function drawCritter(g,cr,view,z,cx,cy,T){crOp.kind=cr.kind;crOp.t=T;crOp.face=cr.face;crOp.hop=cr.hop;crOp.nib=cr.nib;crOp.fly=cr.fly;crOp.seed=cr.seed;
+ if(view){var p=toView(cr.x,cr.y,tileH(st.scene,cr.c,cr.r),0);upright(g,z,cx,cy,p.x,p.y);Art.critter(g,0,0,crOp);camXform(g,z,cx,cy)}else Art.critter(g,cr.x,cr.y,crOp)}
 function figDraw(g,sp,x,y,o){Art.figure(g,x,y,sp.look||sp,o)}
 /* Point lights for the WebGL pass. World pixels. Priority 0 is kept first (the hero). */
 var lights=[],shadows=[],ldx=0,ldy=0;
@@ -413,16 +455,17 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
  var n=0,T=st.time,world=sc.id==='w',cur=st.obj&&st.obj.target,objs=sc.objs,i,o,oy,ox,it,cp;
  for(i=0;i<objs.length;i++){o=objs[i];if(world&&!zoneOpen(sc.zone[o.c][o.r])&&st.fog[sc.zone[o.c][o.r]]>.8)continue;oy=hy(o.r);ox=hx(o.c,o.r);
   if(view){cp=toView(ox,oy,tileH(sc,o.c,o.r),0);if(cp.x<cx-140||cp.x>cx+vw+140||cp.y<cy-220||cp.y>cy+vh+140)continue}else if(ox<cx-90||ox>cx+vw+90||oy<cy-130||oy>cy+vh+90)continue;
-  it=drawList[n]||(drawList[n]={});it.y=oy;it.o=o;it.hero=false;n++}
- if(st.mode!=='title'){it=drawList[n]||(drawList[n]={});it.y=h.y;it.o=null;it.hero=true;n++}
+  it=drawList[n]||(drawList[n]={});it.y=oy;it.o=o;it.hero=false;it.cr=null;n++}
+ if(st.mode!=='title'){it=drawList[n]||(drawList[n]={});it.y=h.y;it.o=null;it.hero=true;it.cr=null;n++}
+ if(!world&&sc.critters){for(i=0;i<sc.critters.length;i++){var crt=sc.critters[i];if(!view&&(crt.x<cx-60||crt.x>cx+vw+60||crt.y<cy-80||crt.y>cy+vh+60))continue;it=drawList[n]||(drawList[n]={});it.y=crt.y-S*.38;it.o=null;it.hero=false;it.cr=crt;n++}}
  drawList.length=n;drawList.sort(byY);
  var w=P().w||emptyW;
- for(var di=0;di<n;di++){it=drawList[di];if(it.hero){var hop={t:T,moving:!!h.mv,face:h.face,step:h.mv?h.step:0,hop:h.hop||0,foot:h.foot||1,turn:h.turn||0,celebrate:motionOn()&&!h.mv&&st.celUntil>T};
+ for(var di=0;di<n;di++){it=drawList[di];if(it.cr){drawCritter(g,it.cr,view,z,cx,cy,T);continue}if(it.hero){var hop={t:T,moving:!!h.mv,face:h.face,step:h.mv?h.step:0,hop:h.hop||0,foot:h.foot||1,turn:h.turn||0,celebrate:motionOn()&&!h.mv&&st.celUntil>T,hero:1,land:h.land||0,settle:h.settle||0,poke:h.poke||0};
    if(view){var fp=toView(h.x,h.y+S*.38,heroH(),0);upright(g,z,cx,cy,fp.x,fp.y);Art.figure(g,0,-S*.38,C.hero,hop);lshift(fp.x-h.x,fp.y-S*.38-h.y)}else Art.figure(g,h.x,h.y,C.hero,hop);
    if(!FX.low){addLight(h.x,h.y-S*.22,76,[0.17,0.12,0.04],0);if(C.hero.staff)addLight(h.x+h.face*8,h.y-S*.95,28,[0.42,0.32,0.1],1);addShadow(h.x,h.y,true)}lshift(0,0);continue}
   var o=it.o,x=hx(o.c,o.r),y=hy(o.r),th=view?tileH(sc,o.c,o.r):0;
-  if(o.type==='npc'){var fc=h.x<x?-1:1,dx=Math.abs(h.x-x),dy=Math.abs(h.y-y),near=dx<S*2.2&&dy<S*2.2,cheer=near&&motionOn()&&!h.mv&&st.celUntil>T,nop={t:T+o.c*.7,face:fc,wave:!cheer&&near&&motionOn()?.5+.5*Math.sin(T*3+o.c):0,celebrate:cheer},px0=x,py0=y-S*1.45-16;
-   if(view){var nf=toView(x,y+S*.38,th,0);upright(g,z,cx,cy,nf.x,nf.y);Art.figure(g,0,-S*.38,nl(o.sp),nop);lshift(nf.x-x,nf.y-S*.38-y);px0=0;py0=-S*1.83-16}else Art.figure(g,x,y,nl(o.sp),nop);
+  if(o.type==='npc'){var fc=h.x<x?-1:1,dx=Math.abs(h.x-x),dy=Math.abs(h.y-y),near=dx<S*2.2&&dy<S*2.2,cheer=near&&motionOn()&&!h.mv&&st.celUntil>T,nop={t:T+o.c*.7,face:fc,wave:!cheer&&near&&motionOn()?.5+.5*Math.sin(T*3+o.c):0,celebrate:cheer},px0=x,py0=y-S*1.45-16,bossy=o.role==='gate'||o.role==='boss';npcAnim(o,nop,bossy,T);if(bossy)py0-=S*.62;
+   if(view){var nf=toView(x,y+S*.38,th,0);upright(g,z,cx,cy,nf.x,nf.y);Art.figure(g,0,-S*.38,nl(o.sp),nop);lshift(nf.x-x,nf.y-S*.38-y);px0=0;py0=-S*1.83-16-(bossy?S*.62:0)}else Art.figure(g,x,y,nl(o.sp),nop);
    if(!FX.low){addShadow(x,y);var nm0=o.name||'';if(/lamp|wick|lantern/i.test(nm0))addLight(x+(fc>0?8:-8),y-S*.2,36,[0.3,0.21,0.06],2);if(o.sp&&o.sp.look&&o.sp.look.staff)addLight(x+fc*7,y-S*.8,28,[0.42,0.32,0.1],3)}lshift(0,0);
    var nd=Math.max(dx,dy)/S,al=motionOn()?(nd>=3?0:nd>2.2?(3-nd)/.8:1):(nd<3?1:0);
    if(al>0.04){var pl=namePlate(g,o.name);g.globalAlpha=al;g.drawImage(pl,px0-pl._w/2,py0,pl._w,pl._h);g.globalAlpha=1}
@@ -450,9 +493,9 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
  /* quest marker */
  if(cur&&cur.sid===sc.id){var nd=null;if(world){for(i=0;i<objs.length;i++){o=objs[i];if(o.type==='node'&&o.c===cur.c&&o.r===cur.r){nd=o;break}}}/* on an overworld town or castle, float above its name plaque */
   var bob=motionOn()?Math.sin(T*4)*4:0,pr=motionOn()?(T*1.5)%1:0;
-  if(view){var thq=tileH(sc,cur.c,cur.r),lift=nd?S*(nd.kind==='castle'?2.7:2.15)+29:S*(world?2.4:2.2),qp=toView(hx(cur.c,cur.r),hy(cur.r),thq,lift-bob);
+  if(view){var thq=tileH(sc,cur.c,cur.r),lift=(nd?S*(nd.kind==='castle'?2.7:2.15)+29:S*(world?2.4:2.2))+bossLift(sc,cur),qp=toView(hx(cur.c,cur.r),hy(cur.r),thq,lift-bob);
    upright(g,z,cx,cy,qp.x,qp.y);g.fillStyle='#f3e2b0';g.strokeStyle='#6b4a0e';g.lineWidth=2;g.beginPath();g.moveTo(0,12);g.lineTo(-9,-2);g.lineTo(9,-2);g.closePath();g.fill();g.stroke();camXform(g,z,cx,cy)}
-  else{var qx=hx(cur.c,cur.r),qy=(nd?hy(cur.r)-S*(nd.kind==='castle'?2.7:2.15)-13-16:hy(cur.r)-S*(world?2.4:2.2))+bob;g.fillStyle='#f3e2b0';g.strokeStyle='#6b4a0e';g.lineWidth=2;g.beginPath();g.moveTo(qx,qy+12);g.lineTo(qx-9,qy-2);g.lineTo(qx+9,qy-2);g.closePath();g.fill();g.stroke()}
+  else{var qx=hx(cur.c,cur.r),qy=(nd?hy(cur.r)-S*(nd.kind==='castle'?2.7:2.15)-13-16:hy(cur.r)-S*(world?2.4:2.2)-bossLift(sc,cur))+bob;g.fillStyle='#f3e2b0';g.strokeStyle='#6b4a0e';g.lineWidth=2;g.beginPath();g.moveTo(qx,qy+12);g.lineTo(qx-9,qy-2);g.lineTo(qx+9,qy-2);g.closePath();g.fill();g.stroke()}
   g.strokeStyle='#f3e2b0';g.globalAlpha=1-pr;g.lineWidth=2.5;hexAt(g,cur.c,cur.r,S*(.7+pr*.5));g.stroke();g.globalAlpha=1}
  g.setTransform(dpr,0,0,dpr,0,0);
  if(cur&&cur.sid===sc.id&&st.mode==='play'){var ax,ay;if(view){var ap=toView(hx(cur.c,cur.r),hy(cur.r),tileH(sc,cur.c,cur.r),0);ax=ap.x;ay=ap.y}else{ax=hx(cur.c,cur.r);ay=hy(cur.r)}

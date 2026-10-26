@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Character sheet (r4)</title>
+<style>body{margin:0;background:#1c2733;color:#f6efe0;font:700 13px Nunito,system-ui}canvas{display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script>window.APP={key:'sheet',levels:[]};try{localStorage.setItem('learning-apps.fx','full')}catch(e){}</script>
+<script src="../../shared/art.js"></script>
+<script>
+/* Draws the hero, NPCs, a gatekeeper and friendly critters with Art.figure / Art.critter at 3x, plus a walk strip.
+   ?t= sets the clock so before/after frames line up. Open over a local static server. */
+(function(){var q=new URLSearchParams(location.search),T=+(q.get('t')||1.3),W=innerWidth,H=innerHeight,cv=document.getElementById('c'),d=Math.max(1,devicePixelRatio||1);
+cv.width=W*d;cv.height=H*d;cv.style.width=W+'px';cv.style.height=H+'px';var g=cv.getContext('2d');g.scale(d,d);
+var bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#5d8a4a');bg.addColorStop(1,'#3f6a3a');g.fillStyle=bg;g.fillRect(0,0,W,H);
+var narrow=W<600,Z=narrow?2.1:3,S=Art.S;
+var hero={skin:'#e2b48c',hair:'#3b2a1d',robe:'#243e66',trim:'#d7b56a',cape:'#6a5428',hat:'hood',staff:true},
+ pyHero={skin:'#e2b48c',hair:'#3b2a1d',robe:'#2f6a4a',trim:'#d7b56a',cape:'#5f8a3a',hat:'cap',staff:false},
+ gate={skin:'#c99568',hair:'#2a2118',robe:'#6a2f2a',trim:'#d7b56a',hat:'helm',beard:true},
+ teach={skin:'#e3b896',hair:'#7a3b22',robe:'#3d6b4f',trim:'#d7b56a',hat:'scholar',beard:true},
+ guide={skin:'#efc4a0',hair:'#8a4a22',robe:'#4a5f8a',trim:'#c8a86a',hat:'cap'},
+ n1=Art.npcLook({skin:'#e2b48c',hair:'#a0522d',robe:'#7a3a5a',trim:'#d7b56a'},'Mira'),n2=Art.npcLook({skin:'#e2b48c',hair:'#2a1c14',robe:'#2f6f7a',trim:'#d7b56a'},'Odo');
+function put(x,y,look,o,lab){g.save();g.translate(x,y);g.scale(Z,Z);Art.figure(g,0,0,look,o);g.restore();g.fillStyle='#f6efe0';g.textAlign='center';g.fillText(lab,x,y+S*.38*Z+18)}
+function hasBoss(){return Art.figure.length>=0&&Art.bossReady}
+var cols=narrow?[[.2,.30],[.5,.30],[.8,.30],[.2,.58],[.5,.58],[.8,.58]]:[[.08,.42],[.22,.42],[.36,.42],[.5,.42],[.66,.42],[.86,.42]];
+var L=[[hero,{t:T,face:1,hero:1},'Wanderer'],[pyHero,{t:T,face:1,hero:1},'Coder'],[teach,{t:T+.7,face:-1,habit:4},'Teacher'],[guide,{t:T+1.4,face:-1,habit:1},'Guide'],[n1,{t:T+2.1,face:1,habit:2},'Townsfolk'],[gate,{t:T,face:-1,boss:1,role:'gate'},'Gatekeeper']];
+L.forEach(function(e,i){put(cols[i][0]*W,cols[i][1]*H,e[0],e[1],e[2])});
+/* walk strip: five frames through one stride */
+var wy=narrow?.82*H:.80*H;for(var k=0;k<5;k++){var s=k/4;put((narrow?.12:.12)*W+k*(narrow?.19:.11)*W,wy,hero,{t:T,moving:true,face:1,step:s,hop:Math.sin(s*Math.PI)*5.5,foot:1,hero:1},'step '+s.toFixed(2))}
+if(Art.critter){var cs=['bunny','bird','butterfly','frog','hare'],cx0=narrow?.12:.70,dx=narrow?.19:.065;cs.forEach(function(k,i){var x=(cx0+i*dx)*W,y=narrow?.94*H:.80*H;g.save();g.translate(x,y);g.scale(Z,Z);Art.critter(g,0,0,{kind:k,t:T+i,face:1,hop:0,seed:i});g.restore();g.fillStyle='#f6efe0';g.textAlign='center';g.fillText(k,x,y+22)})}
+})();
+</script></body></html>
