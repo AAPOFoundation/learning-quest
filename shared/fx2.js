@@ -123,9 +123,13 @@ function fireflies(g,sc,T,cx,cy,vw,vh){if(FX.low||(FX.rm&&FX.rm.matches))return;
  g.restore()}
 window.LQAnim={water:water,particles:particles,burst:burst,floatText:floatText,puff:puff,glows:glows,pools:pools,fireflies:fireflies};
 })();
-/* WebGL colour grade, gold glow and point lights over the painted world.
+/* WebGL colour grade, gold glow, point lights, contact shadows and region atmosphere over the painted world.
    The 2D canvas stays the map. This canvas (#lqgl) covers it and ignores taps.
-   Low effects hides the pass. No new dependency. If the shader cannot link, the caller keeps the old canvas light. */
+   Low effects hides the pass. No new dependency. If the shader cannot link, the caller keeps the old canvas light.
+   Round 4 (light and atmosphere): each biome has an atmosphere (mist, sun shafts, a little dusk, a soft far-band focus,
+   a tinted vignette). Mist is anchored to the world in two layers that scroll at different speeds, so the ground reads deeper
+   as the camera moves. Lamps burn through the mist. Each figure gets a tight contact shadow at the feet under its soft cast.
+   Calm (reduced motion) passes t=0, so mist and shafts hold still. The atmosphere eases between biomes; calm snaps. */
 (function(){
 'use strict';
 var GRADES={
@@ -136,53 +140,121 @@ var GRADES={
  'portfolio-guide':{lift:[0.008,0.032,0.012],gain:[0.92,1.06,0.94],shade:[0.88,1.02,0.92],sat:1.03,glow:0.26,far:0.11},
  home:{lift:[0.016,0.016,0.006],gain:[1.02,1.0,0.94],shade:[0.96,0.94,0.88],sat:1.04,glow:0.18,far:0.08}
 },FALL={lift:[0.014,0.014,0.01],gain:[1,1,1],shade:[0.96,0.94,0.9],sat:1,glow:0.16,far:0.1};
-var cvs,gl,prog,buf,tex,locs,failed=false,err='',nL=0,nS=0,px,pc,hs,watch=null,lastProbe=null;
+/* Atmosphere by biome. a: [mist, shafts, dusk, far focus]. m: mist colour. r: shaft colour. k: contrast. v: vignette tint strength.
+   Dusk is a small dip in the ambient light so lamps and the hero's glow read as pools. It stays bright: this is a kids' map. */
+var ATM={
+ meadow:{a:[0.12,0.18,0.03,0.55],m:[0.86,0.9,0.78],r:[1.0,0.9,0.62],k:0.12,v:0.15},
+ forest:{a:[0.2,0.26,0.054,0.6],m:[0.6,0.76,0.6],r:[0.98,0.93,0.6],k:0.16,v:0.21},
+ hills:{a:[0.15,0.16,0.042,0.6],m:[0.78,0.83,0.92],r:[1.0,0.9,0.66],k:0.14,v:0.17},
+ desert:{a:[0.09,0.14,0.012,0.45],m:[0.96,0.84,0.62],r:[1.0,0.86,0.55],k:0.1,v:0.13},
+ tundra:{a:[0.2,0.08,0.03,0.55],m:[0.9,0.95,1.0],r:[0.86,0.93,1.0],k:0.1,v:0.15},
+ marsh:{a:[0.26,0.07,0.072,0.6],m:[0.68,0.82,0.78],r:[0.9,0.95,0.8],k:0.14,v:0.21},
+ highland:{a:[0.2,0.11,0.06,0.6],m:[0.76,0.8,0.93],r:[0.92,0.9,0.8],k:0.14,v:0.19},
+ crown:{a:[0.1,0.22,0.042,0.5],m:[0.95,0.88,0.7],r:[1.0,0.86,0.5],k:0.14,v:0.17},
+ home:{a:[0.0,0.06,0.0,0.0],m:[0.9,0.88,0.8],r:[1.0,0.9,0.62],k:0.08,v:0.0}
+},cur=null;
+function atmTarget(b){return ATM[b]||ATM.meadow}
+function ease(t,calm){var k=calm||!cur?1:0.06,i;if(!cur){cur={a:t.a.slice(),m:t.m.slice(),r:t.r.slice(),k:t.k,v:t.v}}
+ for(i=0;i<4;i++)cur.a[i]+=(t.a[i]-cur.a[i])*k;for(i=0;i<3;i++){cur.m[i]+=(t.m[i]-cur.m[i])*k;cur.r[i]+=(t.r[i]-cur.r[i])*k}cur.k+=(t.k-cur.k)*k;cur.v+=(t.v-cur.v)*k;return cur}
+var cvs,gl,prog,buf,tex,ntex,locs,failed=false,err='',nL=0,nS=0,px,pc,hs,watch=null,lastProbe=null;
 function fsSrc(L,S){
- return 'precision mediump float;uniform sampler2D uS;uniform vec3 uLift;uniform vec3 uGain;uniform vec3 uShade;uniform float uSat;uniform float uGlow;uniform float uFar;uniform vec2 uRes;uniform float uN;uniform float uNs;uniform vec3 uP['+L+'];uniform vec3 uC['+L+'];uniform vec3 uH['+S+'];varying vec2 v;'
+ return 'precision mediump float;'
+ +'uniform sampler2D uS;uniform sampler2D uNz;uniform vec3 uLift;uniform vec3 uGain;uniform vec3 uShade;uniform vec4 uMisc;uniform vec2 uRes;uniform vec3 uP['+L+'];uniform vec3 uC['+L+'];uniform vec3 uH['+S+'];'
+ +'uniform vec4 uAtm;uniform vec3 uMistC;uniform vec3 uRayC;uniform vec4 uCam;uniform vec4 uTone;varying vec2 v;'
  +'float gold(vec3 c){float y=dot(c,vec3(0.299,0.587,0.114));float w=smoothstep(0.42,0.82,c.r)*smoothstep(0.28,0.7,c.g);float nb=1.0-smoothstep(0.36,0.52,c.b);return w*nb*smoothstep(0.28,0.72,y);}'
- +'void main(){vec2 uv=vec2(v.x,1.0-v.y);vec3 src=texture2D(uS,uv).rgb;vec3 col=src;float l=dot(col,vec3(0.299,0.587,0.114));col=mix(vec3(l),col,uSat);col=mix(col,col*uShade,smoothstep(0.62,0.08,l)*0.38);col=col*uGain+uLift*(1.0-l);float far=smoothstep(0.2,0.92,1.0-uv.y);col=mix(col,col*vec3(0.8,0.86,1.0),far*uFar);'
- +'vec2 px=vec2(5.0)/uRes;float b=gold(src);b+=gold(texture2D(uS,uv+vec2(px.x,0.0)).rgb);b+=gold(texture2D(uS,uv-vec2(px.x,0.0)).rgb);b+=gold(texture2D(uS,uv+vec2(0.0,px.y)).rgb);b+=gold(texture2D(uS,uv-vec2(0.0,px.y)).rgb);col+=vec3(1.0,0.78,0.34)*(b*0.2)*uGlow;'
- +'vec2 p=uv*uRes;vec3 light=vec3(0.0);for(int i=0;i<'+L+';i++){float on=step(float(i)+0.5,uN);vec2 d=p-uP[i].xy;float nd=length(d)/max(uP[i].z,1.0);float a=clamp(1.0-nd,0.0,1.0);float hot=clamp(1.0-nd*3.4,0.0,1.0);light+=uC[i]*(a*a+hot*hot*0.36)*on;}col+=light;'
- +'float sh=1.0;for(int i=0;i<'+S+';i++){float on=step(float(i)+0.5,uNs);vec2 sd=p-uH[i].xy;sd.x/=max(uH[i].z,1.0);sd.y/=max(uH[i].z*0.38,1.0);float e=clamp(1.0-dot(sd,sd),0.0,1.0);sh*=1.0-e*e*0.40*on;}col*=sh;gl_FragColor=vec4(clamp(col,0.0,1.0),1.0);}';
+ +'void main(){vec2 uv=vec2(v.x,1.0-v.y);vec2 p=uv*uRes;float far=smoothstep(0.2,0.92,1.0-uv.y);'
+ +'vec2 px=vec2(5.0)/uRes;vec3 src=texture2D(uS,uv).rgb;vec3 t1=texture2D(uS,uv+vec2(px.x,0.0)).rgb;vec3 t2=texture2D(uS,uv-vec2(px.x,0.0)).rgb;vec3 t3=texture2D(uS,uv+vec2(0.0,px.y)).rgb;vec3 t4=texture2D(uS,uv-vec2(0.0,px.y)).rgb;'
+ /* far-band focus: the top of the frame is further away, so it softens a little (reuses the glow taps) */
+ +'float dof=uAtm.w*smoothstep(0.35,1.0,far);vec3 col=mix(src,(src*2.0+t1+t2+t3+t4)/6.0,dof);'
+ +'float l=dot(col,vec3(0.299,0.587,0.114));col=mix(vec3(l),col,uMisc.x);col=mix(col,col*uShade,smoothstep(0.62,0.08,l)*0.38);col=col*uGain+uLift*(1.0-l);'
+ /* gentle S-curve so the paint has a darker floor and brighter tops */
+ +'col=mix(col,col*col*(3.0-2.0*col),uTone.x);'
+ +'col=mix(col,col*vec3(0.8,0.86,1.0),far*uMisc.z);'
+ +'float b=gold(src)+gold(t1)+gold(t2)+gold(t3)+gold(t4);col+=vec3(1.0,0.78,0.34)*(b*0.2)*uMisc.y;'
+ +'vec3 light=vec3(0.0);for(int i=0;i<'+L+';i++){float on=step(float(i)+0.5,uCam.w);vec2 d=p-uP[i].xy;float nd=length(d)/max(uP[i].z,1.0);float a=clamp(1.0-nd,0.0,1.0);float hot=clamp(1.0-nd*3.4,0.0,1.0);light+=uC[i]*(a*a+hot*hot*0.36)*on;}'
+ /* ambient dips a little (dusk); lamps light the paint (albedo) and add a little glow on top */
+ +'col=col*(1.0-uAtm.z)+col*light*1.5+light*0.55;'
+ +'float sh=1.0;for(int i=0;i<'+S+';i++){float on=step(float(i)+0.5,uTone.w);float r=max(uH[i].z,1.0);vec2 sd=p-uH[i].xy;sd.x-=sd.y*0.5;sd.x/=r;sd.y/=r*0.38;float e=clamp(1.0-dot(sd,sd),0.0,1.0);'
+ +'vec2 cd=(p-(uH[i].xy-vec2(0.6,0.28)*r))/vec2(r*0.62,r*0.2);float ce=clamp(1.0-dot(cd,cd),0.0,1.0);sh*=(1.0-e*e*0.40*on)*(1.0-ce*ce*0.42*on);}col*=sh;'
+ /* world-anchored mist: a far layer that scrolls slower than the ground and a near layer that scrolls faster (parallax) */
+ +'float lum=dot(light,vec3(0.4,0.4,0.2));vec2 w=p/uCam.z;float tt=uMisc.w;'
+ +'float n1=texture2D(uNz,(w+uCam.xy*0.82)/540.0+vec2(tt*0.006,tt*0.002)).r;float n2=texture2D(uNz,(w+uCam.xy*0.82)/230.0-vec2(tt*0.004,-tt*0.003)).g;'
+ +'float m=smoothstep(0.38,0.86,n1*0.66+n2*0.34)*mix(0.3,1.0,far);'
+ +'if(uTone.z>0.5){float n3=texture2D(uNz,(w+uCam.xy*1.22)/300.0+vec2(tt*0.012,tt*0.004)).b;m+=smoothstep(0.55,0.92,n3)*smoothstep(0.62,1.0,uv.y)*0.55;}'
+ +'float low=clamp((src.b-src.r)*2.4+(0.34-l)*1.6,0.0,1.0);m*=uAtm.x*(0.5+0.7*low)*(1.0-clamp(lum*2.6,0.0,0.85));/* mist pools over water and the low night around the island */col=mix(col,uMistC*(0.82+0.18*l),clamp(m,0.0,0.5));'
+ /* sun shafts from the upper left (the key light), fading as they fall */
+ +'vec2 q=p/uRes.y;vec2 dir=normalize(vec2(0.55,1.0));float s=dot(q,vec2(dir.y,-dir.x));float al=dot(q,dir);'
+ +'float sh2=texture2D(uNz,vec2(s*1.7+tt*0.004,0.37)).a;float ray=smoothstep(0.52,0.95,sh2)*(1.0-smoothstep(0.1,1.25,al))*mix(0.45,1.0,far)*uAtm.y*(0.25+0.75*smoothstep(0.12,0.5,l));'
+ +'col=col+uRayC*ray*(1.0-col);'
+ /* tinted vignette: the corners lean toward a dark version of the region mist */
+ +'vec2 vc=(uv-0.5)*vec2(1.0,1.12);float vg=smoothstep(0.32,0.78,length(vc));col=mix(col,col*mix(vec3(1.0),uMistC*0.55,0.8),vg*uTone.y);'
+ +'gl_FragColor=vec4(clamp(col,0.0,1.0),1.0);}';
 }
 var VS='attribute vec2 a;varying vec2 v;void main(){v=a*0.5+0.5;gl_Position=vec4(a,0.0,1.0);}';
 function shader(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){err=gl.getShaderInfoLog(s)||'shader';return null}return s}
+var UN=['uS','uNz','uLift','uGain','uShade','uMisc','uRes','uAtm','uMistC','uRayC','uCam','uTone'];
 function link(L,S){err='';var a=shader(gl.VERTEX_SHADER,VS),b=shader(gl.FRAGMENT_SHADER,fsSrc(L,S));if(!a||!b)return false;
  var p=gl.createProgram();gl.attachShader(p,a);gl.attachShader(p,b);gl.bindAttribLocation(p,0,'a');gl.linkProgram(p);
  if(!gl.getProgramParameter(p,gl.LINK_STATUS)){err=gl.getProgramInfoLog(p)||'link';return false}
- prog=p;nL=L;nS=S;px=new Float32Array(L*3);pc=new Float32Array(L*3);hs=new Float32Array(S*3);
- locs={uS:gl.getUniformLocation(p,'uS'),uLift:gl.getUniformLocation(p,'uLift'),uGain:gl.getUniformLocation(p,'uGain'),uShade:gl.getUniformLocation(p,'uShade'),uSat:gl.getUniformLocation(p,'uSat'),uGlow:gl.getUniformLocation(p,'uGlow'),uFar:gl.getUniformLocation(p,'uFar'),uRes:gl.getUniformLocation(p,'uRes'),uN:gl.getUniformLocation(p,'uN'),uNs:gl.getUniformLocation(p,'uNs'),uP:gl.getUniformLocation(p,'uP[0]'),uC:gl.getUniformLocation(p,'uC[0]'),uH:gl.getUniformLocation(p,'uH[0]')};
+ prog=p;nL=L;nS=S;px=new Float32Array(L*3);pc=new Float32Array(L*3);hs=new Float32Array(S*3);locs={};
+ UN.forEach(function(n){locs[n]=gl.getUniformLocation(p,n)});locs.uP=gl.getUniformLocation(p,'uP[0]');locs.uC=gl.getUniformLocation(p,'uC[0]');locs.uH=gl.getUniformLocation(p,'uH[0]');
  return true}
+/* 128px tileable value noise, four independent channels (mist far, mist detail, mist near, shafts). Built once, no image file. */
+function noiseTex(){var N=128,d=new Uint8Array(N*N*4),ch,x,y,o;
+ function grid(seed,cells){var g=[],i;for(i=0;i<cells*cells;i++){var h=Math.sin(i*127.1+seed*311.7)*43758.5453;g.push(h-Math.floor(h))}return g}
+ var specs=[[1,4],[2,8],[3,6],[4,16]];
+ for(ch=0;ch<4;ch++){var cells=specs[ch][1],g=grid(specs[ch][0],cells),g2=grid(specs[ch][0]+9,cells*2);
+  for(y=0;y<N;y++)for(x=0;x<N;x++){var val=0,k;for(k=0;k<2;k++){var cc=k?cells*2:cells,gg=k?g2:g,fx=x/N*cc,fy=ch===3?0:y/N*cc,ix=Math.floor(fx),iy=Math.floor(fy),tx=fx-ix,ty=fy-iy;
+    tx=tx*tx*(3-2*tx);ty=ty*ty*(3-2*ty);var x0=ix%cc,x1=(ix+1)%cc,y0=iy%cc,y1=(iy+1)%cc,
+    a=gg[y0*cc+x0],b=gg[y0*cc+x1],c=gg[y1*cc+x0],e=gg[y1*cc+x1];val+=((a*(1-tx)+b*tx)*(1-ty)+(c*(1-tx)+e*tx)*ty)*(k?0.35:0.65)}
+   o=(y*N+x)*4+ch;d[o]=Math.round(val*255)}}
+ var t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,N,N,0,gl.RGBA,gl.UNSIGNED_BYTE,d);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);return t}
 function boot(host){if(gl||failed)return !!gl;var stage=host||document.getElementById('stage');if(!stage){failed=true;err='no stage';return false}
  cvs=document.createElement('canvas');cvs.id='lqgl';cvs.setAttribute('aria-hidden','true');
  var home=stage.classList&&stage.classList.contains('hero-frame');
  cvs.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:'+(home?'0':'1')+';visibility:hidden';
  stage.appendChild(cvs);
- try{gl=cvs.getContext('webgl',{alpha:false,antialias:false,depth:false,stencil:false,preserveDrawingBuffer:false,failIfMajorPerformanceCaveat:false})}catch(e){gl=null}
+ /* A still picture (the home strip, or reduced motion, which paints one frame) keeps its drawing buffer. Without it WebKit shows the pass as solid black
+    after it re-composites the page (seen in Playwright WebKit, iPhone 13 profile, on a full-page capture). A moving map repaints every frame, so it does not need it. */
+ var still=home;try{still=still||window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+ try{gl=cvs.getContext('webgl',{alpha:false,antialias:false,depth:false,stencil:false,preserveDrawingBuffer:still,failIfMajorPerformanceCaveat:false})}catch(e){gl=null}
+ /* If the context is lost, hide the pass for this page so the painted canvas (and the caller's 2D light) shows instead of a black layer. */
+ cvs.addEventListener('webglcontextlost',function(ev){failed=true;err='context lost';cvs.style.visibility='hidden';cvs.style.display='none'},false);
  if(!gl){failed=true;err='no webgl';cvs.style.display='none';return false}
- var cap=gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS)||16,tries=cap>=48?[[12,8],[8,4],[4,2]]:cap>=28?[[8,4],[4,2]]:[[4,2]],i;
+ /* A phone keeps the round-3 budget (12 lights, 8 shadows), so the per-pixel loop costs the same there. A large GPU on a wide screen gets 12 shadows. */
+ var cap=gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS)||16,wide=Math.min(innerWidth,innerHeight)>=560,
+  tries=cap>=64?(wide?[[12,12],[12,8],[8,4],[4,2]]:[[12,8],[8,4],[4,2]]):cap>=52?[[12,8],[8,4],[4,2]]:cap>=36?[[8,4],[4,2]]:[[4,2]],i;
  for(i=0;i<tries.length;i++){if(link(tries[i][0],tries[i][1]))break}
  if(!prog){failed=true;cvs.style.display='none';return false}
  buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+ ntex=noiseTex();
  tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);
  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
  return true}
 /* Speed guard: if the GL light pass holds frames above 45 ms for about 1.5 s (software GL, a weak GPU), switch to the 2D light layer for this page. */
 var slow=false,lt=0,ema=0,nf=0;
-function frame(src,lights,shadows,key,host){var FX=window.LQFx;if(failed)return false;if(slow||!src||(FX&&FX.low)){if(cvs)cvs.style.visibility='hidden';return false}var now=performance.now(),d=lt?now-lt:16;lt=now;if(d<250){ema=ema?ema*.94+d*.06:d;nf++}if(nf>40&&ema>45){slow=true;window.LQLightSlow=true;if(cvs)cvs.style.visibility='hidden';return false}if(!boot(host))return false;
+/* opts (optional): biome (atmosphere key), cam [x,y] world px of the view's top left, scale (screen px per world px), t (seconds; 0 when calm), calm (snap and hold still).
+   Without opts (the home strip) the pass uses the quiet 'home' atmosphere: no mist, faint shafts, no dusk. */
+function frame(src,lights,shadows,key,host,opts){var FX=window.LQFx;if(failed)return false;if(slow||!src||(FX&&FX.low)){if(cvs)cvs.style.visibility='hidden';return false}var now=performance.now(),d=lt?now-lt:16;lt=now;if(d<250){ema=ema?ema*.94+d*.06:d;nf++}if(nf>40&&ema>45){slow=true;window.LQLightSlow=true;if(cvs)cvs.style.visibility='hidden';return false}if(!boot(host))return false;
  var w=src.width,h=src.height;if(w<2||h<2)return false;if(cvs.width!==w||cvs.height!==h){cvs.width=w;cvs.height=h}
- gl.viewport(0,0,w,h);gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+ opts=opts||{};var calm=!!opts.calm||!opts.biome,A=ease(atmTarget(opts.biome||'home'),calm),cam=opts.cam||[0,0],scl=opts.scale||1,tt=calm?0:(opts.t||0)%2000;
+ gl.viewport(0,0,w,h);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
  try{gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,src)}catch(e){failed=true;err=String(e&&e.message||e);cvs.style.display='none';return false}
  gl.useProgram(prog);var g=GRADES[key]||FALL;
- gl.uniform3fv(locs.uLift,g.lift);gl.uniform3fv(locs.uGain,g.gain);gl.uniform3fv(locs.uShade,g.shade);gl.uniform1f(locs.uSat,g.sat);gl.uniform1f(locs.uGlow,g.glow);gl.uniform1f(locs.uFar,g.far);gl.uniform2f(locs.uRes,w,h);
+ gl.uniform3fv(locs.uLift,g.lift);gl.uniform3fv(locs.uGain,g.gain);gl.uniform3fv(locs.uShade,g.shade);gl.uniform4f(locs.uMisc,g.sat,g.glow,g.far,tt);gl.uniform2f(locs.uRes,w,h);
  var n=Math.min(nL,lights?lights.length:0),ns=Math.min(nS,shadows?shadows.length:0),i,L;
  for(i=0;i<nL;i++){L=i<n?lights[i]:null;px[i*3]=L?L.x:0;px[i*3+1]=L?L.y:0;px[i*3+2]=L?L.r:1;pc[i*3]=L?L.c[0]:0;pc[i*3+1]=L?L.c[1]:0;pc[i*3+2]=L?L.c[2]:0}
  for(i=0;i<nS;i++){L=i<ns?shadows[i]:null;hs[i*3]=L?L.x:0;hs[i*3+1]=L?L.y:0;hs[i*3+2]=L?L.r:1}
- gl.uniform1f(locs.uN,n);gl.uniform1f(locs.uNs,ns);gl.uniform3fv(locs.uP,px);gl.uniform3fv(locs.uC,pc);gl.uniform3fv(locs.uH,hs);
- gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,tex);gl.uniform1i(locs.uS,0);
+ var nearMist=Math.min(w,h)/(window.devicePixelRatio||1)>=560?1:0;/* phone: skip the near mist layer (bottom of the screen is the move pad) */
+ gl.uniform4f(locs.uAtm,A.a[0],A.a[1],A.a[2],A.a[3]);gl.uniform3fv(locs.uMistC,A.m);gl.uniform3fv(locs.uRayC,A.r);
+ gl.uniform4f(locs.uCam,cam[0]%4320,cam[1]%4320,scl,n);gl.uniform4f(locs.uTone,A.k,A.v,nearMist,ns);
+ gl.uniform3fv(locs.uP,px);gl.uniform3fv(locs.uC,pc);gl.uniform3fv(locs.uH,hs);
+ gl.uniform1i(locs.uS,0);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,ntex);gl.uniform1i(locs.uNz,1);gl.activeTexture(gl.TEXTURE0);
  gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);gl.drawArrays(gl.TRIANGLES,0,6);
  if(watch){var pts=watch,out=[],pix,q;for(q=0;q<pts.length;q++){pix=new Uint8Array(4);gl.readPixels(pts[q][0]|0,h-1-(pts[q][1]|0),1,1,gl.RGBA,gl.UNSIGNED_BYTE,pix);out.push([pix[0],pix[1],pix[2],pix[3]])}lastProbe={pts:out,gl:gl.getError(),err:err,w:w,h:h,nL:nL,nS:nS};watch=null}
  cvs.style.visibility='visible';return true}
-window.LQLight={frame:frame,grades:GRADES,limits:function(){return {lights:nL,shadows:nS}},error:function(){return err},watch:function(pts){watch=pts||[[0,0]]},sample:function(){return lastProbe}};
+window.LQLight={frame:frame,grades:GRADES,atmos:ATM,limits:function(){return {lights:nL||12,shadows:nS||8}},error:function(){return err},watch:function(pts){watch=pts||[[0,0]]},sample:function(){return lastProbe}};
 })();

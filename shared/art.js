@@ -151,7 +151,7 @@ function paintRelief(sc){
  var bg=g.createLinearGradient(0,0,0,Hh);bg.addColorStop(0,'#1d3a4c');bg.addColorStop(1,'#0f2030');g.fillStyle=bg;g.fillRect(0,0,cv.width,cv.height);
  var tiles=[];for(r=0;r<sc.rows;r++)for(c=0;c<sc.cols;c++)tiles.push([hy(r),c,r]);
  tiles.sort(function(a,b){return a[0]-b[0]||a[1]-b[1]});
- var groups={},heights=[];
+ var groups={},heights=[],cast={};/* cast[h]: soft shade polygons that lie on the plane at height h (round 4) */
  for(var i=0;i<tiles.length;i++){c=tiles[i][1];r=tiles[i][2];x=hx(c,r);y=hy(r);h=groundH(sc.t[c][r]);
   for(var e=0;e<6;e++){var n=neigh(c,r,e),inside=n[0]>=0&&n[1]>=0&&n[0]<sc.cols&&n[1]<sc.rows,nh=inside?groundH(sc.t[n[0]][n[1]]):0;if(nh>=h-0.5)continue;
    var ed=EDGE[e],A=corner(x,y,ed[0]),B=corner(x,y,ed[1]);
@@ -165,12 +165,23 @@ function paintRelief(sc){
    g.fillStyle=rgb(stone,sh*0.78);g.beginPath();g.moveTo(B1[0],B1[1]);g.lineTo(B0[0],B0[1]);g.lineTo(A0[0],A0[1]);g.closePath();g.fill();
    if(drop>=12){g.strokeStyle='rgba(48,36,24,.35)';g.lineWidth=1;var steps=drop>=28?3:2,si,tt;
     for(si=1;si<=steps;si++){tt=si/(steps+1);g.beginPath();g.moveTo(A1[0]+(A0[0]-A1[0])*tt,A1[1]+(A0[1]-A1[1])*tt);g.lineTo(B1[0]+(B0[0]-B1[0])*tt,B1[1]+(B0[1]-B1[1])*tt);g.stroke()}}
+   /* round 4: the foot of a face sits in its own shade (ambient occlusion), so a tall cliff reads taller */
+   if(drop>=5){var mA=(A1[0]+B1[0])/2,mT=(A1[1]+B1[1])/2,mB=(A0[1]+B0[1])/2,fg=g.createLinearGradient(mA,mT,mA,mB);fg.addColorStop(0,'rgba(20,14,8,0)');fg.addColorStop(.55,'rgba(20,14,8,.06)');fg.addColorStop(1,'rgba(20,14,8,'+(drop>=16?.34:.24)+')');
+    g.fillStyle=fg;g.beginPath();g.moveTo(A1[0],A1[1]);g.lineTo(B1[0],B1[1]);g.lineTo(B0[0],B0[1]);g.lineTo(A0[0],A0[1]);g.closePath();g.fill();
+    /* the lower ground gets a thin dark band at the cliff foot, and a longer cast where the face looks away from the key light (upper left) */
+    var ao=Math.min(S*.34,4+drop*.3),cl=lam<-.05?Math.min(S*.95,6+drop*.85):0,lx=.55,ly=.84,ll=Math.hypot(lx,ly);lx/=ll;ly/=ll;
+    (cast[nh]=cast[nh]||[]).push([A[0],A[1],B[0],B[1],nx*ao,ny*ao,.26,nh]);if(cl)cast[nh].push([A[0],A[1],B[0],B[1],lx*cl,ly*cl,Math.min(.3,.12+drop*.006),nh])}
    g.strokeStyle='rgba(255,244,210,.45)';g.lineWidth=1.4;g.beginPath();g.moveTo(A1[0],A1[1]);g.lineTo(B1[0],B1[1]);g.stroke()}
   if(!groups[h]){groups[h]=[];heights.push(h)}groups[h].push([c,r])}
  heights.sort(function(a,b){return a-b});
  heights.forEach(function(hv){g.save();g.beginPath();groups[hv].forEach(function(cr){var xx=hx(cr[0],cr[1]),yy=hy(cr[1]);
   for(var k=0;k<6;k++){var ang=(60*k-30)*PI/180;q=project(xx+S*1.05*Math.cos(ang),yy+S*1.05*Math.sin(ang),hv);k?g.lineTo(ox+q.x,oy+q.y):g.moveTo(ox+q.x,oy+q.y)}g.closePath()});
-  g.clip();g.setTransform(1,0,CAM.shear,CAM.v,ox,oy-hv);g.drawImage(sc.cv,0,0);g.restore()});
+  g.clip();g.setTransform(1,0,CAM.shear,CAM.v,ox,oy-hv);g.drawImage(sc.cv,0,0);g.setTransform(1,0,0,1,0,0);
+  /* shade cast on this plane stays inside its own tiles, so a higher tile drawn later covers any spill */
+  (cast[hv]||[]).forEach(function(q){var a0=project(q[0],q[1],hv),b0=project(q[2],q[3],hv),a1=project(q[0]+q[4],q[1]+q[5],hv),b1=project(q[2]+q[4],q[3]+q[5],hv),
+   m0x=ox+(a0.x+b0.x)/2,m0y=oy+(a0.y+b0.y)/2,m1x=ox+(a1.x+b1.x)/2,m1y=oy+(a1.y+b1.y)/2,gr=g.createLinearGradient(m0x,m0y,m1x,m1y);
+   gr.addColorStop(0,'rgba(18,14,10,'+q[6]+')');gr.addColorStop(1,'rgba(18,14,10,0)');g.fillStyle=gr;g.beginPath();g.moveTo(ox+a0.x,oy+a0.y);g.lineTo(ox+b0.x,oy+b0.y);g.lineTo(ox+b1.x,oy+b1.y);g.lineTo(ox+a1.x,oy+a1.y);g.closePath();g.fill()});
+  g.restore()});
  sc.view=cv;sc.viewOx=ox;sc.viewOy=oy}
 /* Low-poly plinth under a building or landmark. (0,0) is the ground contact in upright sprite space.
    The footprint uses the same shear and v as the ground, then extrudes straight up. West face is lit.

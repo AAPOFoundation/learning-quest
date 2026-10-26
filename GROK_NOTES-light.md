@@ -41,3 +41,36 @@ Reduced motion keeps the grade and the lights, because they do not move. Say if 
 The shader caps lights at 12 on a full GPU. A town keeps the hero, the chest and the landmark. Far towns on a large map can lose their window light.
 
 Not tested on a real phone, Safari or Firefox yet.
+
+# Round 4: light, atmosphere and depth (26 Oct 2026)
+
+Branch `graphics/r4-light-atmosphere`, cut from `origin/main` at `45bc940`. Lighting, rendering and FX only: `shared/fx2.js` (the GL pass), the terrain relief bake in `shared/art.js` (`paintRelief`, not the portraits), and a few lines in `shared/world.js` (lamps, shadow list, the atmosphere hint). No new dependency, no image files, no save changes.
+
+## What changed
+
+`shared/fx2.js`, GL pass.
+- Atmosphere by biome (`LQLight.atmos`): mist amount and colour, sun shafts and colour, a small ambient dip ("dusk"), a soft far-band focus, an S-curve contrast amount and a tinted vignette. The pass eases between biomes as the hero walks from one region to the next (about a second). Reduced motion snaps.
+- Mist is a 128px tileable four-channel value-noise texture built once in JS (no image file). Two layers are anchored to the world: a far layer that scrolls at 0.82 of the ground and a near wisp layer at 1.22, so the ground reads deeper as the camera moves. Mist pools over water and the night around the island and thins on lit land. Lamps burn through it.
+- Sun shafts fall from the upper left (the key light), fade as they fall, and are weaker over the dark night so they do not stripe the sky.
+- Lamps now light the paint (albedo) as well as adding glow, and the ambient dips a little per biome, so torches, the forge, the landmark and the hero's glow read as pools.
+- Every figure shadow gets a tight contact shadow at the feet under the soft cast. The cast leans down-right with the key light.
+- The top of the frame softens a little (far-band focus). It reuses the five glow taps, so it costs no extra texture reads.
+- Budget: a wide screen on a large GPU gets 12 lights and 12 shadows. A phone (short side under 560px) keeps the round-3 budget of 12 lights and 8 shadows, and skips the near mist layer (the move pad sits there).
+- `frame(src,lights,shadows,key,host,opts)` takes optional `opts` {biome, cam, scale, t, calm}. The home strip calls it without opts and gets the quiet `home` atmosphere (no mist, no dusk).
+- WebKit: the home strip (and any page under reduced motion) creates its context with `preserveDrawingBuffer: true`. Without it Playwright WebKit (iPhone 13 profile) drew the pass as solid black over the journey strip after a full-page capture re-composited the page, because the strip paints one still frame. A lost context now hides the pass so the painted canvas shows.
+
+`shared/art.js`, relief bake (once per scene, no per-frame cost). Each cliff face darkens toward its foot. The lower ground gets a thin dark band along every cliff foot, and a longer soft cast where the face looks away from the key light. The shade is drawn inside the lower plane's own tiles, so a higher tile drawn later covers any spill.
+
+`shared/world.js`. Gate posts carry two small torches. A fountain gives a cool water light. A course landmark adds a wide low spill on the ground. A ready chest has a larger gold pool and a small glint, and every chest and landmark gets a ground shadow. Light and shadow caps follow `LQLight.limits()`. `atmOpts()` passes the biome under the hero (or the town's biome), the camera and the clock (0 when calm).
+
+## Kept
+
+Low effects hides the pass and keeps the flat map. The slow guard (frames over 45 ms for about 1.5 s) still switches to the 2D light. Reduced motion keeps the still grade and still lights; mist and shafts hold still (t=0). Nothing pulses.
+
+## Checked
+
+Headless Chrome (SwiftShader GL) at 1280x800 and 390x844, Python town (Listwood), Python world, Evals world, Safety town (Dunes) and Foundations town. Shader linked (`LQLight.error()` empty), no console exceptions. Playwright WebKit, iPhone 13, home page with reduced motion: the strip was black before and draws after. Not tested on a real phone, Safari or Firefox.
+
+## Open for Jensen
+
+The map is a touch darker and moodier per region (dusk 0.01 to 0.07). Say if it should be brighter for younger players. Sun shafts are strongest in the forest and the citadel.

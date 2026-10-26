@@ -346,10 +346,12 @@ var MARK={
  'portfolio-guide':{dy:-0.92,r:76,c:[0.38,0.28,0.08]}
 };
 function addLight(x,y,r,col,pri){lights.push({x:x+ldx,y:y+ldy,r:r,c:col,p:pri==null?5:pri})}
-function addShadow(x,y,keep){var u=S/34;shadows.push({x:x+ldx+9*u,y:y+ldy+S*.38+4.2*u,r:15*u,keep:!!keep})}
+function addShadow(x,y,keep,k){var u=S/34*(k||1);shadows.push({x:x+ldx+9*u,y:y+ldy+S*.38+4.2*u,r:15*u,keep:!!keep})}
 function lamp(o,x,y,op){var k=o.kind;
- if(o.type==='chest'){if(op.glow)addLight(x,y+S*.42,42,[0.12,0.08,0.025],1);else if(op.open)addLight(x,y+S*.42,28,[0.1,0.07,0.02],4);return}
- if(o.landmark){var m=MARK[A.key]||{dy:-0.45,r:78,c:[0.42,0.32,0.12]};addLight(x,y+m.dy*S,m.r,m.c,2);return}
+ if(o.type==='chest'){addShadow(x-S*.05,y-S*.12,false,1.25);if(op.glow){addLight(x,y+S*.42,58,[0.15,0.1,0.03],1);addLight(x,y-S*.2,22,[0.2,0.15,0.05],6)}else if(op.open)addLight(x,y+S*.42,30,[0.1,0.07,0.02],4);return}
+ if(k==='gate'){addLight(x-S*.62,y-S*.15,34,[0.34,0.2,0.05],4);addLight(x+S*.62,y-S*.15,34,[0.34,0.2,0.05],4);return}/* torches on the gate posts */
+ if(k==='fountain'){addLight(x,y+S*.1,46,[0.06,0.13,0.2],5);return}/* cool water light */
+ if(o.landmark){var m=MARK[A.key]||{dy:-0.45,r:78,c:[0.42,0.32,0.12]};addLight(x,y+m.dy*S,m.r,m.c,2);addLight(x,y+S*.4,m.r*1.25,[m.c[0]*.32,m.c[1]*.32,m.c[2]*.32],6);addShadow(x-S*.08,y-S*.05,false,1.5);return}/* a wide low spill on the ground under the lamp */
  if(k==='smithy')addLight(x-6,y+S*.5-8,70,[0.62,0.24,0.05],2);
  else if(k==='tower'){addLight(x,y+S*.5-46,52,[0.48,0.36,0.12],2);addLight(x,y+S*.5-90,28,[0.5,0.4,0.14],3)}
  else if(k==='hall'&&op.lit)addLight(x,y+S*.5-12,68,[0.46,0.32,0.1],2);
@@ -361,10 +363,10 @@ function lamp(o,x,y,op){var k=o.kind;
 function packLights(cx,cy,z){var sc=z*dpr,i,L,sx,sy,rr,out=[],sh=[];
  for(i=0;i<lights.length;i++){L=lights[i];sx=(L.x-cx)*sc;sy=(L.y-cy)*sc;rr=L.r*sc;if(sx<-rr||sy<-rr||sx>cv.width+rr||sy>cv.height+rr)continue;
   var dx=sx-cv.width*.5,dy=sy-cv.height*.5;out.push({x:sx,y:sy,r:rr,c:L.c,p:L.p,d:dx*dx+dy*dy})}
- out.sort(function(a,b){return a.p-b.p||a.d-b.d});if(out.length>12)out.length=12;
+ var lim=window.LQLight&&LQLight.limits?LQLight.limits():{lights:12,shadows:8};out.sort(function(a,b){return a.p-b.p||a.d-b.d});if(out.length>lim.lights)out.length=lim.lights;
  for(i=0;i<shadows.length;i++){L=shadows[i];sx=(L.x-cx)*sc;sy=(L.y-cy)*sc;rr=Math.max(8,L.r*sc);if(sx<-rr||sy<-rr||sx>cv.width+rr||sy>cv.height+rr)continue;
   sh.push({x:sx,y:sy,r:rr,k:L.keep?0:1,d:(sx-cv.width*.5)*(sx-cv.width*.5)+(sy-cv.height*.5)*(sy-cv.height*.5)})}
- sh.sort(function(a,b){return a.k-b.k||a.d-b.d});if(sh.length>8)sh.length=8;return {lights:out,shadows:sh}}
+ sh.sort(function(a,b){return a.k-b.k||a.d-b.d});if(sh.length>lim.shadows)sh.length=lim.shadows;return {lights:out,shadows:sh}}
 function useView(){return !FX.low&&!(FX.rm&&FX.rm.matches)&&st.scene&&st.scene.view}/* reduced motion uses the flat map */
 function tileH(sc,c,r){return inb(sc,c,r)?Art.groundH(sc.t[c][r]):0}
 function heroH(){var sc=st.scene,h=st.hero,a=tileH(sc,h.c,h.r);if(!h.mv)return a;var k=Math.max(0,Math.min(1,h.mv.t));return a+(tileH(sc,h.mv.c,h.mv.r)-a)*k}
@@ -395,6 +397,8 @@ function chestPool(g,x,y,a){if(a<=.02)return;var rg=g.createRadialGradient(x,y-S
 function vpt(x,y){if(!useView())return [x,y];var hh=Art.px2hex(x,y),p=toView(x,y,tileH(st.scene,hh[0],hh[1]),0);return [p.x,p.y]}
 function hexAt(g,c,r,rad){if(!useView()){Art.hexPath(g,hx(c,r),hy(r),rad);return}var sc=st.scene,th=tileH(sc,c,r),xx=hx(c,r),yy=hy(r),pk,ang,q;g.beginPath();
  for(pk=0;pk<6;pk++){ang=(60*pk-30)*Math.PI/180;q=Art.project(xx+rad*Math.cos(ang),yy+rad*Math.sin(ang),th);pk?g.lineTo(q.x+sc.viewOx,q.y+sc.viewOy):g.moveTo(q.x+sc.viewOx,q.y+sc.viewOy)}g.closePath()}
+/* Atmosphere for the GL pass: the biome under the hero (overworld) or the town's biome, the camera's top-left in world px, and the clock (held at 0 when calm). */
+function atmOpts(world,sc,h,cx,cy,z){var zb=world&&sc.zone[h.c]?sc.zone[h.c][h.r]:null,b=world?bio(zb==null||zb<0?0:zb):(sc.biome||'meadow');return {biome:b,cam:[cx,cy],scale:z*dpr,t:motionOn()?st.time:0,calm:!motionOn()}}
 function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=st.hero,g=ctx,view=useView();lights.length=0;shadows.length=0;ldx=0;ldy=0;g.setTransform(1,0,0,1,0,0);g.fillStyle='#0a0f15';g.fillRect(0,0,cv.width,cv.height);
  var tx,ty,camW,camH,sway=motionOn()?Math.sin(st.time*.2)*40:0;
  if(view){var feet=toView(h.x,h.y+S*.38,heroH(),0),bias=CW>=560?vh*.06:0;tx=feet.x-vw/2;ty=feet.y-vh/2-bias;
@@ -460,7 +464,7 @@ function draw(){if(!st.scene)return;var sc=st.scene,z=zoom(),vw=CW/z,vh=CH/z,h=s
  g.drawImage(vigLayer(),0,0,CW,CH);
  /* The WebGL pass reads this canvas, so the fade veil is drawn first and gets the same grade. If WebGL is not there, the old canvas light layer is used. */
  if(st.veil>0){g.save();g.globalAlpha=st.veil;g.fillStyle='#0a0f15';g.fillRect(0,0,CW,CH);g.restore()}
- var glOk=false;if(window.LQLight){var pk=packLights(cx,cy,z);glOk=LQLight.frame(cv,pk.lights,pk.shadows,A.key)}
+ var glOk=false;if(window.LQLight){var pk=packLights(cx,cy,z);glOk=LQLight.frame(cv,pk.lights,pk.shadows,A.key,null,atmOpts(world,sc,h,cx,cy,z))}
  if(!FX.low&&!glOk){g.setTransform(1,0,0,1,0,0);if(!fxl||fxl.w!==cv.width||fxl.h!==cv.height)mkLight();g.drawImage(fxl.c,0,0);if(st.veil>0){g.setTransform(dpr,0,0,dpr,0,0);g.save();g.globalAlpha=st.veil;g.fillStyle='#0a0f15';g.fillRect(0,0,CW,CH);g.restore()}}
  st.mmT-=1;var rebake=st.mmT<=0;if(rebake)st.mmT=6;drawMM(rebake)}
 function drawMM(rebake){if(!mm||!st.scene)return;var sc=st.scene,g=mmg,W=mm.width,H=mm.height,k=Math.min(W/sc.W,H/sc.H),ox=(W-sc.W*k)/2,oy=(H-sc.H*k)/2;
