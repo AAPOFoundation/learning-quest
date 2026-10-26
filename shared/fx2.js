@@ -34,7 +34,9 @@ var CSS='.lq-vfx{position:fixed;inset:0;z-index:49;pointer-events:none;overflow:
 function vfxLayer(kind,x,y,html,ms){if(!document.getElementById('lq-vfx-css')){var s=document.createElement('style');s.id='lq-vfx-css';s.textContent=CSS;document.head.appendChild(s)}
  var old=document.querySelector('.lq-vfx.'+kind);if(old)old.remove();var d=document.createElement('div'),m=Math.min(innerWidth,innerHeight);d.className='lq-vfx '+kind+(calm()?' calm':'');d.setAttribute('aria-hidden','true');
  if(x==null)x=innerWidth/2;if(y==null)y=innerHeight/2;var st=d.style;st.setProperty('--x',Math.round(x)+'px');st.setProperty('--y',Math.round(y)+'px');st.setProperty('--g',Math.round(m*.7)+'px');st.setProperty('--r',Math.round(m*.95)+'px');st.setProperty('--w',Math.round(Math.max(70,m*.16))+'px');
- st.setProperty('--k',(Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y))/20*1.05).toFixed(1));d.innerHTML=html;document.body.appendChild(d);setTimeout(function(){d.remove()},ms||2400);return d}
+ st.setProperty('--k',(Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y))/20*1.05).toFixed(1));d.innerHTML=html;document.body.appendChild(d);
+ /* r6: the WebGL pass (below) turns this effect into real light on the ground while it plays */
+ var FL=window.LQFxLights||(window.LQFxLights=[]);FL.push({k:kind,x:x,y:y,t0:performance.now()});if(FL.length>4)FL.shift();setTimeout(function(){d.remove()},ms||2400);return d}
 function beam(x,y){return vfxLayer('beam',x,y,'<div class="rays"></div><div class="shaft"></div><div class="core"></div><div class="glow"></div>',2500)}
 function shockwave(x,y){return vfxLayer('shock',x,y,'<div class="wash"></div><div class="glow"></div><div class="ring"></div><div class="ring r2"></div>',2400)}
 /* gate(x,y): a soft warm glow that blooms and fades where a gate opens (no ring). Calm mode shows it still. */
@@ -100,11 +102,12 @@ function burst(x,y){if(skip()){zap();return}var ps=[];for(var i=0;i<16;i++){var 
 function floatText(x,y,text){if(skip()){zap();return}if(text==null||text==='')return;text=String(text).slice(0,18);if(!text)return;floats.push({x:x,y:y,t:0,s:text});if(floats.length>5)floats.shift()}
 function puff(x,y){if(skip()){zap();return}var ps=[];for(var i=0;i<5;i++){var a=Math.random()*6.283185,sp=8+Math.random()*14;ps.push({x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp*.4-8,r:.6+Math.random()*.8})}
  puffs.push({t:0,ps:ps});if(puffs.length>8)puffs.shift()}
-/* A few glow spots the WebGL pass can turn into real light. World coordinates. */
+/* A few glow spots the WebGL pass can turn into real light. World coordinates. [x,y,r,colour,kind]: kind 3 is a glow the bloom picks up, 0 a pool on the ground.
+   r6: a sparkle burst also lights the ground under it (the burst sits about a body height above the feet). */
 var glows=[];
 function fillGlows(k){glows.length=0;var K=KIND[k]||KIND.meadow,i,j;
- if(K.glow){for(i=0;i<parts.length&&glows.length<4;i+=4)glows.push([parts[i].x,parts[i].y,26,[0.2,0.26,0.08]])}
- for(j=0;j<bursts.length&&glows.length<6;j++){var b=bursts[j];if(b.t<1.1)glows.push([b.x,b.y,72*(1-b.t/1.3),[0.46,0.32,0.1]])}}
+ for(j=0;j<bursts.length&&glows.length<4;j++){var b=bursts[j];if(b.t<1.1){var f=1-b.t/1.3;glows.push([b.x,b.y,72*f,[0.46,0.32,0.1],3]);glows.push([b.x,b.y+S*.95,96*f,[0.3*f,0.22*f,0.08*f],0])}}
+ if(K.glow){for(i=0;i<parts.length&&glows.length<8;i+=4)glows.push([parts[i].x,parts[i].y,26,[0.2,0.26,0.08],3])}}
 /* round 2b ambient light (full effects only; off for Low effects and reduced motion):
    pools(): warm lamplight pools on the ground around houses, halls and towns, breathing gently, added with 'lighter' so they light the paint.
    fireflies(): a few soft glowing motes drifting on fixed sine paths near the edges of the view (stateless, cheap). */
@@ -129,7 +132,18 @@ window.LQAnim={water:water,particles:particles,burst:burst,floatText:floatText,p
    Round 4 (light and atmosphere): each biome has an atmosphere (mist, sun shafts, a little dusk, a soft far-band focus,
    a tinted vignette). Mist is anchored to the world in two layers that scroll at different speeds, so the ground reads deeper
    as the camera moves. Lamps burn through the mist. Each figure gets a tight contact shadow at the feet under its soft cast.
-   Calm (reduced motion) passes t=0, so mist and shafts hold still. The atmosphere eases between biomes; calm snaps. */
+   Calm (reduced motion) passes t=0, so mist and shafts hold still. The atmosphere eases between biomes; calm snaps.
+   Round 6 (light and bloom):
+   - Light kinds (lights[i].k): 0 plain pool, 1 window (a soft cone of light falls from it), 2 flame (flickers; a halo and a
+     faint rising column in the mist), 3 glow (an emissive thing: crystal, chest glint, staff orb, sparkle, gatekeeper aura).
+   - Selective bloom: a bright-pass that only keeps pixels near kinds 1-3 (plus each emitter's own core), drawn into a small
+     target (a quarter of the canvas, long side at most 480px; on a phone at most 192px, refreshed every other frame) and blurred there. The grade and the
+     ambient level are untouched; bloom only adds light around things that glow.
+   - Cones, flame columns and halos scatter more where the mist is thicker, and the mist near a lamp takes the lamp's colour.
+   - Chest beams, shockwaves, gate glows (LQVfx), sparkle bursts and footstep embers in lamp pools light the ground.
+   - Flames flicker (colour and a little radius, mean unchanged). Shallow water gets soft moving caustics (still when calm).
+   - One key light: cast shadows lean along KEY (the same 9:4.2 lean Art.figure paints) and the sun shafts share its azimuth.
+   Calm (reduced motion): no flicker, no embers, caustics and mist hold still, the VFX light shows as a still glow that fades. */
 (function(){
 'use strict';
 var GRADES={
@@ -141,62 +155,101 @@ var GRADES={
  home:{lift:[0.016,0.016,0.006],gain:[1.02,1.0,0.94],shade:[0.96,0.94,0.88],sat:1.04,glow:0.18,far:0.08}
 },FALL={lift:[0.014,0.014,0.01],gain:[1,1,1],shade:[0.96,0.94,0.9],sat:1,glow:0.16,far:0.1};
 /* Atmosphere by biome. a: [mist, shafts, dusk, far focus]. m: mist colour. r: shaft colour. k: contrast. v: vignette tint strength.
-   Dusk is a small dip in the ambient light so lamps and the hero's glow read as pools. It stays bright: this is a kids' map. */
+   r6 (Jensen, 27 Oct: "Noted. You may proceed with your recommendation."): the base is the warm, encouraging look for every region,
+   with no dusk (round 4 had 0.012 to 0.072 everywhere). Mood is added only in the later half of a course (see MOOD and lateness()). */
 var ATM={
- meadow:{a:[0.12,0.18,0.03,0.55],m:[0.86,0.9,0.78],r:[1.0,0.9,0.62],k:0.12,v:0.15},
- forest:{a:[0.2,0.26,0.054,0.6],m:[0.6,0.76,0.6],r:[0.98,0.93,0.6],k:0.16,v:0.21},
- hills:{a:[0.15,0.16,0.042,0.6],m:[0.78,0.83,0.92],r:[1.0,0.9,0.66],k:0.14,v:0.17},
- desert:{a:[0.09,0.14,0.012,0.45],m:[0.96,0.84,0.62],r:[1.0,0.86,0.55],k:0.1,v:0.13},
- tundra:{a:[0.2,0.08,0.03,0.55],m:[0.9,0.95,1.0],r:[0.86,0.93,1.0],k:0.1,v:0.15},
- marsh:{a:[0.26,0.07,0.072,0.6],m:[0.68,0.82,0.78],r:[0.9,0.95,0.8],k:0.14,v:0.21},
- highland:{a:[0.2,0.11,0.06,0.6],m:[0.76,0.8,0.93],r:[0.92,0.9,0.8],k:0.14,v:0.19},
- crown:{a:[0.1,0.22,0.042,0.5],m:[0.95,0.88,0.7],r:[1.0,0.86,0.5],k:0.14,v:0.17},
+ meadow:{a:[0.12,0.18,0.0,0.55],m:[0.86,0.9,0.78],r:[1.0,0.9,0.62],k:0.12,v:0.12},
+ forest:{a:[0.18,0.26,0.0,0.6],m:[0.64,0.78,0.62],r:[0.98,0.93,0.6],k:0.14,v:0.15},
+ hills:{a:[0.14,0.16,0.0,0.6],m:[0.8,0.85,0.92],r:[1.0,0.9,0.66],k:0.13,v:0.13},
+ desert:{a:[0.09,0.14,0.0,0.45],m:[0.96,0.84,0.62],r:[1.0,0.86,0.55],k:0.1,v:0.11},
+ tundra:{a:[0.18,0.08,0.0,0.55],m:[0.9,0.95,1.0],r:[0.86,0.93,1.0],k:0.1,v:0.12},
+ marsh:{a:[0.18,0.08,0.0,0.6],m:[0.72,0.84,0.78],r:[0.92,0.95,0.8],k:0.12,v:0.14},
+ highland:{a:[0.16,0.12,0.0,0.6],m:[0.78,0.82,0.93],r:[0.94,0.9,0.8],k:0.12,v:0.14},
+ crown:{a:[0.1,0.22,0.0,0.5],m:[0.95,0.88,0.7],r:[1.0,0.86,0.5],k:0.14,v:0.13},
  home:{a:[0.0,0.06,0.0,0.0],m:[0.9,0.88,0.8],r:[1.0,0.9,0.62],k:0.08,v:0.0}
-},cur=null;
-function atmTarget(b){return ATM[b]||ATM.meadow}
+},
+/* Mood at full lateness: a: added [mist, shafts, dusk, 0], m: mist colour it leans to, v: added vignette tint. Dusk dims the darks, and the pass gives
+   the light back in the mids, the highlights and the lamps (see the shader), so the average brightness does not drop. Nothing goes dark or scary. */
+MOOD={
+ marsh:{a:[0.1,0.0,0.07,0],m:[0.62,0.76,0.76],v:0.06},
+ highland:{a:[0.07,0.0,0.06,0],m:[0.72,0.77,0.92],v:0.05},
+ tundra:{a:[0.05,0.0,0.035,0],m:[0.84,0.9,1.0],v:0.03},
+ forest:{a:[0.04,0.0,0.04,0],m:[0.58,0.74,0.6],v:0.04},
+ hills:{a:[0.03,0.0,0.03,0],m:[0.76,0.82,0.92],v:0.03},
+ desert:{a:[0.0,0.0,0.015,0],m:[0.96,0.84,0.62],v:0.01},
+ meadow:{a:[0.0,0.0,0.01,0],m:[0.86,0.9,0.78],v:0.01},
+ crown:{a:[0.0,0.0,0.02,0],m:[0.95,0.88,0.7],v:0.02}
+},cur=null,tgt={a:[0,0,0,0],m:[0,0,0],r:[0,0,0],k:0,v:0};
+/* lateness: 0 for the first third of a course, rising smoothly to 1 at the last region and the castle. p = region index / (regions - 1). */
+function lateness(p){var t=Math.max(0,Math.min(1,((p||0)-0.35)/0.65));return t*t*(3-2*t)}
+function atmTarget(b,late){var B=ATM[b]||ATM.meadow,M=MOOD[b],w=M?lateness(late):0,i;
+ for(i=0;i<4;i++)tgt.a[i]=B.a[i]+(M?M.a[i]*w:0);for(i=0;i<3;i++){tgt.m[i]=B.m[i]+(M?(M.m[i]-B.m[i])*w:0);tgt.r[i]=B.r[i]}tgt.k=B.k;tgt.v=B.v+(M?M.v*w:0);return tgt}
 function ease(t,calm){var k=calm||!cur?1:0.06,i;if(!cur){cur={a:t.a.slice(),m:t.m.slice(),r:t.r.slice(),k:t.k,v:t.v}}
  for(i=0;i<4;i++)cur.a[i]+=(t.a[i]-cur.a[i])*k;for(i=0;i<3;i++){cur.m[i]+=(t.m[i]-cur.m[i])*k;cur.r[i]+=(t.r[i]-cur.r[i])*k}cur.k+=(t.k-cur.k)*k;cur.v+=(t.v-cur.v)*k;return cur}
+/* One key light from the upper left. KEY is the ground lean of a cast shadow on screen (Art.figure paints its cast at 9:4.2,
+   and world.js offsets the GL cast the same way). The sun shafts fall along the same azimuth, a little steeper because they come down through the air. */
+var KEY=(function(){var l=Math.sqrt(81+4.2*4.2);return [9/l,4.2/l]})(),SHAFT=(function(){var x=KEY[0],y=KEY[1]+0.5,l=Math.sqrt(x*x+y*y);return [x/l,y/l]})();
 var cvs,gl,prog,buf,tex,ntex,locs,failed=false,err='',nL=0,nS=0,px,pc,hs,watch=null,lastProbe=null;
-function fsSrc(L,S){
+var bp=null,blp=null,bt=[],black=null,bloomOff=false,ex=new Float32Array(24),ec=new Float32Array(24),stats={bloom:[0,0],passes:0,emit:0};
+function fsSrc(L,S,VOL){
  return 'precision mediump float;'
- +'uniform sampler2D uS;uniform sampler2D uNz;uniform vec3 uLift;uniform vec3 uGain;uniform vec3 uShade;uniform vec4 uMisc;uniform vec2 uRes;uniform vec3 uP['+L+'];uniform vec3 uC['+L+'];uniform vec3 uH['+S+'];'
- +'uniform vec4 uAtm;uniform vec3 uMistC;uniform vec3 uRayC;uniform vec4 uCam;uniform vec4 uTone;varying vec2 v;'
+ +'uniform sampler2D uS;uniform sampler2D uNz;uniform sampler2D uBl;uniform vec3 uLift;uniform vec3 uGain;uniform vec3 uShade;uniform vec4 uMisc;uniform vec2 uRes;uniform vec3 uP['+L+'];uniform vec4 uC['+L+'];uniform vec3 uH['+S+'];'
+ +'uniform vec4 uAtm;uniform vec3 uMistC;uniform vec3 uRayC;uniform vec4 uCam;uniform vec4 uTone;uniform vec4 uKey;uniform vec4 uFx;varying vec2 v;'
  +'float gold(vec3 c){float y=dot(c,vec3(0.299,0.587,0.114));float w=smoothstep(0.42,0.82,c.r)*smoothstep(0.28,0.7,c.g);float nb=1.0-smoothstep(0.36,0.52,c.b);return w*nb*smoothstep(0.28,0.72,y);}'
- +'void main(){vec2 uv=vec2(v.x,1.0-v.y);vec2 p=uv*uRes;float far=smoothstep(0.2,0.92,1.0-uv.y);'
+ +'void main(){vec2 uv=vec2(v.x,1.0-v.y);vec2 p=uv*uRes;float far=smoothstep(0.2,0.92,1.0-uv.y);vec2 w=p/uCam.z;float tt=uMisc.w;'
  +'vec2 px=vec2(5.0)/uRes;vec3 src=texture2D(uS,uv).rgb;vec3 t1=texture2D(uS,uv+vec2(px.x,0.0)).rgb;vec3 t2=texture2D(uS,uv-vec2(px.x,0.0)).rgb;vec3 t3=texture2D(uS,uv+vec2(0.0,px.y)).rgb;vec3 t4=texture2D(uS,uv-vec2(0.0,px.y)).rgb;'
  /* far-band focus: the top of the frame is further away, so it softens a little (reuses the glow taps) */
  +'float dof=uAtm.w*smoothstep(0.35,1.0,far);vec3 col=mix(src,(src*2.0+t1+t2+t3+t4)/6.0,dof);'
  +'float l=dot(col,vec3(0.299,0.587,0.114));col=mix(vec3(l),col,uMisc.x);col=mix(col,col*uShade,smoothstep(0.62,0.08,l)*0.38);col=col*uGain+uLift*(1.0-l);'
- /* gentle S-curve so the paint has a darker floor and brighter tops */
  +'col=mix(col,col*col*(3.0-2.0*col),uTone.x);'
  +'col=mix(col,col*vec3(0.8,0.86,1.0),far*uMisc.z);'
  +'float b=gold(src)+gold(t1)+gold(t2)+gold(t3)+gold(t4);col+=vec3(1.0,0.78,0.34)*(b*0.2)*uMisc.y;'
- +'vec3 light=vec3(0.0);for(int i=0;i<'+L+';i++){float on=step(float(i)+0.5,uCam.w);vec2 d=p-uP[i].xy;float nd=length(d)/max(uP[i].z,1.0);float a=clamp(1.0-nd,0.0,1.0);float hot=clamp(1.0-nd*3.4,0.0,1.0);light+=uC[i]*(a*a+hot*hot*0.36)*on;}'
- /* ambient dips a little (dusk); lamps light the paint (albedo) and add a little glow on top */
- +'col=col*(1.0-uAtm.z)+col*light*1.5+light*0.55;'
- +'float sh=1.0;for(int i=0;i<'+S+';i++){float on=step(float(i)+0.5,uTone.w);float r=max(uH[i].z,1.0);vec2 sd=p-uH[i].xy;sd.x-=sd.y*0.5;sd.x/=r;sd.y/=r*0.38;float e=clamp(1.0-dot(sd,sd),0.0,1.0);'
- +'vec2 cd=(p-(uH[i].xy-vec2(0.6,0.28)*r))/vec2(r*0.62,r*0.2);float ce=clamp(1.0-dot(cd,cd),0.0,1.0);sh*=(1.0-e*e*0.40*on)*(1.0-ce*ce*0.42*on);}col*=sh;'
+ /* lights. k (uC.w): 1 window cone falling below the light, 2 flame halo and a faint rising column. vol only shows through the mist (below). */
+ +'vec3 light=vec3(0.0);vec3 vol=vec3(0.0);for(int i=0;i<'+L+';i++){float on=step(float(i)+0.5,uCam.w);vec2 d=p-uP[i].xy;float r=max(uP[i].z,1.0);float nd=length(d)/r;float a=clamp(1.0-nd,0.0,1.0);float hot=clamp(1.0-nd*3.4,0.0,1.0);vec3 c=uC[i].rgb*on;light+=c*(a*a+hot*hot*0.36);float k=uC[i].w;'
+ +(VOL?'if(k>0.5&&k<1.5){float al=d.y/(r*2.1);float sp=abs(d.x-d.y*0.24)/(r*(0.16+0.6*clamp(al,0.0,1.0)));vol+=c*(step(0.0,al)*smoothstep(0.0,0.12,al)*(1.0-smoothstep(0.2,1.0,al))*(1.0-smoothstep(0.3,1.0,sp)));}'
+ +'else if(k>1.5&&k<2.5){float up=-d.y/(r*1.2);vol+=c*(step(0.0,up)*(1.0-smoothstep(0.0,1.0,up))*exp(-abs(d.x)/(r*0.13))*0.75+a*a*a*0.6);}}':'}')
+ /* dusk (later regions only) dims the darks; the mids, highlights and lamps get it back, so the average stays put. Lamps light the paint a little more than in r4 (1.75 vs 1.5) so pools still read now the early regions have no dusk */
+ +'col=col*(1.0-uAtm.z)+col*(uAtm.z*1.7*smoothstep(0.3,0.75,l))+col*light*(1.75+uAtm.z*4.0)+light*(0.6+uAtm.z*1.5);'
+ /* cast shadows lean along the key light (uKey.xy); the tight contact sits at the feet */
+ +'vec2 kd=uKey.xy;vec2 kn=vec2(-kd.y,kd.x);float sh=1.0;for(int i=0;i<'+S+';i++){float on=step(float(i)+0.5,uTone.w);float r=max(uH[i].z,1.0);vec2 f=uH[i].xy-kd*(0.66*r);vec2 sd=p-f-kd*(0.6*r);float su=dot(sd,kd)/(r*1.02);float sv=dot(sd,kn)/(r*0.4);float e=clamp(1.0-su*su-sv*sv,0.0,1.0);'
+ +'vec2 cd=(p-f)/vec2(r*0.62,r*0.2);float ce=clamp(1.0-dot(cd,cd),0.0,1.0);sh*=(1.0-e*e*0.40*on)*(1.0-ce*ce*0.42*on);}col*=sh;'
+ /* soft caustics on shallow (light blue) water, anchored to the world. Mean-neutral: the dark between the lines takes back what the lines add. */
+ +'float wm=clamp((src.b-src.r)*3.2-0.25,0.0,1.0)*smoothstep(0.26,0.46,l)*(1.0-smoothstep(0.8,0.95,l))*uFx.y;'
+ +(VOL?'':'wm=0.0;')+'if(wm>0.004){vec2 cw=(w+uCam.xy)/190.0;float c1=texture2D(uNz,cw+vec2(tt*0.011,tt*0.007)).g;float c2=texture2D(uNz,cw*1.37+vec2(0.31-tt*0.009,0.17+tt*0.012)).b;float ca=smoothstep(0.9,0.99,1.0-abs(c1-c2));col+=(vec3(0.8,0.97,0.92)*ca-0.035)*wm;}'
  /* world-anchored mist: a far layer that scrolls slower than the ground and a near layer that scrolls faster (parallax) */
- +'float lum=dot(light,vec3(0.4,0.4,0.2));vec2 w=p/uCam.z;float tt=uMisc.w;'
+ +'float lum=dot(light,vec3(0.4,0.4,0.2));'
  +'float n1=texture2D(uNz,(w+uCam.xy*0.82)/540.0+vec2(tt*0.006,tt*0.002)).r;float n2=texture2D(uNz,(w+uCam.xy*0.82)/230.0-vec2(tt*0.004,-tt*0.003)).g;'
- +'float m=smoothstep(0.38,0.86,n1*0.66+n2*0.34)*mix(0.3,1.0,far);'
+ +'float md=smoothstep(0.38,0.86,n1*0.66+n2*0.34);float m=md*mix(0.3,1.0,far);'
  +'if(uTone.z>0.5){float n3=texture2D(uNz,(w+uCam.xy*1.22)/300.0+vec2(tt*0.012,tt*0.004)).b;m+=smoothstep(0.55,0.92,n3)*smoothstep(0.62,1.0,uv.y)*0.55;}'
- +'float low=clamp((src.b-src.r)*2.4+(0.34-l)*1.6,0.0,1.0);m*=uAtm.x*(0.5+0.7*low)*(1.0-clamp(lum*2.6,0.0,0.85));/* mist pools over water and the low night around the island */col=mix(col,uMistC*(0.82+0.18*l),clamp(m,0.0,0.5));'
+ /* mist pools over water and the low night around the island; lamps burn through it and the mist left near a lamp takes its colour */
+ +'float low=clamp((src.b-src.r)*2.4+(0.34-l)*1.6,0.0,1.0);m*=uAtm.x*(0.5+0.7*low)*(1.0-clamp(lum*2.6,0.0,0.85));col=mix(col,uMistC*(0.82+0.18*l)'+(VOL?'+light*0.9*uFx.z':'')+',clamp(m,0.0,0.5));'
+ /* volumetric look: cones and flame columns scatter in the air, more where the mist is thicker; streaks drift slowly */
+ +(VOL?'float sn=texture2D(uNz,vec2(p.x/uRes.y*2.4+tt*0.005,0.71)).a;col+=vol*uFx.z*(0.3+md*(0.5+uAtm.x*4.0))*(0.6+0.8*sn)*(1.0-col*0.55);':'')
  /* sun shafts from the upper left (the key light), fading as they fall */
- +'vec2 q=p/uRes.y;vec2 dir=normalize(vec2(0.55,1.0));float s=dot(q,vec2(dir.y,-dir.x));float al=dot(q,dir);'
+ +'vec2 q=p/uRes.y;vec2 dir=uKey.zw;float s=dot(q,vec2(dir.y,-dir.x));float al=dot(q,dir);'
  +'float sh2=texture2D(uNz,vec2(s*1.7+tt*0.004,0.37)).a;float ray=smoothstep(0.52,0.95,sh2)*(1.0-smoothstep(0.1,1.25,al))*mix(0.45,1.0,far)*uAtm.y*(0.25+0.75*smoothstep(0.12,0.5,l));'
  +'col=col+uRayC*ray*(1.0-col);'
+ /* selective bloom (emitters only), added like light: brighter colours take less */
+ +'vec3 bl=texture2D(uBl,v).rgb*uFx.x;col+=bl*(1.0-col*0.6);'
  /* tinted vignette: the corners lean toward a dark version of the region mist */
  +'vec2 vc=(uv-0.5)*vec2(1.0,1.12);float vg=smoothstep(0.32,0.78,length(vc));col=mix(col,col*mix(vec3(1.0),uMistC*0.55,0.8),vg*uTone.y);'
  +'gl_FragColor=vec4(clamp(col,0.0,1.0),1.0);}';
 }
+/* Bloom bright-pass, drawn at low resolution: four bilinear taps of the frame (a 4x4 box), kept only near an emitter, plus each emitter's own core. */
+var BP='precision mediump float;uniform sampler2D uS;uniform vec2 uRes;uniform vec2 uTx;uniform vec3 uE[8];uniform vec3 uEC[8];uniform float uN;varying vec2 v;'
+ +'void main(){vec2 uv=vec2(v.x,1.0-v.y);vec2 p=uv*uRes;vec3 c=(texture2D(uS,uv+uTx).rgb+texture2D(uS,uv-uTx).rgb+texture2D(uS,uv+vec2(uTx.x,-uTx.y)).rgb+texture2D(uS,uv+vec2(-uTx.x,uTx.y)).rgb)*0.25;'
+ +'float mk=0.0;vec3 core=vec3(0.0);for(int i=0;i<8;i++){float on=step(float(i)+0.5,uN);float r=max(uE[i].z,1.0);float nd=length(p-uE[i].xy)/r;float a=clamp(1.0-nd,0.0,1.0);mk+=a*a*on;float h=clamp(1.0-nd*2.2,0.0,1.0);core+=uEC[i]*(h*h*on);}'
+ +'float y=dot(c,vec3(0.299,0.587,0.114));vec3 br=max(c-vec3(0.46),0.0)*1.9*smoothstep(0.42,0.78,y);gl_FragColor=vec4(br*clamp(mk,0.0,1.0)+core,1.0);}';
+/* Separable 9-tap gaussian as five bilinear taps. */
+var BL='precision mediump float;uniform sampler2D uT;uniform vec2 uD;varying vec2 v;'
+ +'void main(){vec3 c=texture2D(uT,v).rgb*0.227027;c+=(texture2D(uT,v+uD*1.384615).rgb+texture2D(uT,v-uD*1.384615).rgb)*0.316216;c+=(texture2D(uT,v+uD*3.230769).rgb+texture2D(uT,v-uD*3.230769).rgb)*0.070270;gl_FragColor=vec4(c,1.0);}';
 var VS='attribute vec2 a;varying vec2 v;void main(){v=a*0.5+0.5;gl_Position=vec4(a,0.0,1.0);}';
 function shader(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){err=gl.getShaderInfoLog(s)||'shader';return null}return s}
-var UN=['uS','uNz','uLift','uGain','uShade','uMisc','uRes','uAtm','uMistC','uRayC','uCam','uTone'];
-function link(L,S){err='';var a=shader(gl.VERTEX_SHADER,VS),b=shader(gl.FRAGMENT_SHADER,fsSrc(L,S));if(!a||!b)return false;
- var p=gl.createProgram();gl.attachShader(p,a);gl.attachShader(p,b);gl.bindAttribLocation(p,0,'a');gl.linkProgram(p);
- if(!gl.getProgramParameter(p,gl.LINK_STATUS)){err=gl.getProgramInfoLog(p)||'link';return false}
- prog=p;nL=L;nS=S;px=new Float32Array(L*3);pc=new Float32Array(L*3);hs=new Float32Array(S*3);locs={};
+function program(fs){var a=shader(gl.VERTEX_SHADER,VS),b=shader(gl.FRAGMENT_SHADER,fs);if(!a||!b)return null;var p=gl.createProgram();gl.attachShader(p,a);gl.attachShader(p,b);gl.bindAttribLocation(p,0,'a');gl.linkProgram(p);
+ if(!gl.getProgramParameter(p,gl.LINK_STATUS)){err=gl.getProgramInfoLog(p)||'link';return null}return p}
+var UN=['uS','uNz','uBl','uLift','uGain','uShade','uMisc','uRes','uAtm','uMistC','uRayC','uCam','uTone','uKey','uFx'];
+function link(L,S){err='';var p=program(fsSrc(L,S,!phone()));/* phone (VOL off): no per-light cones or flame columns, no lit mist, no caustics, so the per-pixel cost stays near round 5 */if(!p)return false;
+ prog=p;nL=L;nS=S;px=new Float32Array(L*3);pc=new Float32Array(L*4);hs=new Float32Array(S*3);locs={};
  UN.forEach(function(n){locs[n]=gl.getUniformLocation(p,n)});locs.uP=gl.getUniformLocation(p,'uP[0]');locs.uC=gl.getUniformLocation(p,'uC[0]');locs.uH=gl.getUniformLocation(p,'uH[0]');
  return true}
 /* 128px tileable value noise, four independent channels (mist far, mist detail, mist near, shafts). Built once, no image file. */
@@ -211,6 +264,32 @@ function noiseTex(){var N=128,d=new Uint8Array(N*N*4),ch,x,y,o;
  var t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,N,N,0,gl.RGBA,gl.UNSIGNED_BYTE,d);
  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);return t}
+function clampTex(t){gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE)}
+/* Bloom targets: two small RGBA textures with framebuffers, resized when the canvas changes. Any failure turns bloom off for the page (the rest of the pass is unchanged). */
+function target(w,h){var t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);clampTex(t);
+ var f=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,f);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,t,0);var ok=gl.checkFramebufferStatus(gl.FRAMEBUFFER)===gl.FRAMEBUFFER_COMPLETE;gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+ return ok?{t:t,f:f,w:w,h:h}:null}
+function phone(){return Math.min(innerWidth,innerHeight)<560}
+/* Bloom size: a quarter of the canvas, long side at most 480px; a phone at most 192px, one blur round instead of two, and refreshed every other frame (it is a soft blur, so the reuse does not show). */
+function bloomSize(w,h){var cap=phone()?192:480,s=Math.max(4,Math.max(w,h)/cap);return [Math.max(8,Math.round(w/s)),Math.max(8,Math.round(h/s))]}
+function bloomSetup(w,h){if(bloomOff)return false;var sz=bloomSize(w,h);if(bt[0]&&bt[0].w===sz[0]&&bt[0].h===sz[1])return true;
+ bt.forEach(function(x){gl.deleteTexture(x.t);gl.deleteFramebuffer(x.f)});bt=[];
+ if(!bp){var e0=err;bp=program(BP);blp=program(BL);err=e0;if(!bp||!blp){bloomOff=true;return false}
+  bp.L={uS:gl.getUniformLocation(bp,'uS'),uRes:gl.getUniformLocation(bp,'uRes'),uTx:gl.getUniformLocation(bp,'uTx'),uE:gl.getUniformLocation(bp,'uE[0]'),uEC:gl.getUniformLocation(bp,'uEC[0]'),uN:gl.getUniformLocation(bp,'uN')};
+  blp.L={uT:gl.getUniformLocation(blp,'uT'),uD:gl.getUniformLocation(blp,'uD')}}
+ var a=target(sz[0],sz[1]),b=a&&target(sz[0],sz[1]);if(!a||!b){bloomOff=true;return false}bt=[a,b];stats.bloom=sz;return true}
+function quad(){gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);gl.drawArrays(gl.TRIANGLES,0,6)}
+/* Runs the bright-pass and blur into bt[0]. Source frame is on TEXTURE0. Returns false (and draws nothing) without emitters. */
+var bfr=0;
+function bloom(w,h,nE){if(!nE||!bloomSetup(w,h))return false;var A=bt[0],B=bt[1],i,ph=phone(),rounds=ph?1:2;
+ if(ph&&(bfr++&1)&&stats.passes)return true;/* phone: reuse last frame's bloom on odd frames */
+ gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,black);/* never sample a target while drawing into it */
+ gl.bindFramebuffer(gl.FRAMEBUFFER,A.f);gl.viewport(0,0,A.w,A.h);gl.useProgram(bp);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,tex);
+ gl.uniform1i(bp.L.uS,0);gl.uniform2f(bp.L.uRes,w,h);var k=w/A.w*0.3;gl.uniform2f(bp.L.uTx,k/w,k/h);gl.uniform3fv(bp.L.uE,ex);gl.uniform3fv(bp.L.uEC,ec);gl.uniform1f(bp.L.uN,nE);quad();
+ gl.useProgram(blp);gl.uniform1i(blp.L.uT,0);
+ for(i=0;i<rounds;i++){var sp=1+i;gl.bindFramebuffer(gl.FRAMEBUFFER,B.f);gl.bindTexture(gl.TEXTURE_2D,A.t);gl.uniform2f(blp.L.uD,sp/A.w,0);quad();
+  gl.bindFramebuffer(gl.FRAMEBUFFER,A.f);gl.bindTexture(gl.TEXTURE_2D,B.t);gl.uniform2f(blp.L.uD,0,sp/A.h);quad()}
+ gl.bindFramebuffer(gl.FRAMEBUFFER,null);stats.passes=1+rounds*2;return true}
 function boot(host){if(gl||failed)return !!gl;var stage=host||document.getElementById('stage');if(!stage){failed=true;err='no stage';return false}
  cvs=document.createElement('canvas');cvs.id='lqgl';cvs.setAttribute('aria-hidden','true');
  var home=stage.classList&&stage.classList.contains('hero-frame');
@@ -230,31 +309,69 @@ function boot(host){if(gl||failed)return !!gl;var stage=host||document.getElemen
  if(!prog){failed=true;cvs.style.display='none';return false}
  buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
  ntex=noiseTex();
- tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);
- gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
- gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+ tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);clampTex(tex);
+ black=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,black);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([0,0,0,255]));clampTex(black);
  return true}
+/* ---- light that comes from effects (all in canvas px; world px are mapped with opts.cam and opts.scale) ---- */
+/* Flame flicker: three incommensurate sines seeded by the light's world position; mean 1. */
+function flick(t,x,y){var s=(Math.floor(x/7)*12.9898+Math.floor(y/7)*78.233)%6.283;return 1+0.085*Math.sin(t*9.1+s)+0.055*Math.sin(t*17.3+s*2.1)+0.035*Math.sin(t*31.7+s*4.3)}
+/* Footstep embers: when the hero walks through a lamp or window pool, a few warm sparks rise from the feet and fade (drawn into the frame, plus one small light). */
+var embers=[],eacc=0,lastHero=null,lastT=0;
+function emberStep(src,lights,scl,cam,calm,now){var dt=lastT?Math.min(0.05,(now-lastT)/1000):0;lastT=now;if(calm){embers.length=0;lastHero=null;return null}
+ var hero=null,i,L;for(i=0;i<lights.length;i++)if(lights[i].p===0){hero=lights[i];break}
+ var S=(window.Art&&Art.S)||34;
+ if(hero){var hx=hero.x/scl+cam[0],hy=hero.y/scl+cam[1]+S*0.6,moved=lastHero&&Math.abs(hx-lastHero[0])+Math.abs(hy-lastHero[1])>0.25;lastHero=[hx,hy];
+  var inPool=false;if(moved){for(i=0;i<lights.length;i++){L=lights[i];if(L.k!==1&&L.k!==2)continue;var ly=L.y+(L.k===1?L.r*0.9:L.r*0.25),dx=hero.x-L.x,dy=hero.y+S*0.6*scl-ly;if(dx*dx+dy*dy<L.r*L.r*0.9){inPool=true;break}}}
+  if(inPool){eacc+=dt;while(eacc>0.06){eacc-=0.06;if(embers.length<28)embers.push({x:hx+(Math.random()-.5)*S*0.5,y:hy-Math.random()*3,vx:(Math.random()-.5)*14,vy:-(18+Math.random()*26),a:0,life:0.7+Math.random()*0.5})}}else eacc=0}
+ if(!embers.length)return null;
+ var g=src.getContext&&src.getContext('2d');var sx=0,sy=0,n=0;
+ if(g){g.save();g.setTransform(1,0,0,1,0,0);g.globalCompositeOperation='lighter'}
+ for(i=embers.length-1;i>=0;i--){var e=embers[i];e.a+=dt;if(e.a>e.life){embers.splice(i,1);continue}e.x+=(e.vx+Math.sin(e.a*7+i)*6)*dt;e.y+=e.vy*dt;e.vy*=0.985;
+  var f=1-e.a/e.life,X=(e.x-cam[0])*scl,Y=(e.y-cam[1])*scl;sx+=X;sy+=Y;n++;
+  if(g){g.globalAlpha=0.22*f;g.fillStyle='#ffb347';g.beginPath();g.arc(X,Y,3.4*scl,0,6.283);g.fill();g.globalAlpha=0.95*f;g.fillStyle='#fff0b8';g.beginPath();g.arc(X,Y,1.0*scl+0.4,0,6.283);g.fill()}}
+ if(g)g.restore();
+ if(!n)return null;var k=Math.min(1,n/10);return {x:sx/n,y:sy/n+S*0.25*scl,r:44*scl,c:[0.3*k,0.17*k,0.05*k],p:1,k:3}}
+/* Effect light from LQVfx (screen px, recorded in window.LQFxLights) and from LQAnim sparkle bursts. */
+function vfxLights(src,out,now,calm){var q=window.LQFxLights;if(!q||!q.length)return;var r=src.getBoundingClientRect?src.getBoundingClientRect():null;if(!r||!r.width)return;var k=src.width/r.width,i;
+ for(i=q.length-1;i>=0;i--){var e=q[i],a=(now-e.t0)/1000,X=(e.x-r.left)*k,Y=(e.y-r.top)*k,env,life=e.k==='beam'?2.4:e.k==='shock'?1.6:2.0;if(a>life||a<0){q.splice(i,1);continue}
+  env=a<0.22?a/0.22:Math.max(0,1-(a-0.22)/(life-0.22));env*=env*(3-2*env);
+  if(e.k==='beam'){out.push({x:X,y:Y+16*k,r:150*k,c:[0.5*env,0.4*env,0.16*env],p:1,k:0});out.push({x:X,y:Y-6*k,r:46*k,c:[0.62*env,0.52*env,0.26*env],p:1,k:3})}
+  else if(e.k==='shock'){var g=calm?0.5:1-Math.pow(1-Math.min(1,a/1.1),3);out.push({x:X,y:Y,r:(70+520*g)*k,c:[0.36*env,0.3*env,0.14*env],p:1,k:0});out.push({x:X,y:Y,r:60*k,c:[0.5*env,0.42*env,0.2*env],p:1,k:3})}
+  else out.push({x:X,y:Y,r:130*k,c:[0.36*env,0.27*env,0.1*env],p:1,k:3})}}
 /* Speed guard: if the GL light pass holds frames above 45 ms for about 1.5 s (software GL, a weak GPU), switch to the 2D light layer for this page. */
-var slow=false,lt=0,ema=0,nf=0;
+var slow=false,lt=0,ema=0,nf=0,work=[];
+function byP(a,b){return (a.p||0)-(b.p||0)}
 /* opts (optional): biome (atmosphere key), cam [x,y] world px of the view's top left, scale (screen px per world px), t (seconds; 0 when calm), calm (snap and hold still).
-   Without opts (the home strip) the pass uses the quiet 'home' atmosphere: no mist, faint shafts, no dusk. */
+   Without opts (the home strip) the pass uses the quiet 'home' atmosphere: no mist, faint shafts, no dusk, and no effect light.
+   lights[i]: {x,y,r,c:[r,g,b],p (priority, 0 first), k (kind, see the top of this section)} in canvas px. */
 function frame(src,lights,shadows,key,host,opts){var FX=window.LQFx;if(failed)return false;if(slow||!src||(FX&&FX.low)){if(cvs)cvs.style.visibility='hidden';return false}var now=performance.now(),d=lt?now-lt:16;lt=now;if(d<250){ema=ema?ema*.94+d*.06:d;nf++}if(nf>40&&ema>45){slow=true;window.LQLightSlow=true;if(cvs)cvs.style.visibility='hidden';return false}if(!boot(host))return false;
  var w=src.width,h=src.height;if(w<2||h<2)return false;if(cvs.width!==w||cvs.height!==h){cvs.width=w;cvs.height=h}
- opts=opts||{};var calm=!!opts.calm||!opts.biome,A=ease(atmTarget(opts.biome||'home'),calm),cam=opts.cam||[0,0],scl=opts.scale||1,tt=calm?0:(opts.t||0)%2000;
- gl.viewport(0,0,w,h);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+ var live=!!(opts&&opts.biome);opts=opts||{};var calm=!!opts.calm||!opts.biome,A=ease(atmTarget(opts.biome||'home',opts.late),calm),cam=opts.cam||[0,0],scl=opts.scale||1,tt=calm?0:(opts.t||0)%2000;
+ /* the light list: the caller's lights, then effect light (embers, VFX), sorted by priority and cut to the shader's budget */
+ work.length=0;var i,L;if(lights)for(i=0;i<lights.length;i++)work.push(lights[i]);
+ if(live){var em=emberStep(src,work,scl,cam,calm,now);if(em)work.push(em);vfxLights(src,work,now,calm);work.sort(byP)}
+ gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
  try{gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,src)}catch(e){failed=true;err=String(e&&e.message||e);cvs.style.display='none';return false}
- gl.useProgram(prog);var g=GRADES[key]||FALL;
+ var n=Math.min(nL,work.length),ns=Math.min(nS,shadows?shadows.length:0),nE=0,fl,kk;
+ for(i=0;i<nL;i++){L=i<n?work[i]:null;kk=L?(L.k|0):0;fl=L&&kk===2&&!calm?flick(opts.t||0,L.x/scl+cam[0],L.y/scl+cam[1]):1;
+  px[i*3]=L?L.x:0;px[i*3+1]=L?L.y:0;px[i*3+2]=L?L.r*(1+(fl-1)*0.35):1;pc[i*4]=L?L.c[0]*fl:0;pc[i*4+1]=L?L.c[1]*fl:0;pc[i*4+2]=L?L.c[2]*fl:0;pc[i*4+3]=kk;
+  /* emitters for the bloom: windows, flames and glows (not the hero's pool or a ground spill) */
+  if(L&&kk>0&&nE<8){ex[nE*3]=L.x;ex[nE*3+1]=L.y;ex[nE*3+2]=Math.max(10,L.r*(kk===3?0.75:0.55));ec[nE*3]=L.c[0]*fl*0.55;ec[nE*3+1]=L.c[1]*fl*0.55;ec[nE*3+2]=L.c[2]*fl*0.55;nE++}}
+ for(i=nE;i<8;i++){ex[i*3+2]=1;ec[i*3]=ec[i*3+1]=ec[i*3+2]=0}
+ stats.emit=nE;var hasBloom=bloom(w,h,nE);
+ gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,w,h);gl.useProgram(prog);var g=GRADES[key]||FALL;
  gl.uniform3fv(locs.uLift,g.lift);gl.uniform3fv(locs.uGain,g.gain);gl.uniform3fv(locs.uShade,g.shade);gl.uniform4f(locs.uMisc,g.sat,g.glow,g.far,tt);gl.uniform2f(locs.uRes,w,h);
- var n=Math.min(nL,lights?lights.length:0),ns=Math.min(nS,shadows?shadows.length:0),i,L;
- for(i=0;i<nL;i++){L=i<n?lights[i]:null;px[i*3]=L?L.x:0;px[i*3+1]=L?L.y:0;px[i*3+2]=L?L.r:1;pc[i*3]=L?L.c[0]:0;pc[i*3+1]=L?L.c[1]:0;pc[i*3+2]=L?L.c[2]:0}
  for(i=0;i<nS;i++){L=i<ns?shadows[i]:null;hs[i*3]=L?L.x:0;hs[i*3+1]=L?L.y:0;hs[i*3+2]=L?L.r:1}
  var nearMist=Math.min(w,h)/(window.devicePixelRatio||1)>=560?1:0;/* phone: skip the near mist layer (bottom of the screen is the move pad) */
  gl.uniform4f(locs.uAtm,A.a[0],A.a[1],A.a[2],A.a[3]);gl.uniform3fv(locs.uMistC,A.m);gl.uniform3fv(locs.uRayC,A.r);
  gl.uniform4f(locs.uCam,cam[0]%4320,cam[1]%4320,scl,n);gl.uniform4f(locs.uTone,A.k,A.v,nearMist,ns);
- gl.uniform3fv(locs.uP,px);gl.uniform3fv(locs.uC,pc);gl.uniform3fv(locs.uH,hs);
- gl.uniform1i(locs.uS,0);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,ntex);gl.uniform1i(locs.uNz,1);gl.activeTexture(gl.TEXTURE0);
- gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);gl.drawArrays(gl.TRIANGLES,0,6);
- if(watch){var pts=watch,out=[],pix,q;for(q=0;q<pts.length;q++){pix=new Uint8Array(4);gl.readPixels(pts[q][0]|0,h-1-(pts[q][1]|0),1,1,gl.RGBA,gl.UNSIGNED_BYTE,pix);out.push([pix[0],pix[1],pix[2],pix[3]])}lastProbe={pts:out,gl:gl.getError(),err:err,w:w,h:h,nL:nL,nS:nS};watch=null}
+ gl.uniform4f(locs.uKey,KEY[0],KEY[1],SHAFT[0],SHAFT[1]);gl.uniform4f(locs.uFx,hasBloom?0.95:0,live?0.2:0,live?1:0,0);
+ gl.uniform3fv(locs.uP,px);gl.uniform4fv(locs.uC,pc);gl.uniform3fv(locs.uH,hs);
+ gl.uniform1i(locs.uS,0);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,ntex);gl.uniform1i(locs.uNz,1);
+ gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,hasBloom?bt[0].t:black);gl.uniform1i(locs.uBl,2);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,tex);
+ quad();
+ if(watch){var pts=watch,out=[],pix,q;for(q=0;q<pts.length;q++){pix=new Uint8Array(4);gl.readPixels(pts[q][0]|0,h-1-(pts[q][1]|0),1,1,gl.RGBA,gl.UNSIGNED_BYTE,pix);out.push([pix[0],pix[1],pix[2],pix[3]])}lastProbe={pts:out,gl:gl.getError(),err:err,w:w,h:h,nL:nL,nS:nS,bloom:hasBloom?stats.bloom:null,emit:nE};watch=null}
  cvs.style.visibility='visible';return true}
-window.LQLight={frame:frame,grades:GRADES,atmos:ATM,limits:function(){return {lights:nL||12,shadows:nS||8}},error:function(){return err},watch:function(pts){watch=pts||[[0,0]]},sample:function(){return lastProbe}};
+window.LQLight={frame:frame,grades:GRADES,atmos:ATM,key:KEY,limits:function(){return {lights:nL||12,shadows:nS||8}},error:function(){return err},watch:function(pts){watch=pts||[[0,0]]},sample:function(){return lastProbe},
+ stats:function(){return {bloom:bloomOff?null:stats.bloom,passes:stats.passes,emitters:stats.emit,embers:embers.length,phone:phone()}}};
 })();
