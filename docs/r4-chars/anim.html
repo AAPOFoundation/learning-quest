@@ -1,0 +1,34 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Animation strips (r4)</title>
+<style>body{margin:0;background:#1c2733;color:#f6efe0;font:700 12px Nunito,system-ui}canvas{display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script>window.APP={key:'sheet',levels:[]};try{localStorage.setItem('learning-apps.fx','full')}catch(e){}</script>
+<script src="../../shared/art.js"></script>
+<script>
+/* Frame strips for the r4 motion: stop and settle, a turn, the gatekeeper entrance, NPC habits and critter hops. Each frame is one call to
+   Art.figure / Art.critter with the option the game passes at that moment. */
+(function(){var W=innerWidth,H=innerHeight,cv=document.getElementById('c'),d=Math.max(1,devicePixelRatio||1);cv.width=W*d;cv.height=H*d;cv.style.width=W+'px';cv.style.height=H+'px';
+var g=cv.getContext('2d');g.scale(d,d);var bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#5d8a4a');bg.addColorStop(1,'#3f6a3a');g.fillStyle=bg;g.fillRect(0,0,W,H);
+var narrow=W<600,Z=narrow?1.55:2.3,S=Art.S,cols=narrow?5:7,dx=W/(cols+.5);
+var hero={skin:'#e2b48c',hair:'#3b2a1d',robe:'#243e66',trim:'#d7b56a',cape:'#6a5428',hat:'hood',staff:true,gear:1},
+ gate={skin:'#c99568',hair:'#2a2118',robe:'#6a2f2a',trim:'#d7b56a',hat:'helm',beard:true},
+ town=[Art.npcLook({skin:'#e2b48c',hair:'#a0522d',robe:'#7a3a5a',trim:'#d7b56a'},'Mira'),Art.npcLook({skin:'#e2b48c',hair:'#2a1c14',robe:'#2f6f7a',trim:'#d7b56a'},'Odo'),Art.npcLook({skin:'#e2b48c',hair:'#e0c070',robe:'#3a5f9a',trim:'#d7b56a'},'Tamsin')];
+function lab(t,x,y){g.fillStyle='#f6efe0';g.textAlign='center';g.fillText(t,x,y)}
+function row(title,y,frames){g.fillStyle='#f3e2b0';g.textAlign='left';g.font='700 13px Nunito,system-ui';g.fillText(title,10,y-S*Z*1.25);g.font='700 11px Nunito,system-ui';
+ frames.slice(0,cols).forEach(function(fr,i){var x=dx*(i+.75);g.save();g.translate(x,y);g.scale(Z,Z);fr.draw();g.restore();lab(fr.l,x,y+S*.38*Z+14)})}
+var rows=narrow?[.15,.34,.55,.75,.94]:[.17,.375,.585,.79,.95];
+row('Stop: landing squash, then the cape and scarf swing to rest',rows[0]*H,[0,.12,.25,.4,.55,.75,1].map(function(k){var land=Math.max(0,1-k/.3),set=Math.max(0,1-k);return {l:'+'+(k*.8).toFixed(2)+'s',draw:function(){Art.figure(g,0,0,hero,{t:1,face:1,hero:1,land:land,settle:set})}}}));
+row('Turn: squash and the cape flares the other way',rows[1]*H,[1,.8,.6,.4,.2,0].map(function(k){return {l:'turn '+k.toFixed(1),draw:function(){Art.figure(g,0,0,hero,{t:1,face:-1,hero:1,turn:k,settle:k*.6})}}}));
+row('Gatekeeper entrance: crouch, jump, land with a dust ring, aura flare',rows[2]*H,[0,.18,.42,.55,.68,.8,.95].map(function(k){return {l:'ent '+k.toFixed(2),draw:function(){g.scale(.7,.7);Art.figure(g,0,0,gate,{t:1+k,face:-1,boss:1,ent:k,accent:'#4f7a3a'})}}}));
+row('Town habits: look around, sway, stretch, tap, read, hum',rows[3]*H,[0,1,2,3,4,5].map(function(hb){var lk=town[hb%3],tt=hb===2?0.55:hb===3?.17:1.2;return {l:['look','sway','stretch','tap','read','hum'][hb],draw:function(){Art.figure(g,0,0,lk,{t:tt+(hb===0?1.6:0),face:1,habit:hb})}}}).concat([{l:'greet hop',draw:function(){Art.figure(g,0,0,town[1],{t:1,face:-1,greet:.5})}}]));
+row('Critters: bunny hop, bird take-off, frog leap, butterfly',rows[4]*H-6,[{l:'bunny',k:'bunny',hop:0},{l:'bunny hop',k:'bunny',hop:6},{l:'bird peck',k:'bird',nib:1},{l:'bird flies',k:'bird',hop:14,fly:1},{l:'frog',k:'frog'},{l:'frog leap',k:'frog',hop:10},{l:'butterfly',k:'butterfly'}].map(function(c,i){return {l:c.l,draw:function(){g.scale(1.8,1.8);Art.critter(g,0,0,{kind:c.k,t:1.1+i*.37,face:1,hop:c.hop||0,nib:c.nib||0,fly:c.fly||0,seed:i})}}}));
+/* quiet check: under Low effects the entrance, habits, landing squash and settle must draw exactly like a plain idle frame */
+var q=document.createElement('canvas');q.width=q.height=140;var qg=q.getContext('2d');function snap(fn){qg.clearRect(0,0,140,140);qg.save();qg.translate(70,100);fn();qg.restore();return q.toDataURL()}
+window.LQFx.low=true;
+var c1=snap(function(){Art.figure(qg,0,0,gate,{t:.3,face:-1,boss:1,ent:.4})})===snap(function(){Art.figure(qg,0,0,gate,{t:.3,face:-1,boss:1,ent:1})}),
+ c2=snap(function(){Art.figure(qg,0,0,town[0],{t:.55,face:1,habit:2})})===snap(function(){Art.figure(qg,0,0,town[0],{t:.55,face:1})}),
+ c3=snap(function(){Art.figure(qg,0,0,hero,{t:1,face:1,hero:1,land:.8,settle:.8,poke:.5})})===snap(function(){Art.figure(qg,0,0,hero,{t:1,face:1,hero:1})});
+window.LQFx.low=false;
+var c4=snap(function(){Art.figure(qg,0,0,gate,{t:.3,face:-1,boss:1,ent:.4})})!==snap(function(){Art.figure(qg,0,0,gate,{t:.3,face:-1,boss:1,ent:1})});
+window.quietStill={entrance:c1,habit:c2,landSettlePoke:c3,fullMoves:c4};
+})();
+</script></body></html>
