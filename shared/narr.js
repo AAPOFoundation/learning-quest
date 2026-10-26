@@ -3,14 +3,16 @@
 try{muted=localStorage.getItem('learning-apps.mute')==='1'}catch(e){}
 function capEl(){if(cap)return cap;cap=document.createElement('div');cap.id='narrcap';cap.hidden=true;cap.setAttribute('role','status');cap.setAttribute('aria-live','polite');cap.innerHTML='<span class="who">Guide</span><span class="tx"></span>';document.body.appendChild(cap);return cap}
 function hide(){if(cap)cap.hidden=true;clearTimeout(timer)}
-function stop(){if(au){try{au.pause()}catch(e){}au=null}hide()}
+/* r6: a finished or replaced line drops its audio source so phones release the decoder and buffer */
+function drop(a){try{a.pause();a.removeAttribute('src');a.load()}catch(e){}}
+function stop(){if(au){drop(au);au=null}hide()}
 function show(t,ms){var c=capEl();c.querySelector('.tx').textContent=t.replace(/R S I/g,'RSI').replace(/M A C D/g,'MACD');c.hidden=false;clearTimeout(timer);timer=setTimeout(hide,ms)}
 function run(l){stop();show(l.text,Math.max(6000,l.text.length*75));if(muted)return;
- if(!l.audio)return;try{var a=new Audio('../narration/'+l.audio);a.preload='auto';au=a;a.addEventListener('error',function(){au=null});var p=a.play();if(p&&p.catch)p.catch(function(err){au=null;if(err&&err.name==='NotAllowedError'){unlocked=false;pending=l}else if(!unlocked)pending=l})}catch(e){}}
+ if(!l.audio)return;try{var a=new Audio('../narration/'+l.audio);a.preload='auto';au=a;a.addEventListener('error',function(){if(au===a)au=null});var p=a.play();if(p&&p.catch)p.catch(function(err){if(au===a)au=null;if(err&&err.name==='AbortError')return;if(err&&err.name==='NotAllowedError'){unlocked=false;pending=l}else if(!unlocked)pending=l})}catch(e){}}
 var CUTS={'portfolio-guide:t1':'cash-vault','portfolio-guide:t3':'hedge-smithy'},ov=null,vid=null;
 function seen(k){try{return localStorage.getItem('learning-apps.cut.'+k)==='1'}catch(e){return false}}
 function mark(k){try{localStorage.setItem('learning-apps.cut.'+k,'1')}catch(e){}}
-function closeCut(){if(!ov)return;try{vid.pause()}catch(e){}ov.remove();ov=null;vid=null;window.removeEventListener('keydown',ckey,true)}
+function closeCut(){if(!ov)return;if(vid)drop(vid);ov.remove();ov=null;vid=null;window.removeEventListener('keydown',ckey,true)}
 function ckey(e){if(e.key==='Escape'||e.key==='Enter'||e.key===' '){closeCut()}e.stopImmediatePropagation();e.preventDefault()}
 function cut(name){if(ov)closeCut();try{
  ov=document.createElement('div');ov.id='cutscene';ov.innerHTML='<video playsinline preload="auto"></video><button type="button" class="skip">Skip \u25B8</button>';
