@@ -1,6 +1,6 @@
 :root{--font:"Nunito","Nunito Variable",system-ui,sans-serif;--display:"Cormorant Garamond","Palatino Linotype",Palatino,Georgia,serif;--ink:#f6efe0;--ink-dim:#e8dcc4;--gold:#d7b56a;--gold-hi:#f3e2b0;--brass:#c8a86a;--brass-mid:#8a6528;--brass-lo:#6b4a0e;--brass-ink:#2a1d0a;--panel:#0e141c;--panel-deep:#0a0f15;--panel-lift:#121a24;--good:#8fcf9a;--bad:#e58a7a;--radius:12px;--field:linear-gradient(180deg,#1c2733 0%,#0e141c 46%,#0a0f15 100%);--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.9 0 0 0 0 0.74 0 0 0 1.1 -0.34'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
-body{margin:0;min-height:100vh;background:#0a0f15;color:var(--ink);font:700 16px/1.5 var(--font)}
+body{margin:0;min-height:100vh;min-height:100dvh;background:#0a0f15;color:var(--ink);font:700 16px/1.5 var(--font)}
 a{color:var(--gold-hi)}
 a:focus-visible,button:focus-visible,.btn:focus-visible,.opt:focus-visible,.lvl:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,.ib:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
 .topbar{position:sticky;top:0;z-index:5;min-height:48px;padding:6px clamp(12px,3vw,24px);display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--panel-deep);border-bottom:1px solid var(--brass-mid)}
@@ -171,3 +171,11 @@ input[type=number],select{min-height:48px}
 .lq-search:focus{border-color:var(--gold-hi)}.lq-search::placeholder{color:#b9ab8c}
 .gl-row{padding:10px 0;border-top:1px solid rgba(215,181,106,.18)}
 .pg-prog{display:grid;margin-top:8px;max-width:320px}.pg-prog .bar{display:block}
+
+/* r4 game feel: buttons lift and warm on hover, sink on press; home quest cards lift (no motion when reduced) */
+.btn-ghost:hover{transform:translateY(-1px);box-shadow:inset 0 1px #f3e2b033,0 0 12px #d7b56a33,0 4px 8px #0007}
+.btn-primary:hover{box-shadow:inset 0 1px #fff8dc8c,inset 0 -2px #5a3c0a4d,0 1px 0 var(--brass-ink),0 0 14px #f0c86055,0 6px 10px #0007}
+.btn:active,.btn-primary:active,.btn-ghost:active{transform:translateY(2px) scale(.98);filter:brightness(.94);box-shadow:inset 0 2px 5px #0009}
+.qcard{transition:transform .14s ease,box-shadow .14s ease}
+@media (hover:hover){.qcard:hover{transform:translateY(-2px);box-shadow:0 0 0 1px #d7b56a66,0 0 22px #d7b56a26,0 14px 28px #0009}}
+@media (prefers-reduced-motion:reduce){.btn:hover,.btn:active,.qcard:hover{transform:none}}

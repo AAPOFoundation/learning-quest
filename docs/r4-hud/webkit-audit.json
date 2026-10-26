@@ -1,0 +1,383 @@
+{
+ "portrait844:home": {
+  "vp": [
+   390,
+   844
+  ],
+  "bodyH": 3064,
+  "scrollW": 390,
+  "cv": null,
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true
+ },
+ "portrait844:python-basics": {
+  "vp": [
+   390,
+   844
+  ],
+  "bodyH": 844,
+  "scrollW": 390,
+  "cv": [
+   780,
+   1688,
+   390,
+   844
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "portrait844:ai-foundations": {
+  "vp": [
+   390,
+   844
+  ],
+  "bodyH": 844,
+  "scrollW": 390,
+  "cv": [
+   780,
+   1688,
+   390,
+   844
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "portrait844:ai-evals": {
+  "vp": [
+   390,
+   844
+  ],
+  "bodyH": 844,
+  "scrollW": 390,
+  "cv": [
+   780,
+   1688,
+   390,
+   844
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "portrait844:ai-safety": {
+  "vp": [
+   390,
+   844
+  ],
+  "bodyH": 844,
+  "scrollW": 390,
+  "cv": [
+   780,
+   1688,
+   390,
+   844
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "portrait844:portfolio-guide": {
+  "vp": [
+   390,
+   844
+  ],
+  "bodyH": 844,
+  "scrollW": 390,
+  "cv": [
+   780,
+   1688,
+   390,
+   844
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "portrait844:errors": [],
+ "safari664:home": {
+  "vp": [
+   390,
+   664
+  ],
+  "bodyH": 3064,
+  "scrollW": 390,
+  "cv": null,
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true
+ },
+ "safari664:python-basics": {
+  "vp": [
+   390,
+   664
+  ],
+  "bodyH": 664,
+  "scrollW": 390,
+  "cv": [
+   780,
+   1328,
+   390,
+   664
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "safari664:ai-foundations": {
+  "vp": [
+   390,
+   664
+  ],
+  "bodyH": 664,
+  "scrollW": 390,
+  "cv": [
+   780,
+   1328,
+   390,
+   664
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "safari664:ai-evals": {
+  "vp": [
+   390,
+   664
+  ],
+  "bodyH": 664,
+  "scrollW": 390,
+  "cv": [
+   780,
+   1328,
+   390,
+   664
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "safari664:ai-safety": {
+  "vp": [
+   390,
+   664
+  ],
+  "bodyH": 664,
+  "scrollW": 390,
+  "cv": [
+   780,
+   1328,
+   390,
+   664
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "safari664:portfolio-guide": {
+  "vp": [
+   390,
+   664
+  ],
+  "bodyH": 664,
+  "scrollW": 390,
+  "cv": [
+   780,
+   1328,
+   390,
+   664
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "safari664:errors": [],
+ "landscape:home": {
+  "vp": [
+   844,
+   390
+  ],
+  "bodyH": 2541,
+  "scrollW": 844,
+  "cv": null,
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true
+ },
+ "landscape:python-basics": {
+  "vp": [
+   844,
+   390
+  ],
+  "bodyH": 390,
+  "scrollW": 844,
+  "cv": [
+   1688,
+   780,
+   844,
+   390
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "landscape:ai-foundations": {
+  "vp": [
+   844,
+   390
+  ],
+  "bodyH": 390,
+  "scrollW": 844,
+  "cv": [
+   1688,
+   780,
+   844,
+   390
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "landscape:ai-evals": {
+  "vp": [
+   844,
+   390
+  ],
+  "bodyH": 390,
+  "scrollW": 844,
+  "cv": [
+   1688,
+   780,
+   844,
+   390
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "landscape:ai-safety": {
+  "vp": [
+   844,
+   390
+  ],
+  "bodyH": 390,
+  "scrollW": 844,
+  "cv": [
+   1688,
+   780,
+   844,
+   390
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "landscape:portfolio-guide": {
+  "vp": [
+   844,
+   390
+  ],
+  "bodyH": 390,
+  "scrollW": 844,
+  "cv": [
+   1688,
+   780,
+   844,
+   390
+  ],
+  "dpr": 3,
+  "overlaps": [],
+  "offscreen": [],
+  "gl": "visible",
+  "dvh": true,
+  "has": true,
+  "colormix": true,
+  "narrUnlockedAudio": false
+ },
+ "landscape:errors": []
+}
