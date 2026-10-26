@@ -1,0 +1,46 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Character sheet (r5)</title>
+<style>body{margin:0;background:#1c2733;color:#f6efe0;font:700 12px Nunito,system-ui}canvas{display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script>window.APP={key:'sheet',levels:[]};try{localStorage.setItem('learning-apps.fx',/[?&]low=1/.test(location.search)?'low':'full')}catch(e){}</script>
+<script src="../../shared/art.js"></script>
+<script>
+/* Round 5 character sheet. Rows: the hero at each rank (gear tier 0-4), townsfolk in each course outfit, one gatekeeper per region design,
+   and the same figures at the real phone map size (about 0.53 CSS px per unit) to check the silhouette outline.
+   ?t= sets the clock. ?close=1 draws a large close-up. ?low=1 uses Low effects. Options a build does not know are ignored, so the same page
+   shows the before state on older code. */
+(function(){var q=new URLSearchParams(location.search),T=+(q.get('t')||1.3),close=q.get('close')==='1',W=innerWidth,H=innerHeight,cv=document.getElementById('c'),d=Math.max(1,devicePixelRatio||1);
+cv.width=W*d;cv.height=H*d;cv.style.width=W+'px';cv.style.height=H+'px';var g=cv.getContext('2d');g.scale(d,d);
+var bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#5d8a4a');bg.addColorStop(1,'#3f6a3a');g.fillStyle=bg;g.fillRect(0,0,W,H);
+var narrow=W<600,S=Art.S;
+function hero(tier){return {skin:'#e2b48c',hair:'#3b2a1d',robe:'#243e66',trim:'#d7b56a',cape:'#6a5428',hat:'hood',staff:true,gear:1,tier:tier}}
+var py={skin:'#e2b48c',hair:'#3b2a1d',robe:'#2f6a4a',trim:'#d7b56a',cape:'#5f8a3a',hat:'cap',staff:false,gear:1,tier:2};
+function npc(base,name,outfit){var l=Art.npcLook(base,name),o={};for(var k in l)o[k]=l[k];o.outfit=outfit;return o}
+var NPCS=[[npc({skin:'#e2b48c',hair:'#a0522d',robe:'#2f6a4a',trim:'#d7b56a'},'Mira','coder'),'Coders guild'],[npc({skin:'#e2b48c',hair:'#2a1c14',robe:'#3a5f9a',trim:'#d7b56a',hat:'scholar'},'Odo','scholar'),'AI scholar'],
+ [npc({skin:'#e2b48c',hair:'#e0c070',robe:'#8a4a3a',trim:'#d7b56a'},'Tamsin','warden'),'Safety warden'],[npc({skin:'#e2b48c',hair:'#4a2a1a',robe:'#8a6530',trim:'#d7b56a'},'Bryn','artisan'),'Portfolio artisan'],
+ [npc({skin:'#e2b48c',hair:'#d8d4cc',robe:'#4a6a3a',trim:'#d7b56a',hat:'cap'},'Pell','coder'),'Coders guild'],[npc({skin:'#e2b48c',hair:'#7a3b22',robe:'#6a4a8a',trim:'#d7b56a'},'Ines','scholar'),'AI scholar'],
+ [npc({skin:'#e2b48c',hair:'#2a2118',robe:'#3a6a8a',trim:'#d7b56a',hat:'cap'},'Hob','warden'),'Safety warden'],[npc({skin:'#e2b48c',hair:'#b5532f',robe:'#7a5230',trim:'#d7b56a'},'Lark','artisan'),'Portfolio artisan']];
+var gl={skin:'#c99568',hair:'#2a2118',robe:'#6a2f2a',trim:'#d7b56a',hat:'helm'},glb={skin:'#bf8c62',hair:'#3a2a1a',robe:'#33425a',trim:'#d7b56a',hat:'helm',beard:true};
+var GATES=[['seed','meadow','#4f7a3a',gl,'Valley'],['list','forest','#8a3b2a',glb,'Listwood'],['loop','hills','#3f5f8f',gl,'Heights'],['anvil','desert','#a0442a',glb,'Forge'],
+ ['dict','marsh','#2f6a62',gl,'Harbour'],['bug','highland','#274a7a',glb,'Highland'],['shield','tundra','#8a4a3a',gl,'Tundra'],['coin','crown','#c9a24f',glb,'Citadel']];
+function put(x,y,Z,look,o,lab){g.save();g.translate(x,y);g.scale(Z,Z);Art.figure(g,0,0,look,o);g.restore();if(lab){g.fillStyle='#f6efe0';g.textAlign='center';g.fillText(lab,x,y+S*.38*Z+15)}}
+function title(t,y){g.fillStyle='#f3e2b0';g.textAlign='left';g.font='700 13px Nunito,system-ui';g.fillText(t,10,y);g.font='700 11px Nunito,system-ui'}
+if(q.get('close')==='2'){var Z2=narrow?2.6:5;for(var r=0;r<5;r++)put(W*(r+.5)/5,H*.62,Z2*(narrow?.62:1),hero(r),{t:T,face:1,hero:1},'rank '+(r+1));return}
+if(close){var Z=narrow?4.2:7.5;
+ put(W*(narrow?.30:.2),H*(narrow?.36:.62),Z,hero(4),{t:T,face:1,hero:1},'Hero, top rank');
+ put(W*(narrow?.72:.47),H*(narrow?.36:.62),Z,NPCS[1][0],{t:T+.4,face:-1},'AI scholar');
+ var pr=document.createElement('div');pr.style.cssText='position:absolute;left:8px;top:8px;display:flex;gap:8px;flex-wrap:wrap;max-width:'+(W-16)+'px';[[hero(0),'rank 1'],[hero(4),'rank 5'],[NPCS[0][0],'coder'],[NPCS[1][0],'scholar'],[NPCS[2][0],'warden'],[NPCS[3][0],'artisan']].forEach(function(e){var d=document.createElement('div');d.style.cssText='text-align:center;font:700 11px Nunito,system-ui;color:#f3e2b0';d.innerHTML='<img width="'+(narrow?52:72)+'" height="'+(narrow?52:72)+'" style="border:1px solid #c8a86a;border-radius:8px;display:block" src="'+Art.portrait(e[0],narrow?52:72)+'">'+e[1];pr.appendChild(d)});document.body.appendChild(pr);
+ put(W*(narrow?.5:.78),H*(narrow?.86:.66),Z*.62,GATES[0][3],{t:T,face:-1,boss:1,role:'gate',accent:GATES[0][2],motif:GATES[0][0],biome:GATES[0][1],gid:0},'Valley gatekeeper');
+ return}
+var Z=narrow?1.7:2.35,rowY=narrow?[.12,.33,.56,.84]:[.2,.45,.73,.93],cols=narrow?5:8,dx=W/cols;
+title('Hero gear by rank (cosmetic)',rowY[0]*H-S*Z*1.2);
+for(var i=0;i<5;i++)put(dx*(i+.5),rowY[0]*H,Z,hero(i),{t:T,face:1,hero:1},'rank '+(i+1));
+if(!narrow)put(dx*5.5,rowY[0]*H,Z,py,{t:T+.3,face:1,hero:1},'Coder hero');
+title('Townsfolk outfits by course (eyes follow the hero, top row)',rowY[1]*H-S*Z*1.2);
+NPCS.slice(0,narrow?5:8).forEach(function(n,i){put(dx*(i+.5),rowY[1]*H,Z,n[0],{t:T+i*.7,face:i%2?-1:1,habit:i%2?1:0},n[1])});
+title('Gatekeepers, one design per region (friendly, no weapons)',rowY[2]*H-S*Z*1.75);
+GATES.slice(0,narrow?5:8).forEach(function(G,i){put(dx*(i+.5),rowY[2]*H,Z*(narrow?.62:.72),G[3],{t:T+i*.3,face:i%2?1:-1,boss:1,role:'gate',accent:G[2],motif:G[0],biome:G[1],gid:i},G[4])});
+var z2=.53*(narrow?1:1),y4=rowY[3]*H;title('Real phone map size',y4-38);
+var sm=[[hero(3),{t:T,face:1,hero:1}],[NPCS[0][0],{t:T,face:-1}],[NPCS[2][0],{t:T,face:1}],[NPCS[3][0],{t:T,face:-1}],[GATES[2][3],{t:T,face:-1,boss:1,role:'gate',accent:GATES[2][2],motif:GATES[2][0],biome:GATES[2][1],gid:2}]];
+sm.forEach(function(s,i){put(20+(i+.5)*(narrow?66:60),y4,z2,s[0],s[1])});
+})();
+</script></body></html>

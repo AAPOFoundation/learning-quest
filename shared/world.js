@@ -360,7 +360,7 @@ var HABIT={teacher:[4,0,4,1],guide:[0,1,5,3]};
 function npcAnim(o,op,bossy,T){var mo=motionOn();
  if(o._habit==null){var hh=0,nm=String(o.name||'');for(var i=0;i<nm.length;i++)hh=(hh*31+nm.charCodeAt(i))|0;hh=Math.abs(hh);var pool=HABIT[o.role];o._habit=pool?pool[hh%pool.length]:hh%6}
  op.habit=o._habit;op.greet=mo&&o._greet!=null?Math.max(0,1-(st.time-o._greet)/.42):0;
- if(bossy){op.boss=1;var sc=st.scene;op.accent=(sc&&sc.i<NR&&C.regions[sc.i]&&hexOk(C.regions[sc.i].accent))?C.regions[sc.i].accent:'#d7b56a';
+ if(bossy){op.boss=1;var sc=st.scene;op.accent=(sc&&sc.i<NR&&C.regions[sc.i]&&hexOk(C.regions[sc.i].accent))?C.regions[sc.i].accent:'#d7b56a';if(sc){op.motif=sc.motif;op.biome=sc.i<NR?bio(sc.i):'crown';op.gid=sc.i}/* r5: one gatekeeper design per region */
   if(!mo){op.ent=1;return}var h=st.hero;if(o._ent==null&&Art.hdist(h.c,h.r,o.c,o.r)<=4)o._ent=st.time;op.ent=o._ent==null?0:(st.time-o._ent)/1.25}}
 /* r4 critters: a few friendly animals per town (bunnies, birds, butterflies, frogs, snow hares by biome). They nibble, peck and flutter,
    hop or fly a short way off when the hero comes close, then settle. Positions stay inside the town's open tiles. Quiet mode holds them still. */
