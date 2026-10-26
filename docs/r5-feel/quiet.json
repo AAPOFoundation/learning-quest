@@ -1,0 +1,20 @@
+{
+ "low": {
+  "dust": 0,
+  "held": false,
+  "off": [
+   0,
+   0
+  ],
+  "errors": []
+ },
+ "rm": {
+  "dust": 0,
+  "held": false,
+  "off": [
+   0,
+   0
+  ],
+  "errors": []
+ }
+}

@@ -98,7 +98,7 @@ function ask(q,idx,total,cb,headTitle){
    else if(q.t==='multi'){if(!sel.length)return;ok=sel.length===q.a.length&&q.a.every(function(x){return sel.indexOf(x)>=0})}
    else if(q.t==='num'){var v=parseFloat($('#nv',el).value);if(isNaN(v))return;sel=v;ok=Math.abs(v-q.a)<=(q.tol||0)}
    else if(q.t==='grade'){if(sel.indexOf(null)>=0)return;ok=q.items.every(function(it,i){return it.a===sel[i]})}
-   answered=true;draw({ok:ok});el._ok=ok}
+   answered=true;draw({ok:ok});el._ok=ok;try{document.dispatchEvent(new CustomEvent('lq:answer',{detail:{ok:ok,el:el}}))}catch(e){}}
   else if(b.id==='nx'){cb(!!el._ok)}
  };
  return el}
