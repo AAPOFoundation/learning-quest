@@ -1,0 +1,21 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Quiet checks (r5)</title></head><body>
+<script>window.APP={key:'python-basics',levels:[]};try{localStorage.setItem('learning-apps.fx','full')}catch(e){}</script>
+<script src="../../shared/art.js"></script>
+<script>
+/* r5 quiet checks. Under Low effects (and under reduced motion, run this page with prefers-reduced-motion: reduce) the eyes stay open and
+   do not follow the hero (the top-rank twinkles use t=0 in quiet mode; see r5twinkle in art.js). In full effects with motion on, the gaze and the blink do change the picture.
+   Result in window.R5Q. */
+(function(){var q=document.createElement('canvas');q.width=q.height=160;var g=q.getContext('2d');
+function snap(fn){g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,160,160);g.save();g.translate(80,120);fn();g.restore();return q.toDataURL()}
+var npc=Art.npcLook({skin:'#e2b48c',hair:'#a0522d',robe:'#2f6a4a',trim:'#d7b56a'},'Mira'),hero={skin:'#e2b48c',hair:'#3b2a1d',robe:'#243e66',trim:'#d7b56a',cape:'#6a5428',hat:'hood',staff:true,gear:1,tier:4};
+var big=document.createElement('canvas').getContext('2d');
+function withHero(){big.setTransform(1,0,0,1,0,0);Art.figure(big,10,10,hero,{t:1,face:1,hero:1})}/* records the hero position far up-left */
+function rm(){return !!(LQFx.rm&&LQFx.rm.matches)}
+var out={reducedMotion:rm()};
+function checks(tag){var a=snap(function(){Art.figure(g,0,0,npc,{t:1,face:1})});withHero();var b=snap(function(){Art.figure(g,0,0,npc,{t:1,face:1})});
+ out[tag+'GazeStill']=(a===b);out[tag+'BlinkOpen']=Art.blinkAt(0.0,0,true)===0&&Art.blinkAt(4.3-0.37+.08,0,true)===0;}
+LQFx.low=true;checks('low');LQFx.low=false;
+if(rm())checks('rm');
+else{var a=snap(function(){Art.figure(g,0,0,npc,{t:1,face:1})});big.setTransform(1,0,0,1,0,0);Art.figure(big,-20,0,hero,{t:1,face:1,hero:1});var b=snap(function(){Art.figure(g,0,0,npc,{t:1,face:1})});out.fullGazeMoves=(a!==b);out.fullBlinks=Art.blinkAt(4.3-.37+.08,0,false)>0}
+window.R5Q=out;document.title='done'})();
+</script></body></html>

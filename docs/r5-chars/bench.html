@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Figure draw bench (r5)</title></head>
+<body style="margin:0;background:#1c2733"><canvas id="c"></canvas>
+<script>window.APP={key:'python-basics',levels:[],rank:[[0,'a'],[100,'b'],[250,'c'],[450,'d'],[650,'e']]};try{localStorage.setItem('learning-apps.fx',/[?&]low=1/.test(location.search)?'low':'full')}catch(e){}</script>
+<script src="../../shared/art.js"></script>
+<script>
+/* Draws one town's worth of characters (hero, six townsfolk, a gatekeeper) at the phone map scale (1.6 device px per unit on an iPhone 13)
+   for many frames and reports the mean time per frame of figure drawing. ?scale= ?frames= ?low=1 ?nosil=1 (skip the phone silhouette pass). Result in window.BENCH. */
+(function(){var q=new URLSearchParams(location.search),NS=q.get('nosil')==='1',sc=+(q.get('scale')||1.6),N=+(q.get('frames')||240),cv=document.getElementById('c');cv.width=390*3;cv.height=844*3;var g=cv.getContext('2d');
+var hero={skin:'#e2b48c',hair:'#3b2a1d',robe:'#2f6a4a',trim:'#d7b56a',cape:'#5f8a3a',hat:'cap',staff:false,gear:1};
+var names=['Mira','Odo','Tamsin','Bryn','Pell','Ines'],folk=names.map(function(n,i){return Art.npcLook({skin:'#e2b48c',hair:'#a0522d',robe:['#2f6a4a','#3a5f9a','#8a4a3a','#8a6530'][i%4],trim:'#d7b56a',hat:i===1?'scholar':i===4?'cap':undefined},n)});
+var gate={skin:'#c99568',hair:'#2a2118',robe:'#6a2f2a',trim:'#d7b56a',hat:'helm'};
+function frame(t){g.setTransform(1,0,0,1,0,0);g.fillStyle='#3f6a3a';g.fillRect(0,0,cv.width,cv.height);g.setTransform(sc,0,0,sc,0,0);
+ Art.figure(g,120,200,hero,{t:t,moving:true,face:1,step:(t*3)%1,hop:4,foot:1,hero:1,noSil:NS});
+ for(var i=0;i<folk.length;i++)Art.figure(g,60+i*55,330+(i%2)*60,folk[i],{t:t+i*.7,face:i%2?-1:1,habit:i,wave:i===2?.8:0,noSil:NS});
+ Art.figure(g,300,140,gate,{t:t,face:-1,boss:1,role:'gate',accent:'#4f7a3a',ent:1,motif:'seed',biome:'meadow',gid:0,noSil:NS})}
+for(var w=0;w<30;w++)frame(w/60);
+var t0=performance.now();for(var k=0;k<N;k++)frame(1+k/60);g.getImageData(0,0,1,1);var ms=(performance.now()-t0)/N;
+window.BENCH={msPerFrame:+ms.toFixed(3),frames:N,scale:sc,low:/low=1/.test(location.search)};document.title='done';})();
+</script></body></html>
