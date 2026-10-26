@@ -16,7 +16,7 @@ function allDone(){return E.doneCount()===NR}
 function bossDone(){return !!(P().boss&&P().boss.done)}
 /* ---------- sound ---------- */
 var AC=null,muted=false,gest=false;try{muted=localStorage.getItem('learning-apps.mute')==='1'}catch(e){}
-function blip(f,d,v,type,f2){if(muted||!gest)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();var o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.linearRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v||.025,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
+function blip(f,d,v,type,f2){if(muted||!gest)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended'){var rp=AC.resume();if(rp&&rp.catch)rp.catch(function(){})}var o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.linearRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v||.025,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
 function motionOn(){return !FX.low&&!(FX.rm&&FX.rm.matches)}
 function chime(msg){if(st)st.celUntil=(st.time||0)+2.4;try{if(motionOn()&&window.LQAnim&&st&&st.hero){var bx=st.hero.x,by=st.hero.y-S*.9,fy=st.hero.y-S*1.4;if(useView()){var p=toView(st.hero.x,st.hero.y,heroH(),S*.9);bx=p.x;by=p.y;fy=p.y-S*.5}LQAnim.burst(bx,by);if(msg&&LQAnim.floatText)LQAnim.floatText(bx,fy,msg)}}catch(e){}blip(660,.25,.04,'triangle',880);setTimeout(function(){blip(990,.4,.035,'triangle')},120)}
 /* ---------- scenes ---------- */
@@ -175,15 +175,17 @@ function openSim(i){var s=C.regions[i].sim,w=PW();w.sim[i]=1;
   host.insertAdjacentHTML('beforeend','<button class="btn btn-primary rise" id="simx">Leave</button>');$('#simx').onclick=function(){closeOv()}})}
 /* round 2 fx: world point -> screen px (for lighting a chest or the hero), and fire the shared lq:celebrate event */
 function scr(x,y,h,up){try{var r=cv.getBoundingClientRect(),z=zoom(),vx=x,vy=y-(up||0);if(useView()){var p=toView(x,y,h||0,up||0);vx=p.x;vy=p.y}return [r.left+(vx-st.cam.x)*z,r.top+(vy-st.cam.y)*z]}catch(e){return [innerWidth/2,innerHeight/2]}}
+/* r4: chest reward card (shared/hud.js draws it) */
+function reward(d){try{document.dispatchEvent(new CustomEvent('lq:reward',{detail:d}))}catch(e){}}
 function cele(d){try{document.dispatchEvent(new CustomEvent('lq:celebrate',{detail:d}))}catch(e){}}
 function chestFx(o,msg){var p=scr(hx(o.c,o.r),hy(o.r),tileH(st.scene,o.c,o.r),S*.25);cele({msg:msg,vfx:'beam',x:p[0],y:p[1]})}
 function chestOpen(o){var i=o.i,w=PW(),was=!!w.chests[i],sp={name:'Treasure chest',mark:was?'gift-open':'gift'};
  if(i>=NR){if(!bossDone()){if(motionOn())o._nudge=.28;return say(sp,['The chest is sealed. Only the Council can open it: finish the final challenge first.'])}
-  if(was)return say(sp,['Empty now. You already took the '+C.castle.chest+'.']);w.chests[i]=1;P().xp+=50;E.award('crown');chime('+50 XP');chestFx(o,'Treasure found!');E.save();hud();sp.mark='gift-lit';return say(sp,['You found the '+C.castle.chest+'! +50 XP and a badge.','The realm is yours to explore. Revisit any trial to earn three stars.'])}
+  if(was)return say(sp,['Empty now. You already took the '+C.castle.chest+'.']);w.chests[i]=1;P().xp+=50;E.award('crown');chime('+50 XP');chestFx(o,'Treasure found!');reward({title:C.castle.chest,kind:'crown',rarity:'legendary',xp:50,where:C.castle.name,accent:C.castle.tint});E.save();hud();sp.mark='gift-lit';return say(sp,['You found the '+C.castle.chest+'! +50 XP and a badge.','The realm is yours to explore. Revisit any trial to earn three stars.'])}
  var R=C.regions[i];
  if(!levelDone(i)){if(motionOn())o._nudge=.28;return say(sp,['The chest is locked. '+R.gate.name+' holds the key: pass the trial first.'])}
  if(was)return say(sp,['Empty now. You already took the Seal of '+R.name+'.']);
- w.chests[i]=1;P().xp+=25;E.award('seal_'+A.levels[i].id);chime('+25 XP');chestFx(o,'Seal found!');E.save();hud();sp.mark='gift-lit';say(sp,['You found the Seal of '+R.name+'! +25 XP and a badge.'])}
+ w.chests[i]=1;P().xp+=25;E.award('seal_'+A.levels[i].id);chime('+25 XP');chestFx(o,'Seal found!');reward({title:'Seal of '+R.name,kind:'seal',rarity:'rare',xp:25,where:R.name,accent:R.accent});E.save();hud();sp.mark='gift-lit';say(sp,['You found the Seal of '+R.name+'! +25 XP and a badge.'])}
 function bossTalk(){var B=C.castle.boss;
  if(!allDone())return say(B,['You are not ready. Clear all '+NR+' regions first.']);
  say(B,bossDone()?['You have faced us already, and did well. Care to try for a higher score?']:['So you have crossed the whole realm. I am '+B.name+'.',B.title+'. Make your five choices wisely.'],function(){var was=bossDone();ask(B,was?'Face the challenge again?':'Begin the final challenge?',[{t:'Begin',fn:function(){openOv(function(){E.boss()},function(){if(bossDone()){chime('Well done');if(!was){var hp=scr(st.hero.x,st.hero.y,heroH(),S*.5);cele({msg:'Well done',vfx:'shockwave',x:hp[0],y:hp[1],confetti:false})}say(B,['A fine piece of work. Open the chest by the wall, and take your crown.'])}})}},{t:'Not yet'}])})}
@@ -249,7 +251,21 @@ function hud(){if(st.mode==='title')return;var p=P(),r=A.rank,i=0,k;for(k=0;k<r.
  $('#stt').innerHTML='<span id="xpn"'+(st.xpT<1?' class="xpup"':'')+'>'+Math.round(st.xpVis)+' XP</span><span class="flame">'+ic('flame',14)+' '+p.streak+'</span><span>'+E.doneCount()+'/'+NR+' regions</span>';
  [].forEach.call(document.querySelectorAll('#pm img'),function(im,k2){var on=levelDone(k2),was=im.classList.contains('on');im.classList.toggle('on',on);if(st.pmReady&&on&&!was){im.classList.remove('fresh');void im.offsetWidth;im.classList.add('fresh')}});st.pmReady=true;
  var o=objective(),qt=$('#qt'),prev=qt?qt.textContent:'';if(qt)qt.textContent=o.text;if(qt&&prev&&prev!==o.text){var qe=$('#quest');qe.classList.remove('ping');void qe.offsetWidth;qe.classList.add('ping')}st.obj=o}
-function showBanner(t,s){var a=$('#area');a.querySelector('.kicker').textContent=s||'';a.querySelector('b').textContent=t;a.classList.add('on');clearTimeout(st.bt);st.bt=setTimeout(function(){a.classList.remove('on')},3400)}
+/* r4: the region banner must not cover a figure (the gatekeeper stands right under it on arrival in a town).
+   figRects() gives each NPC's screen box (head and name plate included). While the banner shows, it is checked every 120ms:
+   if it overlaps a figure it moves to the other slot (.dodge, bottom on phones, lower on desktop); if both slots overlap it
+   shrinks to a slim plaque (.mini) and leaves after 1.6s instead of 3.4s. */
+function figRects(){var out=[],sc=st.scene;if(!sc||!sc.objs)return out;var z=zoom(),hw=S*.62*z,ht=(S*1.95+26)*z;
+ sc.objs.forEach(function(o){if(o.type!=='npc')return;var p=scr(hx(o.c,o.r),hy(o.r),tileH(sc,o.c,o.r),0);out.push({role:o.role||'npc',name:o.name||'',l:p[0]-hw,t:p[1]-ht,r:p[0]+hw,b:p[1]+6*z})});
+ var h=st.hero;if(h){var q=scr(h.x,h.y,heroH(),0);out.push({role:'hero',name:'',l:q[0]-hw,t:q[1]-ht+20*z,r:q[0]+hw,b:q[1]+6*z})}return out}
+function bannerHits(a){var b=a.getBoundingClientRect();if(!b.width)return false;return figRects().some(function(f){return f.l<b.right-4&&f.r>b.left+4&&f.t<b.bottom-2&&f.b>b.top+2})}
+function bannerDodge(){var a=$('#area');if(!a||!a.classList.contains('on'))return;
+ if(a.classList.contains('mini'))return;if(!bannerHits(a))return;
+ if(!a.classList.contains('dodge')){a.classList.add('dodge');if(!bannerHits(a))return}
+ a.classList.add('mini');if(bannerHits(a)){a.classList.remove('dodge');}clearTimeout(st.bt);st.bt=setTimeout(function(){a.classList.remove('on')},1600)}
+function showBanner(t,s){var a=$('#area');a.querySelector('.kicker').textContent=s||'';a.querySelector('b').textContent=t;a.classList.remove('dodge','mini');a.classList.add('on');clearTimeout(st.bt);clearInterval(st.bdi);
+ var t0=Date.now();st.bdi=setInterval(function(){if(!a.classList.contains('on')||Date.now()-t0>3600){clearInterval(st.bdi);return}bannerDodge()},120);
+ st.bt=setTimeout(function(){a.classList.remove('on')},3400)}
 /* ---------- menus ---------- */
 function nextTab(){var t=(A.tabs||[]).filter(function(x){return x.id==='next'})[0];return t||null}
 function tabScreen(id){var t=(A.tabs||[]).filter(function(x){return x.id===id})[0];if(!t)return;openOv(function(){wrap('<div id="rd"></div><button class="btn btn-ghost rise" id="bk2">Back</button>');t.render($('#rd'),{award:E.award,save:E.save,toast:E.toast,P:P()});$('#bk2').onclick=closeOv})}
@@ -270,7 +286,8 @@ function mapScreen(){if(st.mode!=='play')return;openOv(function(){var wc=st.worl
   var cv=$('#mf'),g=cv.getContext('2d'),k=cv.width/wc.W;g.drawImage(wc.cv,0,0,cv.width,cv.height);redrawFog(true);g.drawImage(wc.fogCv,0,0,cv.width,cv.height);
   g.textAlign='center';g.font='700 20px "Cormorant Garamond",Georgia,serif';NODES.forEach(function(nd,i){var x=hx(nd[0],nd[1])*k,y=hy(nd[1])*k,open=zoneOpen(i),tn=i<NR?C.regions[i].tint:C.castle.tint;g.fillStyle=open?(hexOk(tn)?tn:'#d7b56a'):'#6a6a70';g.beginPath();g.arc(x,y,7,0,7);g.fill();g.strokeStyle='#2a1d0a';g.lineWidth=2;g.stroke();if(open){var t=i<NR?C.regions[i].name:C.castle.name,tw=g.measureText(t).width+18;g.fillStyle='rgba(10,15,21,.92)';g.strokeStyle='#c8a86a';g.lineWidth=1.4;g.beginPath();if(g.roundRect)g.roundRect(x-tw/2,y-34,tw,24,6);else g.rect(x-tw/2,y-34,tw,24);g.fill();g.stroke();g.fillStyle='#f3e2b0';g.fillText(t,x,y-16)}});
   if(st.sid==='w')herePip(g,st.hero.x*k,st.hero.y*k,6);
-  $('#mr').innerHTML=NODES.map(function(nd,i){var open=zoneOpen(i),done=i<NR?levelDone(i):bossDone();return '<div class="qrow" style="animation:pop .22s ease both;animation-delay:'+(Math.min(i,10)*35)+'ms"><div class="ic">'+(done?IC2('ok'):open?IC2('go'):IC2('lock'))+'</div>'+plateImg(i<NR&&A.levels[i]?A.levels[i].id:'citadel')+'<div class="qb"><b>'+esc(i<NR?C.regions[i].name:C.castle.name)+'</b></div>'+(open?'<button class="btn btn-ghost" data-tv="'+i+'">Travel</button>':'')+'</div>'}).join('');
+  var nDone=0;for(var q=0;q<NR;q++)if(levelDone(q))nDone++;var here=st.sid==='w'?-1:(st.scene&&st.scene.i!=null?st.scene.i:-1);
+  $('#mr').innerHTML='<div class="mr-head"><span>'+nDone+' of '+NR+' regions cleared</span><div class="bar"><i style="width:'+Math.round(100*nDone/NR)+'%"></i></div></div><div class="mr-grid">'+NODES.map(function(nd,i){var open=zoneOpen(i),done=i<NR?levelDone(i):bossDone(),tn=i<NR?C.regions[i].tint:C.castle.tint,sub=i<NR&&A.levels[i]?A.levels[i].title:'Final challenge',chip=done?'<span class="chip ok">'+IC2('ok')+' Cleared</span>':open?'<span class="chip go">Open</span>':'<span class="chip lock">'+IC2('lock')+' Locked</span>';return '<div class="qrow mr-card'+(done?' done':open?' open':' locked')+(i===here?' here':'')+'" style="--rt:'+(hexOk(tn)?tn:'#8a6528')+';animation:pop .22s ease both;animation-delay:'+(Math.min(i,10)*35)+'ms"><span class="mr-n">'+(i<NR?(i+1):'\u2605')+'</span>'+plateImg(i<NR&&A.levels[i]?A.levels[i].id:'citadel')+'<div class="qb"><b>'+esc(i<NR?C.regions[i].name:C.castle.name)+'</b><span class="mr-sub">'+esc(sub)+'</span>'+chip+(i===here?'<span class="chip here">You are here</span>':'')+'</div>'+(open?'<button class="btn btn-ghost" data-tv="'+i+'">Travel</button>':'')+'</div>'}).join('')+'</div>';
   $('#mr').onclick=function(e){var b=e.target.closest('[data-tv]');if(!b)return;var i=+b.dataset.tv;closeOv();st.scene=st.world;st.sid='w';var nd=NODES[i],pos=nd;for(var d=0;d<6;d++){var n=neigh(nd[0],nd[1],d);if(walkable(st.world,n[0],n[1])&&!st.world.omap[n[0]+','+n[1]]){pos=n;break}}enter('w',pos[0],pos[1])};
   $('#bk2').onclick=closeOv})}
 function artKey(){var k=String(A.key||'');return /^[a-z0-9-]+$/.test(k)?k:''}
@@ -497,8 +514,13 @@ function init(){cv=$('#cv');ctx=cv.getContext('2d');resize();window.addEventList
  cv.addEventListener('pointerup',pointer);cv.addEventListener('pointermove',hover);cv.addEventListener('pointerleave',function(){st.hov=null;st.idleAcc=1});$('#ovx').onclick=function(){closeOv()};
  document.addEventListener('visibilitychange',function(){st.keys={};st.pad=-1;[].forEach.call(document.querySelectorAll('.hold'),function(n){n.classList.remove('hold')})});
  document.body.addEventListener('pointerdown',function(){gest=true},{passive:true});
+ /* r4 Safari: iOS only lets a page start Web Audio inside touchend/click/keydown (pointerdown on touch does not count),
+    so create and resume the context there once, with a silent one-sample buffer. Removed once it is running. */
+ var acU=function(){gest=true;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state!=='running'){var rp=AC.resume();if(rp&&rp.catch)rp.catch(function(){})}var bf=AC.createBuffer(1,1,22050),sn=AC.createBufferSource();sn.buffer=bf;sn.connect(AC.destination);sn.start(0)}catch(e){}if(AC&&AC.state==='running')['touchend','click','keydown'].forEach(function(ev){window.removeEventListener(ev,acU,true)})};
+ ['touchend','click','keydown'].forEach(function(ev){window.addEventListener(ev,acU,true)});
  var w=P().w;if(w&&w.sid){var sc=w.sid==='w'?st.world:null;if(sc){st.hero.c=w.c;st.hero.r=w.r}}
  title();requestAnimationFrame(frame);
- window.__w={interact:interact,st:st,walkTo:function(c,r){return new Promise(function(res){if(!walkTo(c,r))return res(false);var t0=Date.now();(function p(){if(!st.path&&!st.hero.mv||Date.now()-t0>60000)res(true);else setTimeout(p,30)})()})},warp:function(sid,c,r){enter(sid,c,r)},objective:objective,speed:function(n){st.speed=n},NODES:NODES,hud:hud,scene:function(){return st.scene},bfs:bfs,getScene:getScene,zoneOpen:zoneOpen,adv:adv,pick:pick,neigh:neigh,canWalk:canWalk,start:start,pickAt:pickAt,useView:useView,selfTest:function(){return Art.selfTestCam()},draw:function(){draw()}}}
+ window.LQHud={figRects:figRects,gateRect:function(){var f=figRects().filter(function(x){return x.role==='gate'})[0];return f?{l:Math.round(f.l),t:Math.round(f.t),r:Math.round(f.r),b:Math.round(f.b)}:null},bannerRect:function(){var b=$('#area').getBoundingClientRect();return {l:Math.round(b.left),t:Math.round(b.top),r:Math.round(b.right),b:Math.round(b.bottom),on:$('#area').classList.contains('on'),cls:$('#area').className}}};
+window.__w={interact:interact,st:st,walkTo:function(c,r){return new Promise(function(res){if(!walkTo(c,r))return res(false);var t0=Date.now();(function p(){if(!st.path&&!st.hero.mv||Date.now()-t0>60000)res(true);else setTimeout(p,30)})()})},warp:function(sid,c,r){enter(sid,c,r)},objective:objective,speed:function(n){st.speed=n},NODES:NODES,hud:hud,scene:function(){return st.scene},bfs:bfs,getScene:getScene,zoneOpen:zoneOpen,adv:adv,pick:pick,neigh:neigh,canWalk:canWalk,start:start,pickAt:pickAt,useView:useView,selfTest:function(){return Art.selfTestCam()},draw:function(){draw()}}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

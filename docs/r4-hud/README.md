@@ -1,0 +1,26 @@
+# Round 4, lane C: HUD, game feel and the Safari check (26 Oct 2026)
+
+Branch `graphics/r4-hud-feel`. UI only. Lighting, the GL pass and `fx2.js` (lane A) and `hero.js`, `party.js` and character art (lane B) are untouched. The game's name is unchanged.
+
+## Screenshots
+`before-*` is `main` (45bc940), `after-*` is this branch. Desktop is Chromium at 1280x800. iPhone is Playwright WebKit 26.6 with the iPhone 13 profile (DPR 3, touch, mobile UA) at 390x844, saved at 780px wide.
+1 home, 2 world title, 3 world map, 4 full map / region select, 5 arriving in a town (banner vs gatekeeper), 6 opening a chest after clearing level 1 (a real `chestOpen`, not a faked event).
+Extra: `after-iphone-landscape-map.png`, `after-iphone-landscape-chest.png` (844x390).
+`shoot.py` takes the before/after set, `wk_audit.py` runs the WebKit audit, and `webkit-audit.json` holds its results.
+
+## Banner over the gatekeeper (fixed)
+On arrival in a town the region banner sat right on top of the gatekeeper for its full 3.4 s on phones (see `before-iphone-5-town-arrive.png`). `showBanner` now checks every 120 ms while the banner shows: if it overlaps a figure (any NPC, or the hero) it moves to the other slot (above the move pad on phones, low on desktop). If both slots overlap, it shrinks to a slim plaque and leaves after 1.6 s. Checked with `LQHud.gateRect()` against `LQHud.bannerRect()` at 0.3 s, 1.1 s, 1.9 s, 2.7 s and 3.5 s after arrival, in Python Basics and AI Safety, in Chromium 1280x800, WebKit 390x844 and WebKit 390x664. There was no overlap in any sample.
+
+## Safari (WebKit) findings
+Verified in headless Playwright WebKit 26.6 on Linux with the iPhone 13 profile (portrait 390x844, Safari-with-bars 390x664, landscape 844x390). I loaded the home page and all five worlds after Begin, then tapped the map.
+- **No page errors** on any of the 18 loads after the fix. Before it, WebKit threw `InvalidStateError: Failed to start the audio device` as an unhandled rejection from `AudioContext.resume()`. **Fixed:** the resume promise is now caught.
+- **Audio unlock (fixed in code, not verified with sound):** iOS counts touchend, click and keydown as gestures that can start media, but a touch `pointerdown` does not count. Before the fix, `narr.js` marked itself unlocked on the first `pointerdown`, `play()` was refused, and that region's spoken line was dropped. Now touchend and click also unlock, and a `NotAllowedError` keeps the line pending for the next tap. `world.js` also creates and resumes its Web Audio context inside touchend, click or keydown, with a silent one-sample buffer. Headless WebKit has no audio device, so whether sound actually plays could not be tested.
+- **100vh/dvh:** world pages already use `100dvh`. The body measured exactly the viewport height at 844, 664 and 390. `theme.css` (home and menus) now adds `min-height:100dvh` after the `100vh` fallback. `dvh`, `:has()` and `color-mix()` are all supported in this WebKit.
+- **Safe areas:** every page has `viewport-fit=cover`, and the HUD, move pad, A button, dialogue, reward card and caption use `env(safe-area-inset-*)`. Playwright cannot simulate a notch, so the inset values themselves were not exercised.
+- **Canvas DPR:** the map canvas backs at `min(DPR,2)` (780x1688 for 390x844 at DPR 3). That is deliberate for speed. There was no blur from mismatched CSS sizes, and there was no horizontal overflow on any page.
+- **HUD layout:** none of the HUD panels, move pad, A button or caption overlapped or went off screen in any of the three sizes.
+- **Not fixed (lane A, `fx2.js`):** on the **home page only**, WebKit draws the GL light canvas (`#lqgl` over `#hero`) as solid black (`before-iphone-1-home.png`, and the same on `after`). Hiding `#lqgl` shows the painted strip underneath. The world maps' GL pass renders fine in WebKit. The context is created with `alpha:false`, and `LQLight.error()` is empty. This may be specific to headless WebKit's software GL on Linux, but it needs a look in `fx2.js` and a check on a real iPhone.
+- **Not verified:** real iPhone Safari, real touch timing, sound, notch insets, and URL-bar collapse while playing. Those need Jensen's phone.
+
+## Judges' Hills clip (report only, nothing produced)
+Judges' Hills is region 3 of AI Evaluation Skills (`ai-evals/world.js`, level `l3`, "Graders"). Its spoken region line ships (`narration/audio/ai-evals-t2.mp3`, text in `narration/lines.*`). **No Judges' Hills guide clip is in the repo.** `assets/guide/` ships exactly five clips (`ai-evals-l4`, `ai-evals-lS`, `ai-foundations-l3`, `ai-foundations-l5`, `ai-safety-cp`), and `IDS` in `shared/guide.js` lists only those, so `ai-evals-l3` gets no slot. Outside the repo, the shared work machine has three drafts in `/workspace/lq-guide/`: `ai-evals-l3.mp4`, `v2/ai-evals-l3-v2.mp4` and `v3/ai-evals-l3-v3.mp4`. Each is 10.0 s, 848x480, H.264 + AAC, with no WebM twin and no `.vtt` captions. They show two lanterns on stone plinths, with a beam that swaps them, which is the judge position-bias "swap test". They are 3.4 to 8.5 MB, above the README's limit of about 2 MB. They are dated 23 Oct, and none was ever committed. To ship one, someone would pick a draft, compress it to about 2 MB or less, make a WebM twin and captions, and add `ai-evals-l3` to `IDS` and the README table.
