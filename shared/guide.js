@@ -1,12 +1,12 @@
 /* In-game guide clips. A slot is placed at the start of each region's lesson (concept id "<world>-<level id>", e.g. ai-evals-l4)
-   and above each Python challenge (concept id = challenge id, e.g. ev-l4). Only ids in IDS below get a slot (the five shipped clips). It shows a
+   and above each Python challenge (concept id = challenge id, e.g. ev-l4). Only ids in IDS below get a slot (the six shipped clips). It shows a
    short narrated clip with controls (never autoplays; a .webm twin is used by browsers without H.264); if the file does not exist the slot stays empty and invisible.
    An optional assets/guide/<concept-id>.vtt adds captions. Clips that ship are listed in assets/guide/README.md. */
 (function(){
 'use strict';
 var s=document.querySelector('script[src$="shared/guide.js"]'),BASE=s?s.src.replace(/shared\/guide\.js$/,'assets/guide/'):'../assets/guide/',known={};
 /* the clips that ship; any other id gets no slot, so no request is made for a missing video */
-var IDS={'ai-evals-l4':1,'ai-evals-lS':1,'ai-foundations-l3':1,'ai-foundations-l5':1,'ai-safety-cp':1};
+var IDS={'ai-evals-l3':1,'ai-evals-l4':1,'ai-evals-lS':1,'ai-foundations-l3':1,'ai-foundations-l5':1,'ai-safety-cp':1};
 function slot(id){if(!id||!IDS[id])return '';return '<div class="lq-guide" data-guide="'+String(id).replace(/[^a-zA-Z0-9_-]/g,'')+'" hidden></div>'}
 function fill(el,id){var v=document.createElement('video');v.preload='metadata';v.controls=true;v.playsInline=true;v.setAttribute('playsinline','');v.className='lq-guide-v';
  v.addEventListener('loadedmetadata',function(){known[id]=1;el.innerHTML='<p class="kicker">Watch a short guide</p>';el.classList.add('lq-enter');el.appendChild(v);var t=document.createElement('track');t.kind='captions';t.srclang='en';t.label='English';t.src=BASE+id+'.vtt';v.appendChild(t);el.hidden=false},{once:true});
