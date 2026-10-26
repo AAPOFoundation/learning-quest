@@ -780,11 +780,16 @@ function roofHouse(g,x,y,w,h,wallc,roofc,u){ell(g,x+2*u,y,w*.62,2.4*u,'rgba(0,0,
 /* The pole is painted with the building. The cloth is recorded and drawn live, so it is not stuck at the building picture's 15 frames a second. Quiet mode holds the cloth still.
    Sails, jets, smoke, a window and a glint are recorded the same way. The still picture is painted once. */
 var flagRec=null,partRec=null;
-function flag(g,x,y,len,ac,t,u){g.fillStyle='#6a4a22';g.fillRect(x-.8*u,y-len,1.6*u,len);if(flagRec){flagRec.push({x:x,y:y,len:len,ac:ac,u:u});return}var w=Math.sin(t*4)*1.6*u;tri(g,x+.8*u,y-len,x+11*u+w,y-len+4*u,x+.8*u,y-len+8*u,ac)}
-function waveFlags(g,x,y,flags,o){if(!flags||!flags.length)return;o=o||{};var quiet=FX.low||(FX.rm&&FX.rm.matches),t=quiet?0:(o.t||0),seed=quiet?0:x*.017+y*.013;g.save();g.translate(x,y+S*.5);for(var i=0;i<flags.length;i++){var f=flags[i],w=Math.sin(t*4+seed)*1.6*f.u;tri(g,f.x+.8*f.u,f.y-f.len,f.x+11*f.u+w,f.y-f.len+4*f.u,f.x+.8*f.u,f.y-f.len+8*f.u,f.ac)}g.restore()}
+/* r5: a rippling pennant. The cloth bends in a travelling wave that grows toward the free end; ph=0 (quiet mode) gives one still, gently curved shape. */
+function pennant(g,x0,y0,dx,dy,h,amp,ph,ac){var n=5,top=[],bot=[],i,t,w;for(i=0;i<=n;i++){t=i/n;w=Math.sin(ph-t*3.4)*amp*t+(ph?0:amp*.35*t*t);top.push([x0+dx*t,y0+dy*t+w]);bot.push([x0+dx*t,y0+h+(dy-h)*t+w])}
+ g.fillStyle=ac;g.beginPath();g.moveTo(top[0][0],top[0][1]);for(i=1;i<=n;i++)g.lineTo(top[i][0],top[i][1]);for(i=n-1;i>=0;i--)g.lineTo(bot[i][0],bot[i][1]);g.closePath();g.fill();
+ g.save();g.clip();for(i=0;i<n;i++){var c=Math.cos(ph-(i+.5)/n*3.4);if(c<0){g.fillStyle='rgba(0,0,0,'+(-c*.16).toFixed(3)+')';g.fillRect(top[i][0],y0-amp*2-h,top[i+1][0]-top[i][0]+.5,h*3+amp*4)}}g.restore();
+ g.strokeStyle='rgba(255,240,200,.22)';g.lineWidth=Math.max(.6,h*.08);g.beginPath();for(i=0;i<n;i++){var mx=(top[i][0]+bot[i][0])/2,my=(top[i][1]+bot[i][1])/2;if(i)g.lineTo(mx,my);else g.moveTo(mx,my)}g.stroke()}
+function flag(g,x,y,len,ac,t,u){g.fillStyle='#6a4a22';g.fillRect(x-.8*u,y-len,1.6*u,len);if(flagRec){flagRec.push({x:x,y:y,len:len,ac:ac,u:u});return}pennant(g,x+.8*u,y-len,10.2*u,4*u,8*u,2.2*u,t?t*4.4:0,ac)}
+function waveFlags(g,x,y,flags,o){if(!flags||!flags.length)return;o=o||{};var quiet=FX.low||(FX.rm&&FX.rm.matches),t=quiet?0:(o.t||0),seed=quiet?0:x*.017+y*.013;g.save();g.translate(x,y+S*.5);for(var i=0;i<flags.length;i++){var f=flags[i],gu=1+.35*Math.sin(t*.7+seed*3);pennant(g,f.x+.8*f.u,f.y-f.len,10.2*f.u,4*f.u,8*f.u,2.2*f.u*gu,t?t*4.4+seed:0,f.ac)}g.restore()}
 function notePart(p){if(partRec){partRec.push(p);return true}return false}
 function millSails(g,u,ang){g.save();g.translate(0,-30*u);g.rotate(ang);g.fillStyle='#f3e8cc';g.strokeStyle='#6a4a22';g.lineWidth=1*u;for(var k=0;k<4;k++){g.rotate(PI/2);g.fillRect(-1.2*u,0,2.4*u,15*u);g.strokeRect(-1.2*u,0,2.4*u,15*u);g.fillRect(1.2*u,3*u,4*u,11*u)}g.restore();ell(g,0,-30*u,1.8*u,1.8*u,'#6a4a22')}
-function smokePuffs(g,u,t){for(var sm=0;sm<3;sm++){var ph=(t*.35+sm/3)%1;ell(g,8*u+Math.sin(ph*6+sm)*3*u,-27*u-ph*16*u,(2+ph*4)*u,(1.6+ph*3)*u,'rgba(220,226,232,'+(.45*(1-ph))+')')}}
+function smokePuffs(g,u,t){for(var sm=0;sm<5;sm++){var ph=(t*.3+sm/5)%1,dr=ph*ph*9*u;ell(g,8*u+dr+Math.sin(ph*6+sm)*2.4*u,-27*u-ph*26*u,(1.8+ph*5.2)*u,(1.5+ph*4)*u,'rgba(214,220,228,'+(.42*Math.pow(1-ph,1.3)).toFixed(3)+')')}}/* r5: taller plume that leans downwind */
 function palmFronds(g,u,t){for(var f=0;f<5;f++){var a=-PI+f*PI/4+Math.sin(t*1.5)*.05;g.strokeStyle='#4f8a45';g.lineWidth=2.4*u;g.beginPath();g.moveTo(21*u,-24*u);g.quadraticCurveTo(21*u+Math.cos(a)*6*u,-24*u+Math.sin(a)*6*u-3*u,21*u+Math.cos(a)*11*u,-24*u+Math.sin(a)*8*u+2*u);g.stroke()}}
 function hallWindow(g,u,t){var lt=.75+.25*Math.sin(t*2.5);g.fillStyle='rgba(243,215,138,'+lt+')';g.fillRect(-1.6*u,-38*u,3.2*u,5*u)}
 function towerGlow(g,u,t){var sp=.8+.2*Math.sin(t*3);g.fillStyle='rgba(243,215,138,'+sp+')';g.fillRect(-3*u,-46*u,6*u,9*u);g.fillRect(-3*u,-26*u,6*u,9*u)}
@@ -793,7 +798,7 @@ function cacheOrb(g,u,t){var b=1+.12*Math.sin(t*3);ell(g,0,-16*u*b,3*u,3*u,'rgba
 function desertGlint(g,u,t){var gl=.4+.3*Math.sin(t*2);ell(g,0,-40*u,4*u,4*u,'rgba(243,226,176,'+gl+')')}
 function iceSpark(g,u,t){var sp=.5+.5*Math.sin(t*3);ell(g,0,-32*u,2.2*u*sp+1,2.2*u*sp+1,'rgba(255,255,255,.8)')}
 function marshLamp(g,u,t){var fl=.6+.4*Math.sin(t*6);ell(g,7*u,-17*u,5*u,5*u,'rgba(255,210,120,'+(.25*fl)+')');ell(g,7*u,-17*u,1.6*u,2*u,'rgba(255,220,140,'+fl+')')}
-function paintCloth(g,p,phase){var w=Math.sin(phase)*p.wave;tri(g,p.x,p.y,p.x+p.dx+w,p.y+p.dy,p.x,p.y+p.h,p.ac)}
+function paintCloth(g,p,phase){pennant(g,p.x,p.y,p.dx,p.dy,p.h,p.wave*1.5,phase?phase*1.3:0,p.ac)}
 function drawParts(g,x,y,parts,o){if(!parts||!parts.length)return;o=o||{};var quiet=FX.low||(FX.rm&&FX.rm.matches),t=quiet?0:(o.t||0),seed=quiet?0:x*.017+y*.013;g.save();g.translate(x,y+S*.5);for(var i=0;i<parts.length;i++){var p=parts[i];g.save();if(p.sc)g.scale(p.sc,p.sc);if(p.k==='mill')millSails(g,p.u,t*.8+seed);else if(p.k==='smoke')smokePuffs(g,p.u,t+seed);else if(p.k==='palm')palmFronds(g,p.u,t+seed);else if(p.k==='hwin')hallWindow(g,p.u,t+seed);else if(p.k==='tower')towerGlow(g,p.u,t+seed);else if(p.k==='jets')fountainJets(g,p.u,t+seed);else if(p.k==='orb')cacheOrb(g,p.u,t+seed);else if(p.k==='dglint')desertGlint(g,p.u,t+seed);else if(p.k==='ispark')iceSpark(g,p.u,t+seed);else if(p.k==='mlamp')marshLamp(g,p.u,t+seed);else if(p.k==='cloth')paintCloth(g,p,t*(p.spd||4)+seed);g.restore()}g.restore()}
 function townVariant(g,b,u,ac,t,roofC){var rf=roofC||ac;
  if(b==='meadow'){roofHouse(g,-15*u,-2*u,16*u,11*u,'#e6d6b2',mix(rf,'#3a2414',.35),u);roofHouse(g,13*u,4*u,15*u,10*u,'#eadfc4',rf,u);
