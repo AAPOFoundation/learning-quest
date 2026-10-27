@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Quiet checks (r6 animation states)</title></head><body>
+<script>window.APP={key:'python-basics',levels:[]};try{localStorage.setItem('learning-apps.fx','full')}catch(e){}</script>
+<script src="../../shared/art.js"></script>
+<script>
+/* r6 quiet checks. Under Low effects (and under reduced motion: run this page with prefers-reduced-motion: reduce) every r6 pose weight
+   (run, kneel, reach, read, pump, jump, think, nod, shrug, chat, wave, cheer) must draw exactly like the same figure with no pose, the hero
+   state machine must return no pose and no run speed-up, and critter idle acts must not change the picture. In full effects with motion on,
+   the poses and acts must change the picture. Result in window.R6Q. */
+(function(){var q=document.createElement('canvas');q.width=q.height=180;var g=q.getContext('2d');
+function snap(fn){g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,180,180);g.save();g.translate(90,140);fn();g.restore();return q.toDataURL()}
+var hero={skin:'#e2b48c',hair:'#3b2a1d',robe:'#243e66',trim:'#d7b56a',cape:'#6a5428',hat:'hood',staff:true,gear:1,tier:2},npc=Art.npcLook({skin:'#d9a97c',hair:'#4a4a52',robe:'#2f5d62',trim:'#d7b56a',hat:'scholar'},'Mara'),
+ gate={skin:'#d2a078',hair:'#5a3a22',robe:'#3f5f8f',trim:'#d7b56a',hat:'helm'};
+function pose(k){var p={};for(var x in Art.NOPOSE)p[x]=0;p[k]=1;p.jp=.5;p.pp=.3;p.talk=1;return p}
+var KEYS=['run','kneel','reach','read','pump','jump','think','nod','shrug','chat','wave','cheer'];
+function figs(k){return snap(function(){Art.figure(g,-40,0,hero,{t:1.3,face:1,hero:1,pose:pose(k)});Art.figure(g,10,0,npc,{t:1.3,face:-1,pose:pose(k)});Art.figure(g,50,0,gate,{t:1.3,face:-1,boss:1,ent:1,pose:pose(k)})})}
+function plain(){return snap(function(){Art.figure(g,-40,0,hero,{t:1.3,face:1,hero:1});Art.figure(g,10,0,npc,{t:1.3,face:-1});Art.figure(g,50,0,gate,{t:1.3,face:-1,boss:1,ent:1})})}
+function crit(t){return snap(function(){['bunny','hare','bird','frog','butterfly'].forEach(function(k,i){Art.critter(g,-70+i*34,0,{kind:k,t:t,face:1,seed:i})})})}
+function rm(){return !!(LQFx.rm&&LQFx.rm.matches)}
+var out={reducedMotion:rm()};
+function quietSet(tag){var base=plain(),same={};KEYS.forEach(function(k){same[k]=figs(k)===base});
+ var acts=true;for(var t=0;t<12;t+=.7){if(crit(t)!==crit(0)){acts=false;break}}
+ var sm=Art.heroSM.step(.1,{mv:true,held:true,dlg:false,turn:0,cel:true});Art.heroSM.step(.6,{mv:true,held:true,dlg:false,turn:0,cel:true});
+ out[tag]={poseIgnored:same,crittersStill:acts,heroSMPose:sm,heroSMpose2:Art.heroSM.pose(),runK:Art.heroSM.runK}}
+function fullSet(tag){var base=plain(),diff={};KEYS.forEach(function(k){diff[k]=figs(k)!==base});var acts=false;for(var t=0;t<12;t+=.35){if(crit(t)!==crit(.01)){acts=true;break}}out[tag]={poseMoves:diff,crittersMove:acts}}
+window.LQFx.low=true;quietSet('low');window.LQFx.low=false;
+if(rm())quietSet('reducedMotion');else fullSet('full');
+window.R6Q=out})();
+</script></body></html>
