@@ -1,0 +1,318 @@
+{
+ "summary": {
+  "desk-python": {
+   "main": {
+    "canvas2d_med": 1.95,
+    "canvas2d_p95": 6.15,
+    "logic_per_frame": 0.0,
+    "followers": 0
+   },
+   "r6": {
+    "canvas2d_med": 2.45,
+    "canvas2d_p95": 6.3,
+    "logic_per_frame": 0.012,
+    "followers": 3
+   }
+  },
+  "desk-foundations": {
+   "main": {
+    "canvas2d_med": 2.15,
+    "canvas2d_p95": 6.7,
+    "logic_per_frame": 0.0,
+    "followers": 0
+   },
+   "r6": {
+    "canvas2d_med": 2.45,
+    "canvas2d_p95": 7.7,
+    "logic_per_frame": 0.007,
+    "followers": 3
+   }
+  },
+  "desk-safety": {
+   "main": {
+    "canvas2d_med": 1.8,
+    "canvas2d_p95": 5.9,
+    "logic_per_frame": 0.0,
+    "followers": 0
+   },
+   "r6": {
+    "canvas2d_med": 2.4,
+    "canvas2d_p95": 7.35,
+    "logic_per_frame": 0.008,
+    "followers": 3
+   }
+  },
+  "phone-python": {
+   "main": {
+    "canvas2d_med": 4.25,
+    "canvas2d_p95": 12.7,
+    "logic_per_frame": 0.0,
+    "followers": 0
+   },
+   "r6": {
+    "canvas2d_med": 3.5,
+    "canvas2d_p95": 15.8,
+    "logic_per_frame": 0.036,
+    "followers": 2
+   }
+  },
+  "phone-foundations": {
+   "main": {
+    "canvas2d_med": 3.35,
+    "canvas2d_p95": 11.55,
+    "logic_per_frame": 0.0,
+    "followers": 0
+   },
+   "r6": {
+    "canvas2d_med": 2.6,
+    "canvas2d_p95": 11.8,
+    "logic_per_frame": 0.024,
+    "followers": 2
+   }
+  },
+  "phone-safety": {
+   "main": {
+    "canvas2d_med": 4.0,
+    "canvas2d_p95": 10.8,
+    "logic_per_frame": 0.0,
+    "followers": 0
+   },
+   "r6": {
+    "canvas2d_med": 3.0,
+    "canvas2d_p95": 11.2,
+    "logic_per_frame": 0.032,
+    "followers": 2
+   }
+  }
+ },
+ "runs": {
+  "desk-python": {
+   "main": [
+    {
+     "canvas2d": [
+      1.9000000059604645,
+      6.5
+     ],
+     "logic": 0,
+     "followers": 0
+    },
+    {
+     "canvas2d": [
+      2,
+      5.799999997019768
+     ],
+     "logic": 0,
+     "followers": 0
+    }
+   ],
+   "r6": [
+    {
+     "canvas2d": [
+      2.5999999940395355,
+      6.5999999940395355
+     ],
+     "logic": 0.016499999985098837,
+     "followers": 3
+    },
+    {
+     "canvas2d": [
+      2.2999999970197678,
+      6
+     ],
+     "logic": 0.00850000001490116,
+     "followers": 3
+    }
+   ]
+  },
+  "desk-foundations": {
+   "main": [
+    {
+     "canvas2d": [
+      2.2999999970197678,
+      7.5
+     ],
+     "logic": 0,
+     "followers": 0
+    },
+    {
+     "canvas2d": [
+      2,
+      5.9000000059604645
+     ],
+     "logic": 0,
+     "followers": 0
+    }
+   ],
+   "r6": [
+    {
+     "canvas2d": [
+      2.5,
+      7.699999988079071
+     ],
+     "logic": 0.006499999985098839,
+     "followers": 3
+    },
+    {
+     "canvas2d": [
+      2.3999999910593033,
+      7.700000002980232
+     ],
+     "logic": 0.0075,
+     "followers": 3
+    }
+   ]
+  },
+  "desk-safety": {
+   "main": [
+    {
+     "canvas2d": [
+      1.800000011920929,
+      6
+     ],
+     "logic": 0,
+     "followers": 0
+    },
+    {
+     "canvas2d": [
+      1.7999999970197678,
+      5.799999997019768
+     ],
+     "logic": 0,
+     "followers": 0
+    }
+   ],
+   "r6": [
+    {
+     "canvas2d": [
+      2.3999999910593033,
+      6.5
+     ],
+     "logic": 0.00850000001490116,
+     "followers": 3
+    },
+    {
+     "canvas2d": [
+      2.3999999910593033,
+      8.200000002980232
+     ],
+     "logic": 0.007999999970197678,
+     "followers": 3
+    }
+   ]
+  },
+  "phone-python": {
+   "main": [
+    {
+     "canvas2d": [
+      5.5,
+      18.600000008940697
+     ],
+     "logic": 0,
+     "followers": 0
+    },
+    {
+     "canvas2d": [
+      3,
+      6.799999997019768
+     ],
+     "logic": 0,
+     "followers": 0
+    }
+   ],
+   "r6": [
+    {
+     "canvas2d": [
+      3.9000000059604645,
+      18.299999997019768
+     ],
+     "logic": 0.03950000002980232,
+     "followers": 2
+    },
+    {
+     "canvas2d": [
+      3.0999999940395355,
+      13.299999997019768
+     ],
+     "logic": 0.03149999998509884,
+     "followers": 2
+    }
+   ]
+  },
+  "phone-foundations": {
+   "main": [
+    {
+     "canvas2d": [
+      3.3999999910593033,
+      7.299999997019768
+     ],
+     "logic": 0,
+     "followers": 0
+    },
+    {
+     "canvas2d": [
+      3.2999999970197678,
+      15.800000011920929
+     ],
+     "logic": 0,
+     "followers": 0
+    }
+   ],
+   "r6": [
+    {
+     "canvas2d": [
+      2.2999999970197678,
+      10.5
+     ],
+     "logic": 0.01899999998509884,
+     "followers": 2
+    },
+    {
+     "canvas2d": [
+      2.9000000059604645,
+      13.100000008940697
+     ],
+     "logic": 0.03,
+     "followers": 2
+    }
+   ]
+  },
+  "phone-safety": {
+   "main": [
+    {
+     "canvas2d": [
+      4.100000008940697,
+      11.200000002980232
+     ],
+     "logic": 0,
+     "followers": 0
+    },
+    {
+     "canvas2d": [
+      3.8999999910593033,
+      10.400000005960464
+     ],
+     "logic": 0,
+     "followers": 0
+    }
+   ],
+   "r6": [
+    {
+     "canvas2d": [
+      3.1000000089406967,
+      12.400000005960464
+     ],
+     "logic": 0.032999999970197674,
+     "followers": 2
+    },
+    {
+     "canvas2d": [
+      2.9000000059604645,
+      10
+     ],
+     "logic": 0.030500000044703483,
+     "followers": 2
+    }
+   ]
+  }
+ }
+}
