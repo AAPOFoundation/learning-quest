@@ -40,9 +40,14 @@ with sync_playwright() as p:
     end=pg.inner_text('#tt')[:70].replace('\n',' ');print(' ',end)
     chk(w+': round completes',total>0 and 'complete' in end.lower(),total)
     pg.evaluate("document.getElementById('tt').remove()")
-    # practice tab with the real ctx
-    n=pg.evaluate("(function(){var d=document.createElement('div');d.id='tt';document.body.appendChild(d);APP.tabs.filter(x=>x.id==='practice')[0].render(d,%s);return d.innerText.length})()"%CTX)
-    chk(w+': practice tab renders',n>50,n)
+    # practice tab with the real ctx. Foundations does not ship this tab.
+    has=pg.evaluate("APP.tabs.some(function(t){return t.id==='practice'})")
+    if has:
+      n=pg.evaluate("(function(){var d=document.createElement('div');d.id='tt';document.body.appendChild(d);APP.tabs.filter(x=>x.id==='practice')[0].render(d,%s);return d.innerText.length})()"%CTX)
+      chk(w+': practice tab renders',n>50,n)
+      pg.evaluate("document.getElementById('tt').remove()")
+    else:
+      print(' ',w,'has no practice tab')
     chk(w+': no console errors',not errs,errs)
     pg.close()
   b.close()
