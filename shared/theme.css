@@ -179,3 +179,26 @@ input[type=number],select{min-height:48px}
 .qcard{transition:transform .14s ease,box-shadow .14s ease}
 @media (hover:hover){.qcard:hover{transform:translateY(-2px);box-shadow:0 0 0 1px #d7b56a66,0 0 22px #d7b56a26,0 14px 28px #0009}}
 @media (prefers-reduced-motion:reduce){.btn:hover,.btn:active,.qcard:hover{transform:none}}
+/* === The Wanderer's Atlas gold storybook wordmark (brand/atlas-logo) ===
+   One markup, three looks: .logo-a Gilded Compass (default), .logo-b Storybook Flourish, .logo-c Brass Plate.
+   Free assets only: Cormorant Garamond (Google Fonts, already loaded) + inline SVG + CSS. */
+.atlas-logo{display:inline-flex;align-items:center;gap:.32em;white-space:nowrap;font:700 clamp(20px,5.4vw,25px)/1.05 var(--display);letter-spacing:.015em;text-transform:none;color:#f0cf74;text-decoration:none;max-width:100%}
+.atlas-logo .al-compass{flex:none;width:1.12em;height:1.12em;filter:drop-shadow(0 1px 0 #2a1d0a) drop-shadow(0 0 4px #f0c86040)}
+.atlas-logo .al-word{position:relative;padding:0 .04em .06em;background:linear-gradient(180deg,#fff6d2 0%,#f7dc8c 30%,#e2b04a 56%,#b98424 80%,#e9c46a 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;filter:drop-shadow(0 1px 0 #3a2708) drop-shadow(0 2px 3px #000a)}
+.atlas-logo .al-the{font-size:.78em;font-style:italic;letter-spacing:0}
+/* A: Gilded Compass — compass rose + embossed gold wordmark, no frame */
+.atlas-logo.logo-a .al-word{filter:drop-shadow(0 -1px 0 #fff3c255) drop-shadow(0 1px 0 #3a2708) drop-shadow(0 2px 3px #000b)}
+/* B: Storybook Flourish — no compass, leafy gold swashes either side, a touch larger */
+.atlas-logo.logo-b{gap:.22em;font-size:clamp(21px,5.6vw,26px)}
+.atlas-logo.logo-b .al-compass{display:none}
+.atlas-logo.logo-b::before,.atlas-logo.logo-b::after{content:"";flex:none;width:1.05em;height:.7em;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 20'%3E%3Cpath d='M29 10C22 10 19 4 13 5C8 6 7 11 10.5 12.5C13 13.5 15 11 13.5 9.5' fill='none' stroke='%23e2b04a' stroke-width='1.7' stroke-linecap='round'/%3E%3Cpath d='M20 9.3C18 6 15 5.6 13 7C15.5 8.8 17.6 9.6 20 9.3Z' fill='%23f3d27a'/%3E%3Ccircle cx='2.5' cy='10' r='1.6' fill='%23f3d27a'/%3E%3Cpath d='M5 10H9' stroke='%23e2b04a' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;filter:drop-shadow(0 1px 0 #2a1d0a)}
+.atlas-logo.logo-b::after{transform:scaleX(-1)}
+.atlas-logo.logo-b .al-word{background:linear-gradient(180deg,#fffbe6 0%,#fbe6a6 34%,#eabd55 60%,#c48e2a 84%,#f0cf74 100%);-webkit-background-clip:text;background-clip:text}
+/* C: Brass Plate — engraved dark plaque with a double gold rule, compass inside */
+.atlas-logo.logo-c{padding:.2em .62em .24em .46em;border-radius:.42em;background:linear-gradient(180deg,#1d2734,#0c1219);border:1px solid #d7b56a;box-shadow:inset 0 0 0 2px #0a0f15,inset 0 0 0 3px #d7b56a66,inset 0 1px 6px #000c,0 1px 0 #f3e2b033,0 2px 6px #0008;font-size:clamp(18px,5vw,23px)}
+.atlas-logo.logo-c .al-word{filter:drop-shadow(0 -1px 0 #000) drop-shadow(0 1px 0 #f3e2b040)}
+.topbar .atlas-logo{min-height:40px}
+.title-logo{margin:0 0 6px;line-height:1}
+.title-logo .atlas-logo{font-size:clamp(22px,6vw,28px)}
+.title-logo .atlas-logo.logo-c{font-size:clamp(20px,5.4vw,25px)}
+@media (max-width:360px){.atlas-logo,.title-logo .atlas-logo{font-size:19px}.atlas-logo.logo-c,.title-logo .atlas-logo.logo-c{font-size:17px}}
