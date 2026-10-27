@@ -1,0 +1,34 @@
+<!doctype html><html><head><meta charset="utf-8"><title>r6 animation states: pose sheet</title>
+<style>body{margin:0;background:#0e141c;color:#f3e2b0;font:600 13px Nunito,system-ui,sans-serif}canvas{display:block}</style></head><body>
+<script>window.APP={key:'python-basics',levels:[]};try{localStorage.setItem('learning-apps.fx',/low=1/.test(location.search)?'low':'full')}catch(e){}</script>
+<script src="../../shared/art.js"></script>
+<canvas id="c"></canvas>
+<script>
+/* Pose sheet for round 6 lane A. Rows: hero states, the crossfade from idle to kneel (0, .25, .5, .75, 1), townsfolk and companions,
+   gatekeeper moods, and the critter idle acts at full weight. ?low=1 draws the same sheet in Low effects (every pose falls back to idle). */
+(function(){var cv=document.getElementById('c'),Z=2.4,COLW=96,ROWH=118,rows=[],g=cv.getContext('2d');
+function P(o){var p={};for(var k in Art.NOPOSE)p[k]=0;for(var k2 in o)p[k2]=o[k2];return p}
+var hero={skin:'#e2b48c',hair:'#3b2a1d',robe:'#274a7a',trim:'#d7b56a',cape:'#7a2e2a',hat:'hood',staff:true,gear:1,tier:2},
+ pip={skin:'#e8bd94',hair:'#8a4a22',robe:'#4a5f8a',trim:'#d7b56a',hat:'cap',outfit:'artisan'},mara={skin:'#d9a97c',hair:'#4a4a52',robe:'#2f5d62',trim:'#d7b56a',hat:'scholar',outfit:'scholar'},
+ vex={skin:'#d2a078',hair:'#d8d4cc',robe:'#7a2f3a',trim:'#d7b56a',hat:'crown',beard:true,outfit:'warden'},guide={skin:'#c99a74',hair:'#2a1d14',robe:'#6a7a3a',trim:'#d7b56a',style:'braids'},
+ gate={skin:'#d2a078',hair:'#5a3a22',robe:'#3f5f8f',trim:'#d7b56a',hat:'helm'};
+var H=function(lbl,o){return {lbl:lbl,look:hero,o:Object.assign({t:1.2,face:1,hero:1},o)}};
+rows.push(['Hero states',[H('idle',{}),H('walk',{moving:true,step:.5,foot:1}),H('run',{moving:true,step:.5,foot:1,pose:P({run:1})}),H('turn',{turn:.5}),H('reach',{pose:P({reach:1})}),H('kneel (chest)',{pose:P({kneel:1})}),H('read a scroll',{pose:P({read:1})}),H('fist pump',{pose:P({pump:1,pp:.17})}),H('jump: crouch',{pose:P({jump:1,jp:.09})}),H('jump: air',{pose:P({jump:1,jp:.48})}),H('jump: land',{pose:P({jump:1,jp:.86})})]]);
+rows.push(['Crossfade idle to kneel',[0,.25,.5,.75,1].map(function(w){return H('kneel '+w,{pose:P({kneel:w})})}).concat([0,.33,.66,1].map(function(w){return H('pump '+w,{pose:P({pump:w,pp:.17})})}))]);
+var N=function(lbl,look,o){return {lbl:lbl,look:look,o:Object.assign({t:1.2,face:1},o)}};
+rows.push(['Townsfolk and party',[N('stroll',guide,{moving:true,step:.3,foot:1}),N('chat: talking',guide,{pose:P({chat:1,talk:1})}),N('chat: listening',pip,{face:-1,pose:P({chat:1,talk:0,nod:.8})}),N('wave',guide,{t:1.31,pose:P({wave:1})}),N('Pip follows',pip,{moving:true,t:1.1}),N('Mara: pump',mara,{pose:P({pump:1,pp:.17})}),N('Vex: jump',vex,{pose:P({jump:1,jp:.48})}),N('Wren: jump',Object.assign({},mara,{hat:'',robe:'#3d6b4f',outfit:'coder'}),{pose:P({jump:1,jp:.4})})]]);
+var Gt=function(lbl,o){return {lbl:lbl,look:gate,o:Object.assign({t:1.2,face:-1,boss:1,ent:1,accent:'#3f5f8f',motif:'seed',biome:'meadow',gid:0},o),big:1}};
+rows.push(['Gatekeeper moods',[Gt('waiting',{}),Gt('thinking',{pose:P({think:1})}),Gt('nod (right)',{pose:P({nod:1})}),Gt('shrug + smile (wrong)',{pose:P({shrug:1})}),Gt('cheer (passed)',{pose:P({cheer:1})})]]);
+var C=function(lbl,kind,act,sd){return {lbl:lbl,crit:kind,act:act,sd:sd||0}};
+rows.push(['Critter idle acts',[C('bunny: groom','bunny','groom'),C('bunny: sit up','bunny','sit'),C('bunny: scratch','bunny','scratch'),C('bunny: nap','bunny','rest'),C('hare: thump','hare','thump'),C('bird: preen','bird','preen'),C('bird: stretch','bird','stretch'),C('bird: sing','bird','sing'),C('frog: croak','frog','croak'),C('frog: tongue','frog','tongue'),C('frog: blink','frog','blink'),C('butterfly: rest','butterfly','rest')]]);
+/* find a time t and seed where critAct gives the wanted act near full weight */
+function critT(kind,act){for(var sd=0;sd<40;sd++)for(var t=0;t<400;t+=.05){var a=Art.critAct(kind,t,sd);if(a&&a.a===act&&a.w>.99&&a.v>.45&&a.v<.55)return [t,sd]}return [0,0]}
+var maxC=0;rows.forEach(function(r){maxC=Math.max(maxC,r[1].length)});var W=Math.round(COLW*Z*maxC/2.4+20),Hh=Math.round(rows.length*(ROWH+26)*Z/2.4+20);
+var dpr=window.devicePixelRatio||1;cv.width=W*dpr;cv.height=Hh*dpr;cv.style.width=W+'px';cv.style.height=Hh+'px';g.scale(dpr,dpr);
+var k=Z/2.4;rows.forEach(function(r,ri){var y0=10+ri*(ROWH+26)*k;g.fillStyle='#c8a86a';g.font='700 '+Math.round(15*k)+'px Georgia,serif';g.textAlign='left';g.fillText(r[0],12,y0+16*k);
+ r[1].forEach(function(c,ci){var x=12+ci*COLW*k+COLW*k/2,yb=y0+ROWH*k;g.fillStyle='rgba(255,255,255,.04)';g.fillRect(x-COLW*k/2+3,y0+22*k,COLW*k-6,ROWH*k-6);
+  g.save();g.translate(x,yb-14*k);var s=Z*(c.big?.62:.86)*k;g.scale(s,s);
+  if(c.crit){var ts=critT(c.crit,c.act);g.scale(1.5,1.5);Art.critter(g,0,0,{kind:c.crit,t:ts[0],face:1,seed:ts[1]})}else Art.figure(g,0,-Art.S*.38,c.look,c.o);
+  g.restore();g.fillStyle='#f3e2b0';g.font='600 '+Math.round(11*k)+'px Nunito,system-ui,sans-serif';g.textAlign='center';g.fillText(c.lbl,x,yb+2*k)})});
+window.sheetDone=true})();
+</script></body></html>

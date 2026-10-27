@@ -1,0 +1,34 @@
+{
+ "desk-chromium-before-errors": [],
+ "desk-chromium-python-basics": {
+  "state": "interact",
+  "runK": 1,
+  "followers": 3,
+  "folkMoved": 1,
+  "stateAfter": "idle"
+ },
+ "desk-chromium-ai-safety": {
+  "state": "interact",
+  "runK": 1,
+  "followers": 3,
+  "folkMoved": 0,
+  "stateAfter": "idle"
+ },
+ "desk-chromium-after-errors": [],
+ "iphone13-webkit-before-errors": [],
+ "iphone13-webkit-python-basics": {
+  "state": "run",
+  "runK": 1.1020408163265305,
+  "followers": 2,
+  "folkMoved": 3,
+  "stateAfter": "idle"
+ },
+ "iphone13-webkit-ai-safety": {
+  "state": "run",
+  "runK": 1.1020408163265305,
+  "followers": 2,
+  "folkMoved": 3,
+  "stateAfter": "idle"
+ },
+ "iphone13-webkit-after-errors": []
+}
