@@ -91,7 +91,18 @@ with sync_playwright() as p:
                 raise SystemExit('unknown q ' + q['t'])
         txt = pg.inner_text('#ovbody')[:60].replace('\n', ' ')
         print('level', i + 1, '->', txt)
-    print('done levels', pg.evaluate("Engine.doneCount()"), 'of', n, 'code solved', pg.evaluate("Object.keys(Engine.P().code||{}).length"), 'badges', pg.evaluate("Engine.P().badges"))
+    done = pg.evaluate("Engine.doneCount()")
+    print('done levels', done, 'of', n, 'code solved', pg.evaluate("Object.keys(Engine.P().code||{}).length"), 'badges', pg.evaluate("Engine.P().badges"))
     print('console errors:', errs)
     b.close()
+fails = 0
+if done != n:
+    print('FAIL levels completed', done, 'of', n)
+    fails += 1
+if errs:
+    print('FAIL console errors', errs)
+    fails += 1
+if fails:
+    print('FAILS', fails)
+    sys.exit(1)
 print('FAILS 0')
