@@ -5,7 +5,7 @@ Short, light-hearted clips in the game's medieval world that play once per save 
 The full brief for the video maker, with every milestone, scene, narration line and pun, lives outside the repo at
 `/workspace/lq-milestones/BRIEF.md` on the shared work machine; `manifest.js` here is generated from the same data.
 
-**Nothing plays yet.** Every clip in `manifest.js` has `"ship": false`, so the player (`shared/milestones.js`) never requests a file and shows nothing.
+**18 clips are shipped.** Every clip in `manifest.js` has `"ship": true`, with an H.264 MP4, a VP9 WebM twin and a `.vtt` caption of the spoken line in this folder. The player (`shared/milestones.js`) plays a clip the first time a save hits that milestone.
 
 ## Adding a clip
 1. Put three files here, named after the clip id in `manifest.js` (for example `ms-region-meadow`):
