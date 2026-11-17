@@ -6,7 +6,7 @@ Checked in headless Edge (Chromium) against a local static server. Home, the fiv
 
 ## Decisions
 
-The game stays 2D procedural canvas. "Models" here means clearer painted volumes: robe sides, cheeks, arms, hands, and capes. A 3D library would break this art direction, add a dependency, and cost more on kids' devices.
+The game stays 2D procedural canvas. "Models" here means clearer painted volumes: robe sides, cheeks, arms, hands, and capes. A 3D library would break this art direction, add a dependency, and cost more on modest devices.
 
 Low effects and reduced motion still gate the new decoration and the new motion. Low skips the region wash, the material hatch, the brass emblems, and arm and cape sway. It also still skips props, town variants, landmarks, water shimmer, particles, reward bursts, bevel, and height lift. The cached tile light stays on in low mode, because the old per-tile gradient was already on in both modes. Seeded grain is on in both modes so a repaint does not flicker.
 
