@@ -1,96 +1,96 @@
 /* Milestone celebration clips (round 5). Generated from the brief (/workspace/lq-milestones/BRIEF.md); keyed by milestone id "<course>:<kind>".
    A clip only plays when its "ship" flag is true AND video/milestones/<clip>.mp4 (+ .webm twin, + .vtt captions) is in the repo.
-   While every clip is ship:false the player does nothing at all, and no video is requested. Kept as a .js file (not .json) so it also works from file://. */
+   All 18 clips are shipped (ship:true). A clip with ship:false is never requested. Kept as a .js file (not .json) so it also works from file://. */
 window.LQMilestoneManifest={
  "version": 1,
  "clips": {
   "ms-region-meadow": {
-   "ship": false,
+   "ship": true,
    "title": "Meadow region cleared",
    "narration": "Hooray! The meadow gate is open. You're growing like a wildflower!"
   },
   "ms-region-forest": {
-   "ship": false,
+   "ship": true,
    "title": "Forest region cleared",
    "narration": "The forest gate creaks open. Wood you believe how far you've come?"
   },
   "ms-region-hills": {
-   "ship": false,
+   "ship": true,
    "title": "Hills region cleared",
    "narration": "Up and over the hills! Your skills are really peaking."
   },
   "ms-region-desert": {
-   "ship": false,
+   "ship": true,
    "title": "Dunes region cleared",
    "narration": "Hot work in the dunes! You are simply sand-sational."
   },
   "ms-region-tundra": {
-   "ship": false,
+   "ship": true,
    "title": "Frost region cleared",
    "narration": "Snow way! You cleared the frosty lands. Ice work!"
   },
   "ms-region-marsh": {
-   "ship": false,
+   "ship": true,
    "title": "Marsh region cleared",
    "narration": "Ribbit! The marsh frogs say you're toad-ally brilliant."
   },
   "ms-region-highland": {
-   "ship": false,
+   "ship": true,
    "title": "Highland region cleared",
    "narration": "High five from the highlands! You reached new heights."
   },
   "ms-seal-chest": {
-   "ship": false,
+   "ship": true,
    "title": "First seal found",
    "narration": "The chest swings open... your very first seal! Seal-ebration time!"
   },
   "ms-rank-up": {
-   "ship": false,
+   "ship": true,
    "title": "Rank up",
    "narration": "Rank up! You're climbing higher, one step at a time."
   },
   "ms-council": {
-   "ship": false,
+   "ship": true,
    "title": "Final challenge passed",
    "narration": "The whole council stands and claps. Great choices, wise traveller!"
   },
   "ms-finale-python-basics": {
-   "ship": false,
+   "ship": true,
    "title": "Python Basics complete",
    "narration": "The Debugger's Lens is yours! Every bug is easy to spot now."
   },
   "ms-finale-ai-foundations": {
-   "ship": false,
+   "ship": true,
    "title": "AI Foundations complete",
    "narration": "The Builder's Crown is yours! What a kingdom of knowledge."
   },
   "ms-finale-ai-evals": {
-   "ship": false,
+   "ship": true,
    "title": "AI Evaluation Skills complete",
    "narration": "The Eval Designer's Crown is yours! We tested it: a perfect fit."
   },
   "ms-finale-ai-safety": {
-   "ship": false,
+   "ship": true,
    "title": "AI Safety complete",
    "narration": "The Safety Planner's Crown is yours! Safe to say, you shine."
   },
   "ms-finale-portfolio-guide": {
-   "ship": false,
+   "ship": true,
    "title": "Portfolio Guide complete",
    "narration": "The Steady Hand's Crown is yours! Steady, ready, brilliant."
   },
   "ms-perfect": {
-   "ship": false,
+   "ship": true,
    "title": "First three-star clear",
    "narration": "Three shining stars! What a stellar performance."
   },
   "ms-pathfinder": {
-   "ship": false,
+   "ship": true,
    "title": "Every supply cache found",
    "narration": "Every supply cache found! Map-nificent exploring, Pathfinder."
   },
   "ms-code-first": {
-   "ship": false,
+   "ship": true,
    "title": "First Python challenge solved",
    "narration": "Your first program ran! Run-believable work!"
   }
