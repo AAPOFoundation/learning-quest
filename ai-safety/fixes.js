@@ -321,5 +321,6 @@ A.levels.forEach(function(L){var f=F[L.id]||{},d=DROP[L.id]||[];
  L.qs.forEach(function(q,i){var x=f[i];if(!x)return;
   if(x.o&&(q.t==='mc')){q.opts=x.o.slice();q.a=(x.a===undefined?0:x.a)}
   else if(x.o&&q.t==='multi'){q.opts=x.o.slice();q.a=x.a}
+  else if(x.a!==undefined)q.a=x.a
   if(x.q)q.q=x.q;if(x.why)q.why=x.why});
  L.qs=L.qs.filter(function(q,i){return d.indexOf(i)<0})})})();

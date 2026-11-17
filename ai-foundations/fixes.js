@@ -151,7 +151,8 @@ var F={
 },
 "4": {
 "q": "Validation losses by epoch are [0.9, 0.7, 0.6, 0.65, 0.7]. Counting positions from 0, as Python does, which index had the lowest validation loss?",
-"why": "Index 2 (loss 0.6), which is the third epoch. Early stopping would keep that checkpoint."
+"why": "Index 2 (loss 0.6), which is the third epoch. Early stopping would keep that checkpoint.",
+"a": 2
 }
 },
 "l5": {
@@ -270,5 +271,6 @@ A.levels.forEach(function(L){var f=F[L.id]||{},d=DROP[L.id]||[];
  L.qs.forEach(function(q,i){var x=f[i];if(!x)return;
   if(x.o&&(q.t==='mc')){q.opts=x.o.slice();q.a=(x.a===undefined?0:x.a)}
   else if(x.o&&q.t==='multi'){q.opts=x.o.slice();q.a=x.a}
+  else if(x.a!==undefined)q.a=x.a
   if(x.q)q.q=x.q;if(x.why)q.why=x.why});
  L.qs=L.qs.filter(function(q,i){return d.indexOf(i)<0})})})();
